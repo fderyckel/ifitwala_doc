@@ -2,7 +2,6 @@ exclude: 'node_modules|.git'
 default_stages: [pre-commit]
 fail_fast: false
 
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -23,10 +22,8 @@ repos:
       - id: ruff
         name: "Run ruff import sorter"
         args: ["--select=I", "--fix"]
-
       - id: ruff
         name: "Run ruff linter"
-
       - id: ruff-format
         name: "Run ruff formatter"
 
@@ -34,36 +31,42 @@ repos:
     rev: v2.7.1
     hooks:
       - id: prettier
-        types_or: [javascript, vue, scss]
-        # Ignore any files that might contain jinja / bundles
+        name: prettier
+        # Only format front-end assets; avoid JSON/MD/Jinja
+        files: "\\.(vue|ts|js|css|scss)$"
         exclude: |
-            (?x)^(
-                ifitwala_doc/public/dist/.*|
-                .*node_modules.*|
-                .*boilerplate.*|
-                ifitwala_doc/templates/includes/.*|
-                ifitwala_doc/public/js/lib/.*
-            )$
-
+          (?x)^(
+            ifitwala_doc/public/dist/.*|
+            .*node_modules.*|
+            .*boilerplate.*|
+            ifitwala_doc/templates/includes/.*|
+            ifitwala_doc/public/js/lib/.*
+          )$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.44.0
     hooks:
       - id: eslint
-        types_or: [javascript]
+        name: eslint
         args: ['--quiet']
-        # Ignore any files that might contain jinja / bundles
+        # Lint Vue/TS/JS; skip bundles & Jinja-heavy dirs
+        files: "\\.(js|ts|vue)$"
         exclude: |
-            (?x)^(
-                ifitwala_doc/public/dist/.*|
-                cypress/.*|
-                .*node_modules.*|
-                .*boilerplate.*|
-                ifitwala_doc/templates/includes/.*|
-                ifitwala_doc/public/js/lib/.*
-            )$
+          (?x)^(
+            ifitwala_doc/public/dist/.*|
+            cypress/.*|
+            .*node_modules.*|
+            .*boilerplate.*|
+            ifitwala_doc/templates/includes/.*|
+            ifitwala_doc/public/js/lib/.*
+          )$
+        additional_dependencies:
+          - "eslint@8.44.0"
+          - "eslint-plugin-vue@9.28.0"
+          - "eslint-plugin-import@2.29.1"
+          - "eslint-config-prettier@9.1.0"
 
 ci:
-    autoupdate_schedule: weekly
-    skip: []
-    submodules: false
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
