@@ -1,11 +1,12 @@
 import { createApp } from 'vue';
 import { FrappeUI } from 'frappe-ui';
+import { createRouter, createWebHistory } from 'vue-router';
 
+const router = createRouter({
+	history: createWebHistory(),
+	routes: []
+});
 
-/**
- * Register your Vue islands here.
- * Each entry is lazy-loaded, so routes only download what they need.
- */
 const registry = {
 	Hero: () => import('@/components/Hero.vue'),
 	TestimonialCarousel: () => import('@/components/TestimonialCarousel.vue'),
@@ -37,5 +38,6 @@ document.querySelectorAll('[data-vue]').forEach(async (el) => {
 
 	const app = createApp(Comp, props);
 	app.use(FrappeUI);
+	app.use(router);
 	app.mount(el);
 });

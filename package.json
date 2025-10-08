@@ -1,23 +1,24 @@
 {
-  "name": "ifitwala_doc",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "build:docs-index": "python3 scripts/build_docs_index.py || true"
-  },
-  "dependencies": {
-    "frappe-ui": "^0.1.201",
-    "vue": "^3.4.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/typography": "^0.5.10",
-    "@vitejs/plugin-vue": "^5.0.4",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.13",
-    "vite": "^5.4.9"
-  }
+	"name": "ifitwala_doc",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview",
+		"build:docs-index": "python3 scripts/build_docs_index.py || true"
+	},
+	"dependencies": {
+		"frappe-ui": "^0.1.201",
+		"vue": "^3.4.0",
+		"vue-router": "^4.3.0"
+	},
+	"devDependencies": {
+		"@tailwindcss/typography": "^0.5.10",
+		"@vitejs/plugin-vue": "^5.0.4",
+		"autoprefixer": "^10.4.20",
+		"postcss": "^8.4.47",
+		"tailwindcss": "^3.4.13",
+		"vite": "^5.4.9"
+	}
 }
