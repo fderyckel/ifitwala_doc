@@ -2,7 +2,4 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Optional: nicer long-form content */
-.prose {
-	@apply prose-slate max-w-none;
-}
+/* remove the .prose @apply for now */
