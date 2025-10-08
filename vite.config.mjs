@@ -15,7 +15,7 @@ export default defineConfig({
 		include: ['vue-router']
 	},
 	build: {
-		outDir: path.resolve(__dirname, 'ifitwala_doc/ifitwala_doc/public/dist'),
+		outDir: path.resolve(__dirname, 'ifitwala_doc/public/dist'),
 		emptyOutDir: false,
 		sourcemap: false,
 		minify: 'esbuild',
