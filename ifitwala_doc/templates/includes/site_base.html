@@ -19,7 +19,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
 
 		<!-- Tailwind bundle -->
-		<link rel="stylesheet" href="{{ frappe.get_asset_url('ifitwala_doc/dist/site.css') }}" />
+		<link rel="stylesheet" href="{{ '/assets/ifitwala_doc/dist/site.css' }}" />
 
 		{% block head_extra %}{% endblock %}
 	</head>
@@ -30,7 +30,7 @@
 		<header class="border-b border-line">
 			<nav class="mx-auto flex max-w-screen-xl items-center justify-between px-6 py-4">
 				<a href="/" class="flex items-center gap-3">
-					<img src="{{ frappe.get_asset_url('ifitwala_doc/ui/logo.svg') }}" alt="Ifitwala Ed" class="h-8 w-8" />
+					<img src="{{ '/assets/ifitwala_doc/ui/logo.svg' }}" alt="Ifitwala Ed" class="h-8 w-8" />
 					<span class="text-lg font-semibold tracking-tight">Ifitwala&nbsp;Ed</span>
 				</a>
 				<ul class="hidden gap-6 md:flex">
@@ -59,7 +59,7 @@
 			<div class="mx-auto grid max-w-screen-xl gap-8 px-6 py-10 md:grid-cols-3">
 				<div>
 					<div class="mb-3 flex items-center gap-3">
-						<img src="{{ frappe.get_asset_url('ifitwala_doc/ui/logo.svg') }}" alt="Ifitwala Ed" class="h-7 w-7" />
+						<img src="{{ '/assets/ifitwala_doc/ui/logo.svg' }}" alt="Ifitwala Ed" class="h-7 w-7" />
 						<span class="font-semibold">Ifitwala&nbsp;Ed</span>
 					</div>
 					<p class="max-w-sm text-sm text-slate">Elegant tools for schools — so educators spend less time on admin and more time with students.</p>
@@ -100,7 +100,7 @@
 		</footer>
 
 		<!-- Base JS to hydrate Vue islands when present -->
-		<script type="module" src="{{ frappe.get_asset_url('ifitwala_doc/dist/base.js') }}"></script>
+		<script type="module" src="{{ '/assets/ifitwala_doc/dist/base.js' }}"></script>
 		{% block scripts_extra %}{% endblock %}
 	</body>
 </html>
