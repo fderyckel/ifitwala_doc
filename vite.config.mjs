@@ -1,10 +1,18 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import Icons from 'unplugin-icons/vite';
+import IconsResolver from 'unplugin-icons/resolver';
 import path from 'node:path';
 
 export default defineConfig({
 	root: process.cwd(),
-	plugins: [vue()],
+	plugins: [
+		vue(),
+		Icons({
+			autoInstall: true,
+			compiler: 'vue3'
+		})
+	],
 	build: {
 		outDir: path.resolve(__dirname, 'ifitwala_doc/ifitwala_doc/public/dist'),
 		emptyOutDir: false, // keep any existing assets in dist
