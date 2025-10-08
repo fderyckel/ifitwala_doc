@@ -48,6 +48,23 @@ app_license = "mit"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
+
+website_redirects = [
+    {
+        "source": "/home",
+        "target": "/",
+        "status_code": 301
+    }
+]
+
+# Alternatively (if Frappe version supports):
+website_route_rules = [
+    {
+        "from_route": "/home",
+        "to_route": "/"
+    }
+]
+
 # Svg Icons
 # ------------------
 # include app icons in desk
