@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{% block title %}Ifitwala Ed — A campus where curiosity blooms.{% endblock %}</title>
+		<meta name="description" content="{% block meta_description %}Ifitwala Ed is a modern, elegant education ERP and LMS — trusted, simple, and built for multi-school realities.{% endblock %}" />
+
+		<!-- Open Graph / Twitter (safe defaults; override per page via blocks) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="{% block og_title %}Ifitwala Ed{% endblock %}" />
+		<meta property="og:description" content="{% block og_description %}A campus where curiosity blooms.{% endblock %}" />
+		<meta property="og:image" content="{% block og_image %}{{ frappe.get_asset_url('ifitwala_doc/ui/og-default.jpg') }}{% endblock %}" />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<!-- Fonts (optionally self-host later) -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
+
+		<!-- Tailwind bundle -->
+		<link rel="stylesheet" href="{{ frappe.get_asset_url('ifitwala_doc/dist/site.css') }}" />
+
+		{% block head_extra %}{% endblock %}
+	</head>
+	<body class="min-h-screen bg-white text-ink antialiased">
+		<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:m-4 focus:rounded-lg focus:bg-panel focus:px-4 focus:py-2">Skip to content</a>
+
+		<!-- Header / Primary Nav -->
+		<header class="border-b border-line">
+			<nav class="mx-auto flex max-w-screen-xl items-center justify-between px-6 py-4">
+				<a href="/" class="flex items-center gap-3">
+					<img src="{{ frappe.get_asset_url('ifitwala_doc/ui/logo.svg') }}" alt="Ifitwala Ed" class="h-8 w-8" />
+					<span class="text-lg font-semibold tracking-tight">Ifitwala&nbsp;Ed</span>
+				</a>
+				<ul class="hidden gap-6 md:flex">
+					<li><a href="/features" class="text-slate hover:text-ink">Features</a></li>
+					<li><a href="/solutions" class="text-slate hover:text-ink">Solutions</a></li>
+					<li><a href="/docs" class="text-slate hover:text-ink">Docs</a></li>
+					<li><a href="/blog" class="text-slate hover:text-ink">Blog</a></li>
+					<li><a href="/contact" class="text-slate hover:text-ink">Contact</a></li>
+				</ul>
+				<div class="hidden md:block">
+					<a href="/contact" class="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-white shadow hover:opacity-95">Request a demo</a>
+				</div>
+				<!-- Simple mobile menu trigger (to enhance later) -->
+				<button class="md:hidden inline-flex items-center rounded-lg border border-line px-3 py-2 text-slate" aria-label="Open menu">
+					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+				</button>
+			</nav>
+		</header>
+
+		<main id="main">
+			{% block main %}{% endblock %}
+		</main>
+
+		<!-- Footer -->
+		<footer class="mt-16 border-t border-line">
+			<div class="mx-auto grid max-w-screen-xl gap-8 px-6 py-10 md:grid-cols-3">
+				<div>
+					<div class="mb-3 flex items-center gap-3">
+						<img src="{{ frappe.get_asset_url('ifitwala_doc/ui/logo.svg') }}" alt="Ifitwala Ed" class="h-7 w-7" />
+						<span class="font-semibold">Ifitwala&nbsp;Ed</span>
+					</div>
+					<p class="max-w-sm text-sm text-slate">Elegant tools for schools — so educators spend less time on admin and more time with students.</p>
+				</div>
+				<div class="grid grid-cols-2 gap-6 text-sm">
+					<div>
+						<div class="mb-3 font-semibold">Product</div>
+						<ul class="space-y-2">
+							<li><a class="hover:underline" href="/features">Features</a></li>
+							<li><a class="hover:underline" href="/solutions">Solutions</a></li>
+							<li><a class="hover:underline" href="/docs">Docs</a></li>
+							<li><a class="hover:underline" href="/blog">Blog</a></li>
+						</ul>
+					</div>
+					<div>
+						<div class="mb-3 font-semibold">Company</div>
+						<ul class="space-y-2">
+							<li><a class="hover:underline" href="/about">About</a></li>
+							<li><a class="hover:underline" href="/contact">Contact</a></li>
+							<li><a class="hover:underline" href="/legal/privacy">Privacy</a></li>
+							<li><a class="hover:underline" href="/legal/terms">Terms</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="text-sm text-slate">
+					<div class="font-semibold">Newsletter</div>
+					<p class="mt-2">No spam. Updates on features and resources.</p>
+					<!-- placeholder; later mount a Vue island here -->
+					<form class="mt-3 flex gap-2" action="/api/method/ifitwala_doc.api.subscribe" method="post">
+						<input type="email" name="email" required class="w-full rounded-lg border border-line px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20" placeholder="you@school.edu" />
+						<button class="rounded-lg bg-secondary px-4 py-2 text-white hover:opacity-95">Subscribe</button>
+					</form>
+				</div>
+			</div>
+			<div class="border-t border-line py-4 text-center text-xs text-slate">
+				© Ifitwala Ed — All rights reserved.
+			</div>
+		</footer>
+
+		<!-- Base JS to hydrate Vue islands when present -->
+		<script type="module" src="{{ frappe.get_asset_url('ifitwala_doc/dist/base.js') }}"></script>
+		{% block scripts_extra %}{% endblock %}
+	</body>
+</html>
