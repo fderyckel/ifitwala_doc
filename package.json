@@ -9,7 +9,7 @@
     "build:docs-index": "python3 scripts/build_docs_index.py || true"
   },
   "dependencies": {
-    "frappe-ui": "^1.8.0",
+    "frappe-ui": "^0.1.201",
     "vue": "^3.4.0"
   },
   "devDependencies": {
