@@ -4,6 +4,7 @@ import path from 'node:path';
 import Icons from 'unplugin-icons/vite';
 
 export default defineConfig({
+	base: '/assets/ifitwala_doc/dist/',
 	plugins: [
 		vue(),
 		Icons({
