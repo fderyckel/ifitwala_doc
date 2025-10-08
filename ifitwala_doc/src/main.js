@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
-import FrappeUI from 'frappe-ui';
+import { FrappeUI } from 'frappe-ui';
+
 
 /**
  * Register your Vue islands here.
