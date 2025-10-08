@@ -4,7 +4,7 @@
 	"type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "build:docs-index": "python3 scripts/build_docs_index.py || true"
   },
