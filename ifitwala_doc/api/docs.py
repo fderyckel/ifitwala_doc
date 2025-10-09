@@ -34,12 +34,23 @@ def _get_tags_for(doctype: str, name: str | None) -> list[str]:
     )
     return links or []
 
-def _subcategory_column() -> str:
+def _subcategory_column() -> str | None:
+    meta = frappe.get_meta("Documentation", cached=True)
+    if meta:
+        if meta.has_field("subcategory"):
+            return "subcategory"
+        if meta.has_field("sub_category"):
+            return "sub_category"
     if frappe.db.has_column("Documentation", "subcategory"):
         return "subcategory"
-    return "sub_category"
+    if frappe.db.has_column("Documentation", "sub_category"):
+        return "sub_category"
+    return None
 
-def _normalize_subcategory(record: dict, column: str):
+def _normalize_subcategory(record: dict, column: str | None):
+    if not column:
+        record.setdefault("subcategory", None)
+        return record
     if column != "subcategory":
         record["subcategory"] = record.pop(column, None)
     return record
@@ -50,13 +61,17 @@ def fetch_all(language: str | None = None):
     if language:
         flt["language"] = language
     subcat_col = _subcategory_column()
+    fields = [
+        "name","slug","language","title","summary","version",
+        "published_on","category","doc_order","body_md","modified"
+    ]
+    if subcat_col:
+        fields.insert(7, subcat_col)
     docs = frappe.get_all(
         "Documentation",
         filters=flt,
-        fields=["name","slug","language","title","summary","version",
-                "published_on","category",subcat_col,"doc_order",
-                "body_md","modified"],
-        order_by=f"category, {subcat_col}, doc_order, title",
+        fields=fields,
+        order_by=f"category, {subcat_col}, doc_order, title" if subcat_col else "category, doc_order, title",
         ignore_permissions=True,
     )
     for d in docs:
@@ -70,12 +85,16 @@ def fetch_all(language: str | None = None):
 @frappe.whitelist(allow_guest=True)
 def fetch_one(language: str, slug: str):
     subcat_col = _subcategory_column()
+    fields = [
+        "name","slug","language","title","summary","version",
+        "published_on","category","doc_order","body_md","modified"
+    ]
+    if subcat_col:
+        fields.insert(7, subcat_col)
     d = frappe.get_value(
         "Documentation",
         {"language": language, "slug": slug, "status": "Published"},
-        ["name","slug","language","title","summary","version",
-         "published_on","category",subcat_col,"doc_order",
-         "body_md","modified"],
+        fields,
         as_dict=True,
         ignore_permissions=True,
     )
@@ -91,10 +110,15 @@ def search_index(language: str | None = None):
     if language:
         flt["language"] = language
     subcat_col = _subcategory_column()
+    fields = [
+        "name","slug","language","title","summary","category","body_md","modified"
+    ]
+    if subcat_col:
+        fields.insert(6, subcat_col)
     items = frappe.get_all(
         "Documentation",
         filters=flt,
-        fields=["name","slug","language","title","summary","category",subcat_col,"body_md","modified"],
+        fields=fields,
         ignore_permissions=True,
     )
     for i in items:
