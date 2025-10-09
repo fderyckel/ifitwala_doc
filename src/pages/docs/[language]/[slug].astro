@@ -6,14 +6,19 @@ export async function getStaticPaths() {
   const langs = ['en','th','fr','ar']
   const paths = []
   for (const lang of langs) {
-    const { docs } = await getAllDocs(lang)
-    for (const d of (docs || [])) paths.push({ params: { language: lang, slug: d.slug } })
+    try {
+      const { docs } = await getAllDocs(lang)
+      for (const d of (docs || [])) paths.push({ params: { language: lang, slug: d.slug } })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.warn(`[docs] getAllDocs failed for ${lang}: ${message}`)
+    }
   }
   return paths
 }
 
 const { language, slug } = Astro.params
-let doc = null
+let doc: any | null = null
 let docError: string | null = null
 try {
   doc = await getOneDoc(language, slug)
