@@ -4,7 +4,7 @@ import tailwind from '@astrojs/tailwind'
 export default defineConfig({
   output: 'static',
   outDir: './dist',
-  srcDir: './ifitwala_doc/src',
+  srcDir: './src',
   publicDir: './ifitwala_doc/public',
   trailingSlash: 'always',   // so folders like /docs/en/slug/ work nicely
   integrations: [tailwind({
