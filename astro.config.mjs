@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config'
 import tailwind from '@astrojs/tailwind'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   output: 'static',
@@ -11,4 +12,11 @@ export default defineConfig({
     config: './tailwind.config.cjs',   // reuse your Tailwind config
     applyBaseStyles: false             // you already have site.css; keep Astro minimal
   })],
+  vite: {
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      }
+    }
+  }
 })
