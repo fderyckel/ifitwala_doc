@@ -7,7 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "label",
-  "order",
+  "cat_order",
   "icon",
   "description"
  ],
@@ -19,11 +19,6 @@
    "unique": 1
   },
   {
-   "fieldname": "order",
-   "fieldtype": "Int",
-   "label": "Order"
-  },
-  {
    "fieldname": "icon",
    "fieldtype": "Data",
    "label": "Icon"
@@ -32,12 +27,17 @@
    "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Description"
+  },
+  {
+   "fieldname": "cat_order",
+   "fieldtype": "Int",
+   "label": "Category Order"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-09 17:02:37.587640",
+ "modified": "2025-10-09 17:10:50.932958",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Doc Category",

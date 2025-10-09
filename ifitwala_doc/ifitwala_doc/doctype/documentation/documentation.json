@@ -13,7 +13,7 @@
   "version",
   "status",
   "published_on",
-  "order",
+  "doc_order",
   "body_md",
   "body_html",
   "author",
@@ -68,11 +68,6 @@
    "label": "Published On"
   },
   {
-   "fieldname": "order",
-   "fieldtype": "Int",
-   "label": "Order"
-  },
-  {
    "fieldname": "body_md",
    "fieldtype": "Long Text",
    "label": "Body MD"
@@ -103,12 +98,17 @@
    "fieldtype": "Link",
    "label": "Subcategory",
    "options": "Doc Subcategory"
+  },
+  {
+   "fieldname": "doc_order",
+   "fieldtype": "Int",
+   "label": "Doc Order"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-09 17:04:38.110440",
+ "modified": "2025-10-09 17:09:58.942257",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Documentation",

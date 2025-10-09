@@ -7,7 +7,7 @@
  "field_order": [
   "category",
   "label",
-  "order"
+  "subcat_order"
  ],
  "fields": [
   {
@@ -24,17 +24,17 @@
    "reqd": 1
   },
   {
-   "fieldname": "order",
+   "fieldname": "subcat_order",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Order",
+   "label": "Subcat Order",
    "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-09 17:04:08.328892",
+ "modified": "2025-10-09 17:10:18.518791",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Doc Subcategory",
