@@ -23,6 +23,17 @@ def _set_cache_headers(payload: bytes, modified: str | None):
         return True
     return False
 
+def _get_tags_for(doctype: str, name: str | None) -> list[str]:
+    if not name:
+        return []
+    links = frappe.db.get_all(
+        "Tag Link",
+        filters={"link_doctype": doctype, "link_name": name},
+        pluck="tag",
+        ignore_permissions=True,
+    )
+    return links or []
+
 def _subcategory_column() -> str:
     if frappe.db.has_column("Documentation", "subcategory"):
         return "subcategory"
@@ -50,7 +61,7 @@ def fetch_all(language: str | None = None):
     )
     for d in docs:
         _normalize_subcategory(d, subcat_col)
-        d["tags"] = frappe.get_tags("Documentation", d["name"])
+        d["tags"] = _get_tags_for("Documentation", d.get("name"))
     payload = frappe.as_json({"docs": docs})
     if _set_cache_headers(payload.encode(), max((d.modified for d in docs), default=None)):
         return
@@ -71,7 +82,7 @@ def fetch_one(language: str, slug: str):
     if not d:
         frappe.throw("Not Found", frappe.DoesNotExistError)
     _normalize_subcategory(d, subcat_col)
-    d["tags"] = frappe.get_tags("Documentation", d["name"])
+    d["tags"] = _get_tags_for("Documentation", d.get("name"))
     return d
 
 @frappe.whitelist(allow_guest=True)
@@ -88,7 +99,7 @@ def search_index(language: str | None = None):
     )
     for i in items:
         _normalize_subcategory(i, subcat_col)
-        i["tags"] = frappe.get_tags("Documentation", i["name"])
+        i["tags"] = _get_tags_for("Documentation", i.get("name"))
         i["headings"] = _extract_headings(i.get("body_md") or "")
         i.pop("body_md", None)  # keep index payload small
         i.pop("name", None)
