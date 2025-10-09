@@ -32,11 +32,13 @@ def fetch_all(language: str | None = None):
         "Documentation",
         filters=flt,
         fields=["name","slug","language","title","summary","version",
-                "published_on","category","sub_category","tags","doc_order",
+                "published_on","category","subcategory","doc_order",
                 "body_md","modified"],
-        order_by="category, sub_category, `doc_order`, title",
+        order_by="category, subcategory, doc_order, title",
         ignore_permissions=True,
     )
+    for d in docs:
+        d["tags"] = frappe.get_tags("Documentation", d["name"])
     payload = frappe.as_json({"docs": docs})
     if _set_cache_headers(payload.encode(), max((d.modified for d in docs), default=None)):
         return
@@ -48,13 +50,14 @@ def fetch_one(language: str, slug: str):
         "Documentation",
         {"language": language, "slug": slug, "status": "Published"},
         ["name","slug","language","title","summary","version",
-         "published_on","category","sub_category","tags","doc_order",
+         "published_on","category","subcategory","doc_order",
          "body_md","modified"],
         as_dict=True,
         ignore_permissions=True,
     )
     if not d:
         frappe.throw("Not Found", frappe.DoesNotExistError)
+    d["tags"] = frappe.get_tags("Documentation", d["name"])
     return d
 
 @frappe.whitelist(allow_guest=True)
@@ -65,12 +68,14 @@ def search_index(language: str | None = None):
     items = frappe.get_all(
         "Documentation",
         filters=flt,
-        fields=["slug","language","title","summary","tags","category","sub_category","body_md","modified"],
+        fields=["name","slug","language","title","summary","category","subcategory","body_md","modified"],
         ignore_permissions=True,
     )
     for i in items:
+        i["tags"] = frappe.get_tags("Documentation", i["name"])
         i["headings"] = _extract_headings(i.get("body_md") or "")
         i.pop("body_md", None)  # keep index payload small
+        i.pop("name", None)
     payload = frappe.as_json({"items": items})
     if _set_cache_headers(payload.encode(), max((i.modified for i in items), default=None)):
         return
