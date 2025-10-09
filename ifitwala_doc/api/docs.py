@@ -34,7 +34,8 @@ def fetch_all(language: str | None = None):
         fields=["name","slug","language","title","summary","version",
                 "published_on","category","sub_category","tags","doc_order",
                 "body_md","modified"],
-        order_by="category, sub_category, `doc_order`, title"
+        order_by="category, sub_category, `doc_order`, title",
+        ignore_permissions=True,
     )
     payload = frappe.as_json({"docs": docs})
     if _set_cache_headers(payload.encode(), max((d.modified for d in docs), default=None)):
@@ -49,7 +50,8 @@ def fetch_one(language: str, slug: str):
         ["name","slug","language","title","summary","version",
          "published_on","category","sub_category","tags","doc_order",
          "body_md","modified"],
-        as_dict=True
+        as_dict=True,
+        ignore_permissions=True,
     )
     if not d:
         frappe.throw("Not Found", frappe.DoesNotExistError)
@@ -63,7 +65,8 @@ def search_index(language: str | None = None):
     items = frappe.get_all(
         "Documentation",
         filters=flt,
-        fields=["slug","language","title","summary","tags","category","sub_category","body_md","modified"]
+        fields=["slug","language","title","summary","tags","category","sub_category","body_md","modified"],
+        ignore_permissions=True,
     )
     for i in items:
         i["headings"] = _extract_headings(i.get("body_md") or "")
