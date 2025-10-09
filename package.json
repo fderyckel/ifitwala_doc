@@ -5,8 +5,8 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
-    "astro:dev": "astro dev",
-    "astro:build": "astro build",
+		"astro:dev": "astro dev",
+		"astro:build": "astro build",
 		"preview": "vite preview",
 		"build:docs-index": "python3 scripts/build_docs_index.py || true"
 	},
@@ -22,6 +22,7 @@
 		"@vitejs/plugin-vue": "^6.0.1",
 		"astro": "^5.14.1",
 		"autoprefixer": "^10.4.20",
+		"marked": "^16.4.0",
 		"postcss": "^8.4.47",
 		"rehype-autolink-headings": "^7.1.0",
 		"rehype-slug": "^6.0.0",

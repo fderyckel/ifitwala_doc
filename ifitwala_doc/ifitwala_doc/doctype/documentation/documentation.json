@@ -42,9 +42,9 @@
   },
   {
    "fieldname": "language",
-   "fieldtype": "Link",
+   "fieldtype": "Select",
    "label": "Language",
-   "options": "Language"
+   "options": "en\nth\nfr\nar"
   },
   {
    "fieldname": "summary",
@@ -108,7 +108,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-09 17:09:58.942257",
+ "modified": "2025-10-09 22:09:46.354298",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Documentation",
