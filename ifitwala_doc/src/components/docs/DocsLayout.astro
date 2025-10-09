@@ -1,0 +1,17 @@
+---
+const { doc } = Astro.props;
+const html = await import('marked').then(m => m.marked.parse(doc.body_md || ""));
+---
+
+<html lang={doc.language}>
+  <head>
+    <meta charset="utf-8" />
+    <title>{doc.title} | Ifitwala Ed Docs</title>
+    <meta name="description" content={doc.summary || ''} />
+  </head>
+  <body class="prose mx-auto max-w-3xl px-6 py-10">
+    <h1 class="mb-2">{doc.title}</h1>
+    {doc.summary && <p class="text-slate-500">{doc.summary}</p>}
+    <div set:html={html} />
+  </body>
+</html>

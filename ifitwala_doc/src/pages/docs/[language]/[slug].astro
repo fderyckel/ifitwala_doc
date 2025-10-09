@@ -1,0 +1,19 @@
+---
+import DocsLayout from '@/components/docs/DocsLayout.astro'
+import { getAllDocs, getOneDoc } from '@/lib/docsClient'
+
+export async function getStaticPaths() {
+  const langs = ['en','th','fr','ar']
+  const paths = []
+  for (const lang of langs) {
+    const { docs } = await getAllDocs(lang)
+    for (const d of (docs || [])) paths.push({ params: { language: lang, slug: d.slug } })
+  }
+  return paths
+}
+
+const { language, slug } = Astro.params
+const doc = await getOneDoc(language, slug)
+---
+
+<DocsLayout doc={doc} />

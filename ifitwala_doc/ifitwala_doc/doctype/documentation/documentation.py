@@ -32,8 +32,8 @@ class Documentation(Document):
             frappe.throw(f"Slug already in use for language '{self.language}': {self.slug}")
 
         # subcategory must belong to category (guard)
-        if self.sub_category and self.category:
-            parent = frappe.db.get_value("Doc Subcategory", self.sub_category, "category")
+        if self.subcategory and self.category:
+            parent = frappe.db.get_value("Doc Subcategory", self.subcategory, "category")
             if parent and parent != self.category:
                 frappe.throw("Selected Subcategory does not belong to the chosen Category")
 
@@ -53,7 +53,7 @@ class Documentation(Document):
                 (old.language != self.language) or
                 (old.slug != self.slug) or
                 (old.category != self.category) or
-                (old.sub_category != self.sub_category) or
+                (old.subcategory != self.subcategory) or
                 (old.doc_order != self.doc_order)
             ))
             self.flags.trigger_docs_build = became_published or updated_published
