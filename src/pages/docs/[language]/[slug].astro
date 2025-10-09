@@ -13,7 +13,38 @@ export async function getStaticPaths() {
 }
 
 const { language, slug } = Astro.params
-const doc = await getOneDoc(language, slug)
+let doc = null
+let docError: string | null = null
+try {
+  doc = await getOneDoc(language, slug)
+  if (!doc) {
+    docError = `No documentation entry returned for ${language}/${slug}`
+    console.warn(`[docs] ${docError}`)
+  }
+} catch (error) {
+  docError = error instanceof Error ? error.message : String(error)
+  console.warn(`[docs] getOneDoc failed for ${language}/${slug}:`, error)
+}
 ---
 
-<DocsLayout doc={doc} />
+{doc
+  ? <DocsLayout doc={doc} />
+  : <html lang={typeof language === 'string' ? language : 'en'}>
+      <head>
+        <meta charset="utf-8" />
+        <title>Documentation unavailable | Ifitwala Ed Docs</title>
+      </head>
+      <body class="prose mx-auto max-w-3xl px-6 py-10">
+        <h1 class="mb-2 text-red-600">Documentation unavailable</h1>
+        <p class="text-slate-600">
+          We could not load the documentation page for
+          {' '}
+          <code>{language}/{slug}</code>.
+        </p>
+        {docError && <p class="mt-4 text-slate-500">{docError}</p>}
+        <p class="mt-6 text-slate-500">
+          Make sure the Docs API is reachable and the environment variable <code>DOCS_API_BASE</code> points to it.
+        </p>
+      </body>
+    </html>
+}
