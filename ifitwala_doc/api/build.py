@@ -36,3 +36,11 @@ def run_astro_build():
     if not os.path.isdir(built_docs):
         frappe.throw("Astro build did not produce dist/docs")
     _run(f"rsync -a --delete {shlex.quote(built_docs)}/ {shlex.quote(out_dir)}/", cwd=proj_root)
+
+@frappe.whitelist(allow_guest=True)
+def debug_headers():
+    return {
+        "headers": frappe.local.request.headers,
+        "token": frappe.get_conf().get("docs_build_token"),
+        "site": frappe.local.site
+    }
