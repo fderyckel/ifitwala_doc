@@ -10,12 +10,16 @@ def _require_token():
     if not expected or got != expected:
         frappe.throw("Unauthorized", frappe.PermissionError)
 
-def _run(cmd, cwd):
-    proc = subprocess.run(cmd, cwd=cwd, shell=True,
-                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+def _run(cmd, cwd, env=None):
+    proc = subprocess.run(
+        cmd, cwd=cwd, shell=True, env=env,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+    )
     frappe.logger("ifitwala_doc").info(proc.stdout)
     if proc.returncode != 0:
         frappe.throw(f"Command failed: {cmd}\n{proc.stdout}")
+
+
 
 @frappe.whitelist(allow_guest=True)
 def trigger():
