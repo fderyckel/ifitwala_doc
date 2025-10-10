@@ -1,18 +1,46 @@
 ---
 const { doc } = Astro.props;
-// simple MD render (you can swap to remark later)
-const html = await import('marked').then(m => m.marked.parse(doc.body_md || ""));
+
+import { marked } from 'marked';
+marked.use({ headerIds: true, mangle: false });
+
+const html = marked.parse(doc.body_md || '');
+
+const title = `${doc.title} | Ifitwala Ed Docs`;
+const description = doc.summary || '';
+const canonical = `/docs/${doc.slug}`;
+const lang = doc.language || 'en';
 ---
 
-<html lang={doc.language}>
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
-    <title>{doc.title} | Ifitwala Ed Docs</title>
-    <meta name="description" content={doc.summary || ''} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
-  <body class="prose mx-auto max-w-3xl px-6 py-10">
-    <h1 class="mb-2">{doc.title}</h1>
-    {doc.summary && <p class="text-slate-500">{doc.summary}</p>}
-    <div set:html={html} />
+
+  <body class="bg-panel text-ink">
+    <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10">
+      <nav class="not-prose text-sm text-slate mb-4">
+        <a href="/docs" class="hover:underline">Docs</a>
+        {doc.category && <>
+          <span class="mx-1">›</span>
+          <a href={`/docs/${doc.category}`} class="hover:underline">{doc.category_label || doc.category}</a>
+        </>}
+        {doc.sub_category && <>
+          <span class="mx-1">›</span>
+          <a href={`/docs/${doc.category}/${doc.sub_category}`} class="hover:underline">
+            {doc.sub_category_label || doc.sub_category}
+          </a>
+        </>}
+      </nav>
+
+      <h1 class="mb-1">{doc.title}</h1>
+      {doc.summary && <p class="text-slate">{doc.summary}</p>}
+
+      <div class="mt-6" set:html={html} />
+    </main>
   </body>
 </html>

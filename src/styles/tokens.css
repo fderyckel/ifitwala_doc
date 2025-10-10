@@ -1,0 +1,16 @@
+:root {
+/* Core brand */
+--brand-50:#f5f7fb; --brand-100:#e9eef7; --brand-200:#c9d7ef;
+--brand-300:#a9c0e6; --brand-400:#88a7db; --brand-500:#5a80c8; /* primary */
+--brand-600:#4266ae; --brand-700:#37538e; --brand-800:#2c426f; --brand-900:#203250;
+
+
+/* Accent & state */
+--accent-500:#f3a712; /* warm amber accent */
+--success-500:#299f65; --info-500:#2b7bbb; --warning-500:#d08700; --danger-500:#c24040;
+
+
+/* Neutrals */
+--neutral-50:#f8fafc; --neutral-100:#f1f5f9; --neutral-200:#e2e8f0; --neutral-300:#cbd5e1;
+--neutral-400:#94a3b8; --neutral-500:#64748b; --neutral-600:#475569; --neutral-700:#334155; --neutral-800:#1e293b; --neutral-900:#0f172a;
+}

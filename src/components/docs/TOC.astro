@@ -1,0 +1,13 @@
+---
+const { headings = [] } = Astro.props
+---
+<div class="bg-white border rounded-2xl p-3 shadow-sm sticky top-20">
+<div class="text-xs uppercase tracking-wide text-neutral-500 mb-2">On this page</div>
+<ul class="space-y-1 text-sm">
+{headings.map(h => (
+<li class={`pl-${(h.depth-2)*3} truncate`}>
+<a href={`#${h.slug}`} class="hover:text-brand-700">{h.text}</a>
+</li>
+))}
+</ul>
+</div>
