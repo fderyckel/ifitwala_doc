@@ -2,54 +2,54 @@
 import DocsLayout from '@/components/docs/DocsLayout.astro'
 import { getAllDocs, getOneDoc } from '@/lib/docsClient'
 
+// Build-time: enumerate language+slug
 export async function getStaticPaths() {
-  const langs = ['en','th','fr','ar']
-  const paths = []
-  for (const lang of langs) {
+  const langs = ['en', 'th', 'fr', 'ar']; // adjust to your seeded languages
+  const paths = [];
+
+  for (const language of langs) {
     try {
-      const { docs } = await getAllDocs(lang)
-      for (const d of (docs || [])) paths.push({ params: { language: lang, slug: d.slug } })
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      console.warn(`[docs] getAllDocs failed for ${lang}: ${message}`)
+      const { docs = [] } = await getAllDocs(language);
+      for (const d of docs) {
+        // only pages with a slug
+        if (d?.slug) {
+          paths.push({ params: { language, slug: d.slug } });
+        }
+      }
+    } catch {
+      // ignore languages without data
     }
   }
-  return paths
+
+  return paths;
 }
 
-const { language, slug } = Astro.params
-let doc: any | null = null
-let docError: string | null = null
+const { language, slug } = Astro.params;
+let doc;
 try {
-  doc = await getOneDoc(language, slug)
-  if (!doc) {
-    docError = `No documentation entry returned for ${language}/${slug}`
-    console.warn(`[docs] ${docError}`)
-  }
-} catch (error) {
-  docError = error instanceof Error ? error.message : String(error)
-  console.warn(`[docs] getOneDoc failed for ${language}/${slug}:`, error)
+  doc = await getOneDoc(language, slug);
+} catch (e) {
+  doc = null;
 }
 ---
 
-{doc
-  ? <DocsLayout doc={doc} />
-  : <html lang={typeof language === 'string' ? language : 'en'}>
-      <head>
-        <meta charset="utf-8" />
-        <title>Documentation unavailable | Ifitwala Ed Docs</title>
-      </head>
-      <body class="prose mx-auto max-w-3xl px-6 py-10">
-        <h1 class="mb-2 text-red-600">Documentation unavailable</h1>
-        <p class="text-slate-600">
-          We could not load the documentation page for
-          {' '}
-          <code>{language}/{slug}</code>.
+{!doc ? (
+  <html lang={language || 'en'}>
+    <head>
+      <meta charset="utf-8" />
+      <title>Not Found | Ifitwala Ed Docs</title>
+      <meta name="robots" content="noindex" />
+    </head>
+    <body class="bg-panel text-ink">
+      <main class="mx-auto max-w-3xl px-6 py-10">
+        <h1 class="text-2xl font-semibold text-primary mb-2">Page not found</h1>
+        <p class="text-slate mb-6">
+          We couldn’t find <code class="font-mono">{slug}</code> in <strong>{language}</strong>.
         </p>
-        {docError && <p class="mt-4 text-slate-500">{docError}</p>}
-        <p class="mt-6 text-slate-500">
-          Make sure the Docs API is reachable and the environment variable <code>DOCS_API_BASE</code> points to it.
-        </p>
-      </body>
-    </html>
-}
+        <a class="text-primary underline" href={`/docs/${language || 'en'}`}>Back to docs</a>
+      </main>
+    </body>
+  </html>
+) : (
+  <DocsLayout doc={doc} />
+)}

@@ -8,8 +8,8 @@ const html = marked.parse(doc.body_md || '');
 
 const title = `${doc.title} | Ifitwala Ed Docs`;
 const description = doc.summary || '';
-const canonical = `/docs/${doc.slug}`;
 const lang = doc.language || 'en';
+const canonical = `/docs/${lang}/${doc.slug}`;
 ---
 
 <html lang={lang}>
@@ -24,14 +24,16 @@ const lang = doc.language || 'en';
   <body class="bg-panel text-ink">
     <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10">
       <nav class="not-prose text-sm text-slate mb-4">
-        <a href="/docs" class="hover:underline">Docs</a>
+        <a href={`/docs/${lang}`} class="hover:underline">Docs</a>
         {doc.category && <>
           <span class="mx-1">›</span>
-          <a href={`/docs/${doc.category}`} class="hover:underline">{doc.category_label || doc.category}</a>
+          <a href={`/docs/${lang}/${doc.category}`} class="hover:underline">
+            {doc.category_label || doc.category}
+          </a>
         </>}
         {doc.sub_category && <>
           <span class="mx-1">›</span>
-          <a href={`/docs/${doc.category}/${doc.sub_category}`} class="hover:underline">
+          <a href={`/docs/${lang}/${doc.category}/${doc.sub_category}`} class="hover:underline">
             {doc.sub_category_label || doc.sub_category}
           </a>
         </>}
@@ -44,3 +46,4 @@ const lang = doc.language || 'en';
     </main>
   </body>
 </html>
+
