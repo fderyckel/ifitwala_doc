@@ -66,3 +66,23 @@ export async function getOneDoc(language: string, slug: string): Promise<Doc> {
   const raw = await fetchJSON(url);
   return unwrap<Doc>(raw);
 }
+
+
+export async function getCategories(language = 'en') {
+  const res = await fetch(`/api/method/ifitwala_doc.api.get_categories?language=${language}`)
+  const data = await res.json()
+  return data?.message || []
+}
+
+export async function getCategory(slug: string) {
+  const res = await fetch(`/api/method/ifitwala_doc.api.get_category?slug=${encodeURIComponent(slug)}`)
+  const data = await res.json()
+  return data?.message || null
+}
+
+export async function getDocsInCategory(language: string, category_slug: string) {
+  const q = new URLSearchParams({ language, category_slug })
+  const res = await fetch(`/api/method/ifitwala_doc.api.get_docs_in_category?${q.toString()}`)
+  const data = await res.json()
+  return data?.message || []
+}

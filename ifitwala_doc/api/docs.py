@@ -1,7 +1,12 @@
+
+
+# apps/ifitwala_doc/ifitwala_doc/api/docs.py
+
 import re
 import frappe
 from frappe.utils import format_datetime
 from hashlib import md5
+from frappe import _
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$", re.M)
 
@@ -122,7 +127,7 @@ def fetch_one(language: str, slug: str):
     if subcat_col:
         fields.insert(7, f"{subcat_col} as subcategory")
 
-    d = frappe.db.get_value(      
+    d = frappe.db.get_value(
         "Documentation",
         {"language": language, "slug": slug, "status": "Published"},
         fields,
@@ -167,3 +172,56 @@ def search_index(language: str | None = None):
     if _set_cache_headers(payload.encode(), max((i.modified for i in items), default=None)):
         return
     return {"items": items}
+
+
+
+@frappe.whitelist(allow_guest=True)
+def get_categories(language="en"):
+    """
+    Return Doc Category cards (ordered by cat_order, then label).
+    Note: 'language' is present for future per-language category copies,
+    but we don't filter by it for now (categories are language-agnostic).
+    """
+    return frappe.get_all(
+        "Doc Category",
+        fields=["name", "slug", "label", "icon", "description", "cat_order"],
+        order_by="IFNULL(cat_order, 9999), label asc",
+        limit_page_length=500,
+    )
+
+@frappe.whitelist(allow_guest=True)
+def get_category(slug: str):
+    """
+    Fetch a single category by slug.
+    """
+    return frappe.db.get_value(
+        "Doc Category",
+        {"slug": slug},
+        ["name", "slug", "label", "icon", "description", "cat_order"],
+        as_dict=True,
+    )
+
+@frappe.whitelist(allow_guest=True)
+def get_docs_in_category(language: str, category_slug: str):
+    """
+    Return Published Documentation records for (language, category.slug).
+    - 'Documentation.category' is a Link to 'Doc Category' (by name)
+    - We accept the category slug in the API, resolve to its 'name',
+      then filter Documentation by that Link field.
+    """
+    cat = frappe.db.get_value("Doc Category", {"slug": category_slug}, "name")
+    if not cat:
+        return []
+
+    filters = {
+        "status": "Published",
+        "language": language,
+        "category": cat,  # link by name
+    }
+    return frappe.get_all(
+        "Documentation",
+        filters=filters,
+        fields=["name", "title", "slug", "summary", "doc_order"],
+        order_by="IFNULL(doc_order, 9999), title asc",
+        limit_page_length=1000,
+    )
