@@ -53,3 +53,14 @@ def debug_headers():
         "token": frappe.get_conf().get("docs_build_token"),
         "site": frappe.local.site
     }
+
+
+@frappe.whitelist()
+def kick_build():
+    """Server-side trigger so Desk JS doesn't handle tokens.
+    Restrict to trusted roles.
+    """
+    frappe.only_for(("System Manager", "Website Manager"))
+    from ifitwala_doc.ifitwala_doc.published_utils import ping_build
+    ping_build()
+    return {"queued": True}

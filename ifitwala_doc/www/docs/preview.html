@@ -1,0 +1,17 @@
+{% extends "ifitwala_doc/templates/site_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block main %}
+  <article class="prose mx-auto max-w-3xl px-6 py-10">
+    <h1 class="mb-2">{{ doc.title }}</h1>
+    {% if doc.summary %}
+      <p class="text-slate">{{ doc.summary }}</p>
+    {% endif %}
+    <div>{{ body_html or "" }}</div>
+    <hr class="my-8" />
+    <div class="text-xs text-slate">
+      Preview of <code>/docs/{{ doc.language }}/{{ doc.slug }}/</code> •
+      Last edited: {{ doc.modified }}
+    </div>
+  </article>
+{% endblock %}
