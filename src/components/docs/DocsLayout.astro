@@ -1,6 +1,8 @@
 ---
 const { doc } = Astro.props;
 
+import '../../styles/global.css';
+
 import { marked } from 'marked';
 marked.use({ headerIds: true, mangle: false });
 
