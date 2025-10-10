@@ -120,20 +120,24 @@ def fetch_one(language: str, slug: str):
         "published_on","category","doc_order","body_md","modified"
     ]
     if subcat_col:
-        fields.insert(7, subcat_col)
-    d = frappe.get_value(
+        fields.insert(7, f"{subcat_col} as subcategory")
+
+    d = frappe.db.get_value(      
         "Documentation",
         {"language": language, "slug": slug, "status": "Published"},
         fields,
-        as_dict=True,
-        ignore_permissions=True,
+        as_dict=True
     )
     if not d:
         frappe.throw("Not Found", frappe.DoesNotExistError)
+
+    # subcategory is already aliased; normalize anyway (no-op if absent)
     _normalize_subcategory(d, subcat_col)
+
     tags = _load_tags_for([d.get("name")])
     d["tags"] = tags.get(d.get("name"), [])
     return d
+
 
 @frappe.whitelist(allow_guest=True)
 def search_index(language: str | None = None):
