@@ -23,27 +23,34 @@ def _set_cache_headers(payload: bytes, modified: str | None):
         return True
     return False
 
-def _get_tags_for(doctype: str, name: str | None) -> list[str]:
-    if not name:
-        return []
-    links = frappe.db.get_all(
-        "Tag Link",
-        filters={"link_doctype": doctype, "link_name": name},
-        pluck="tag",
-        ignore_permissions=True,
+def _load_tags_for(names: list[str]) -> dict[str, list[str]]:
+    if not names:
+        return {}
+    placeholders = ", ".join(["%s"] * len(names))
+    rows = frappe.db.sql(
+        f"""
+        SELECT link_name, tag
+        FROM `tabTag Link`
+        WHERE link_doctype = 'Documentation'
+          AND link_name IN ({placeholders})
+        """,
+        names,
+        as_dict=True,
     )
-    return links or []
+    tags_by_name: dict[str, list[str]] = {}
+    for row in rows:
+        tags_by_name.setdefault(row["link_name"], []).append(row["tag"])
+    return tags_by_name
 
 def _subcategory_column() -> str | None:
-    meta = frappe.get_meta("Documentation", cached=True)
-    if meta:
-        if meta.has_field("subcategory"):
-            return "subcategory"
-        if meta.has_field("sub_category"):
-            return "sub_category"
-    if frappe.db.has_column("Documentation", "subcategory"):
+    columns = []
+    try:
+        columns = frappe.db.get_table_columns("Documentation") or []
+    except Exception:
+        pass
+    if "subcategory" in columns:
         return "subcategory"
-    if frappe.db.has_column("Documentation", "sub_category"):
+    if "sub_category" in columns:
         return "sub_category"
     return None
 
@@ -74,9 +81,10 @@ def fetch_all(language: str | None = None):
         order_by=f"category, {subcat_col}, doc_order, title" if subcat_col else "category, doc_order, title",
         ignore_permissions=True,
     )
+    tags = _load_tags_for([d["name"] for d in docs])
     for d in docs:
         _normalize_subcategory(d, subcat_col)
-        d["tags"] = _get_tags_for("Documentation", d.get("name"))
+        d["tags"] = tags.get(d.get("name"), [])
     payload = frappe.as_json({"docs": docs})
     if _set_cache_headers(payload.encode(), max((d.modified for d in docs), default=None)):
         return
@@ -101,7 +109,8 @@ def fetch_one(language: str, slug: str):
     if not d:
         frappe.throw("Not Found", frappe.DoesNotExistError)
     _normalize_subcategory(d, subcat_col)
-    d["tags"] = _get_tags_for("Documentation", d.get("name"))
+    tags = _load_tags_for([d.get("name")])
+    d["tags"] = tags.get(d.get("name"), [])
     return d
 
 @frappe.whitelist(allow_guest=True)
@@ -121,9 +130,10 @@ def search_index(language: str | None = None):
         fields=fields,
         ignore_permissions=True,
     )
+    tags = _load_tags_for([i["name"] for i in items])
     for i in items:
         _normalize_subcategory(i, subcat_col)
-        i["tags"] = _get_tags_for("Documentation", i.get("name"))
+        i["tags"] = tags.get(i.get("name"), [])
         i["headings"] = _extract_headings(i.get("body_md") or "")
         i.pop("body_md", None)  # keep index payload small
         i.pop("name", None)
