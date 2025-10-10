@@ -29,8 +29,13 @@ def run_astro_build():
     out_dir   = get_site_path("assets", "ifitwala_doc", "docs")  # sites/assets/ifitwala_doc/docs
     os.makedirs(out_dir, exist_ok=True)
 
-    _run("npm ci --prefer-offline --no-audit", cwd=proj_root)
-    _run("npx astro build", cwd=proj_root)
+    use_yarn = os.path.exists(os.path.join(proj_root, "yarn.lock"))
+    if use_yarn:
+        _run("yarn install --frozen-lockfile --check-files", cwd=proj_root)
+        _run("yarn astro:build", cwd=proj_root)
+    else:
+        _run("npm ci --prefer-offline --no-audit", cwd=proj_root)
+        _run("npx astro build", cwd=proj_root)
 
     built_docs = os.path.join(proj_root, "dist", "docs")
     if not os.path.isdir(built_docs):

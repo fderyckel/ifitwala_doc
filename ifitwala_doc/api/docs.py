@@ -24,23 +24,45 @@ def _set_cache_headers(payload: bytes, modified: str | None):
     return False
 
 def _load_tags_for(names: list[str]) -> dict[str, list[str]]:
+    """Return {docname: [tag, ...]} for Documentation docs in `names`,
+    adapting to whichever Tag Link schema this site uses."""
     if not names:
         return {}
-    placeholders = ", ".join(["%s"] * len(names))
-    rows = frappe.db.sql(
-        f"""
-        SELECT link_name, tag
-        FROM `tabTag Link`
-        WHERE link_doctype = 'Documentation'
-          AND link_name IN ({placeholders})
-        """,
-        names,
-        as_dict=True,
-    )
+
+    has = frappe.db.has_column
+    # Prefer the classic schema first (most common)
+    if has("Tag Link", "parenttype") and has("Tag Link", "parent"):
+        rows = frappe.get_all(
+            "Tag Link",
+            filters={"parenttype": "Documentation", "parent": ["in", names]},
+            fields=["parent as name", "tag"],
+            ignore_permissions=True,
+        )
+    elif has("Tag Link", "document_type") and has("Tag Link", "document_name"):
+        rows = frappe.get_all(
+            "Tag Link",
+            filters={"document_type": "Documentation", "document_name": ["in", names]},
+            fields=["document_name as name", "tag"],
+            ignore_permissions=True,
+        )
+    elif has("Tag Link", "link_doctype") and has("Tag Link", "link_name"):
+        rows = frappe.get_all(
+            "Tag Link",
+            filters={"link_doctype": "Documentation", "link_name": ["in", names]},
+            fields=["link_name as name", "tag"],
+            ignore_permissions=True,
+        )
+    else:
+        # Unknown schema; return empty safely
+        return {}
+
     tags_by_name: dict[str, list[str]] = {}
-    for row in rows:
-        tags_by_name.setdefault(row["link_name"], []).append(row["tag"])
+    for r in rows:
+        nm = r.get("name")
+        if nm:
+            tags_by_name.setdefault(nm, []).append(r["tag"])
     return tags_by_name
+
 
 def _subcategory_column() -> str | None:
     columns = []
