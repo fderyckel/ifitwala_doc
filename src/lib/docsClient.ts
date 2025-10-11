@@ -70,7 +70,7 @@ export async function getOneDoc(language: string, slug: string): Promise<Doc> {
 
 export async function getCategories(language = 'en') {
   const url = normalizeUrl(
-    `/api/method/ifitwala_doc.api.get_categories?language=${encodeURIComponent(language)}`
+    `/api/method/ifitwala_doc.api.docs.get_categories?language=${encodeURIComponent(language)}`
   );
   const raw = await fetchJSON(url);
   return unwrap(raw) || [];
@@ -78,7 +78,7 @@ export async function getCategories(language = 'en') {
 
 export async function getCategory(slug: string) {
   const url = normalizeUrl(
-    `/api/method/ifitwala_doc.api.get_category?slug=${encodeURIComponent(slug)}`
+    `/api/method/ifitwala_doc.api.docs.get_category?slug=${encodeURIComponent(slug)}`
   );
   const raw = await fetchJSON(url);
   return unwrap(raw) || null;
@@ -87,7 +87,7 @@ export async function getCategory(slug: string) {
 export async function getDocsInCategory(language: string, category_slug: string) {
   const q = new URLSearchParams({ language, category_slug });
   const url = normalizeUrl(
-    `/api/method/ifitwala_doc.api.get_docs_in_category?${q.toString()}`
+    `/api/method/ifitwala_doc.api.docs.get_docs_in_category?${q.toString()}`
   );
   const raw = await fetchJSON(url);
   return unwrap(raw) || [];
