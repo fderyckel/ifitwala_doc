@@ -30,22 +30,23 @@ try {
 } catch {
   doc = null
 }
+
+const lang = doc?.language || language || 'en'
+const title = doc ? `${doc.title} | Ifitwala Ed Docs` : 'Not Found | Ifitwala Ed Docs'
+const description = doc?.summary || ''
+const canonical = doc ? `/docs/${lang}/${doc.slug}` : undefined
 ---
 
-{!doc ? (
-  <DocsShell
-    lang={language || 'en'}
-    title="Not Found | Ifitwala Ed Docs"
-    description=""
-  >
+<DocsShell lang={lang} title={title} description={description} canonical={canonical}>
+  {!doc ? (
     <main class="mx-auto max-w-3xl px-6 py-10">
       <h1 class="text-2xl font-semibold text-primary mb-2">Page not found</h1>
       <p class="text-slate mb-6">
-        We couldn’t find <code class="font-mono">{slug}</code> in <strong>{language}</strong>.
+        We couldn’t find <code class="font-mono">{slug}</code> in <strong>{lang}</strong>.
       </p>
-      <a class="text-primary underline" href={`/docs/${language || 'en'}`}>Back to docs</a>
+      <a class="text-primary underline" href={`/docs/${lang}`}>Back to docs</a>
     </main>
-  </DocsShell>
-) : (
-  <DocsLayout doc={doc} />
-)}
+  ) : (
+    <DocsLayout doc={doc} />
+  )}
+</DocsShell>

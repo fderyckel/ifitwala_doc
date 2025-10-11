@@ -1,4 +1,3 @@
-import DocsShell from '@/layouts/DocsShell.astro'
 import { marked } from 'marked'
 
 const { doc } = Astro.props
@@ -6,34 +5,28 @@ const { doc } = Astro.props
 marked.use({ headerIds: true, mangle: false })
 
 const html = marked.parse(doc.body_md || '')
-
-const title = `${doc.title} | Ifitwala Ed Docs`
-const description = doc.summary || ''
 const lang = doc.language || 'en'
-const canonical = `/docs/${lang}/${doc.slug}`
 ---
 
-<DocsShell lang={lang} title={title} description={description} canonical={canonical}>
-  <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10">
-    <nav class="not-prose text-sm text-slate mb-4">
-      <a href={`/docs/${lang}`} class="hover:underline">Docs</a>
-      {doc.category && <>
-        <span class="mx-1">›</span>
-        <a href={`/docs/${lang}/${doc.category}`} class="hover:underline">
-          {doc.category_label || doc.category}
-        </a>
-      </>}
-      {doc.sub_category && <>
-        <span class="mx-1">›</span>
-        <a href={`/docs/${lang}/${doc.category}/${doc.sub_category}`} class="hover:underline">
-          {doc.sub_category_label || doc.sub_category}
-        </a>
-      </>}
-    </nav>
+<main class="prose prose-docs mx-auto max-w-3xl px-6 py-10">
+  <nav class="not-prose text-sm text-slate mb-4">
+    <a href={`/docs/${lang}`} class="hover:underline">Docs</a>
+    {doc.category && <>
+      <span class="mx-1">›</span>
+      <a href={`/docs/${lang}/${doc.category}`} class="hover:underline">
+        {doc.category_label || doc.category}
+      </a>
+    </>}
+    {doc.sub_category && <>
+      <span class="mx-1">›</span>
+      <a href={`/docs/${lang}/${doc.category}/${doc.sub_category}`} class="hover:underline">
+        {doc.sub_category_label || doc.sub_category}
+      </a>
+    </>}
+  </nav>
 
-    <h1 class="mb-1">{doc.title}</h1>
-    {doc.summary && <p class="text-slate">{doc.summary}</p>}
+  <h1 class="mb-1">{doc.title}</h1>
+  {doc.summary && <p class="text-slate">{doc.summary}</p>}
 
-    <div class="mt-6" set:html={html} />
-  </main>
-</DocsShell>
+  <div class="mt-6" set:html={html} />
+</main>
