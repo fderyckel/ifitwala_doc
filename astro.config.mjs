@@ -3,6 +3,7 @@ import tailwind from '@astrojs/tailwind'
 import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
+  base: '/docs',
   output: 'static',
   outDir: './dist',
   srcDir: './src',
