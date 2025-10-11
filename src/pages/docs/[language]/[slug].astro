@@ -1,19 +1,18 @@
 ---
 import DocsLayout from '@/components/docs/DocsLayout.astro'
+import DocsShell from '@/layouts/DocsShell.astro'
 import { getAllDocs, getOneDoc } from '@/lib/docsClient'
 
-// Build-time: enumerate language+slug
 export async function getStaticPaths() {
-  const langs = ['en', 'th', 'fr', 'ar']; // adjust to your seeded languages
-  const paths = [];
+  const langs = ['en', 'th', 'fr', 'ar'] // adjust to your seeded languages
+  const paths = []
 
   for (const language of langs) {
     try {
-      const { docs = [] } = await getAllDocs(language);
+      const { docs = [] } = await getAllDocs(language)
       for (const d of docs) {
-        // only pages with a slug
         if (d?.slug) {
-          paths.push({ params: { language, slug: d.slug } });
+          paths.push({ params: { language, slug: d.slug } })
         }
       }
     } catch {
@@ -21,35 +20,32 @@ export async function getStaticPaths() {
     }
   }
 
-  return paths;
+  return paths
 }
 
-const { language, slug } = Astro.params;
-let doc;
+const { language, slug } = Astro.params
+let doc
 try {
-  doc = await getOneDoc(language, slug);
-} catch (e) {
-  doc = null;
+  doc = await getOneDoc(language, slug)
+} catch {
+  doc = null
 }
 ---
 
 {!doc ? (
-  <html lang={language || 'en'}>
-    <head>
-      <meta charset="utf-8" />
-      <title>Not Found | Ifitwala Ed Docs</title>
-      <meta name="robots" content="noindex" />
-    </head>
-    <body class="bg-panel text-ink">
-      <main class="mx-auto max-w-3xl px-6 py-10">
-        <h1 class="text-2xl font-semibold text-primary mb-2">Page not found</h1>
-        <p class="text-slate mb-6">
-          We couldn’t find <code class="font-mono">{slug}</code> in <strong>{language}</strong>.
-        </p>
-        <a class="text-primary underline" href={`/docs/${language || 'en'}`}>Back to docs</a>
-      </main>
-    </body>
-  </html>
+  <DocsShell
+    lang={language || 'en'}
+    title="Not Found | Ifitwala Ed Docs"
+    description=""
+  >
+    <main class="mx-auto max-w-3xl px-6 py-10">
+      <h1 class="text-2xl font-semibold text-primary mb-2">Page not found</h1>
+      <p class="text-slate mb-6">
+        We couldn’t find <code class="font-mono">{slug}</code> in <strong>{language}</strong>.
+      </p>
+      <a class="text-primary underline" href={`/docs/${language || 'en'}`}>Back to docs</a>
+    </main>
+  </DocsShell>
 ) : (
   <DocsLayout doc={doc} />
 )}

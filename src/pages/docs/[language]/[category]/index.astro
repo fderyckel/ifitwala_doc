@@ -1,4 +1,5 @@
-import '../../../styles/global.css'
+---
+import DocsShell from '@/layouts/DocsShell.astro'
 import { getCategory, getDocsInCategory, getCategories } from '@/lib/docsClient'
 
 export async function getStaticPaths() {
@@ -9,7 +10,9 @@ export async function getStaticPaths() {
     let cats = []
     try {
       cats = await getCategories(lang) // should return [{ slug, ... }, ...]
-    } catch { /* build should still continue even if empty */ }
+    } catch {
+      // ignore fetch issues per language; keep building others
+    }
 
     for (const c of (cats || [])) {
       if (c?.slug) paths.push({ params: { language: lang, category: c.slug } })
@@ -30,59 +33,58 @@ const ICON_PATHS = {
   calendar: 'M6 8h12M7 4v4m10-4v4M6 20h12a2 2 0 002-2V8H4v10a2 2 0 002 2',
 }
 
-const title = `${(cat?.label || category)} — Docs (${language}) | Ifitwala Ed`
+const title = `${cat?.label || category} — Docs (${language}) | Ifitwala Ed`
+const description = cat?.description || 'Category'
 ---
-<html lang={language || 'en'}>
-  <head>
-    <meta charset="utf-8" />
-    <title>{title}</title>
-    <meta name="description" content={cat?.description || 'Category'} />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
 
-  <body class="bg-panel text-ink">
-    <main class="mx-auto max-w-6xl px-6 py-10">
-      <nav class="text-sm text-slate mb-4">
-        <a class="hover:underline" href="/docs/">Docs</a>
-        <span class="mx-1">›</span>
-        <span>{cat?.label || category}</span>
-      </nav>
+<DocsShell lang={language || 'en'} title={title} description={description}>
+  <main class="mx-auto max-w-6xl px-6 py-10">
+    <nav class="text-sm text-slate mb-4">
+      <a class="hover:underline" href={`/docs/${language || 'en'}`}>Docs</a>
+      <span class="mx-1">›</span>
+      <span>{cat?.label || category}</span>
+    </nav>
 
-      <header class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          {cat?.icon && (
-            ICON_PATHS[(cat.icon || '').toLowerCase()]
-              ? (
-                <svg viewBox="0 0 24 24" class="w-6 h-6 opacity-80"
-                     fill="none" stroke="currentColor" stroke-width="1.5"
-                     stroke-linecap="round" stroke-linejoin="round">
-                  <path d={ICON_PATHS[(cat.icon || '').toLowerCase()]} />
-                </svg>
-              )
-              : <span class="text-xl">{cat.icon}</span>
-          )}
-          <span>{cat?.label || category}</span>
-        </h1>
-        {cat?.description && <p class="text-slate mt-1">{cat.description}</p>}
-      </header>
-
-      {docs?.length ? (
-        <ul class="grid sm:grid-cols-2 gap-4">
-          {docs.map((d) => (
-            <li>
-              <a
-                href={`/docs/${language}/${d.slug}`}
-                class="block bg-white border rounded-2xl p-5 hover:shadow-lg transition"
+    <header class="mb-6">
+      <h1 class="text-2xl font-bold flex items-center gap-2">
+        {cat?.icon && (
+          ICON_PATHS[(cat.icon || '').toLowerCase()]
+            ? (
+              <svg
+                viewBox="0 0 24 24"
+                class="w-6 h-6 opacity-80"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               >
-                <div class="font-semibold">{d.title}</div>
-                {d.summary && <div class="text-sm text-slate mt-1">{d.summary}</div>}
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div class="text-slate">No documents in this category yet.</div>
-      )}
-    </main>
-  </body>
-</html>
+                <path d={ICON_PATHS[(cat.icon || '').toLowerCase()]} />
+              </svg>
+            )
+            : <span class="text-xl">{cat.icon}</span>
+        )}
+        <span>{cat?.label || category}</span>
+      </h1>
+      {cat?.description && <p class="text-slate mt-1">{cat.description}</p>}
+    </header>
+
+    {docs?.length ? (
+      <ul class="grid sm:grid-cols-2 gap-4">
+        {docs.map((d) => (
+          <li>
+            <a
+              href={`/docs/${language}/${d.slug}`}
+              class="block bg-white border rounded-2xl p-5 hover:shadow-lg transition"
+            >
+              <div class="font-semibold">{d.title}</div>
+              {d.summary && <div class="text-sm text-slate mt-1">{d.summary}</div>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="text-slate">No documents in this category yet.</div>
+    )}
+  </main>
+</DocsShell>
