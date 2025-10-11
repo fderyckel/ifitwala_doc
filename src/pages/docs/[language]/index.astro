@@ -1,49 +1,8 @@
 ---
-import { getAllDocs } from '@/lib/docsClient'
-const { language } = Astro.params
+export async function getStaticPaths() {
+  const langs = ['en', 'th', 'fr', 'ar']  // keep in one place if you like
+  return langs.map((language) => ({ params: { language } }))
+}
 
-let docs = [], sidebar = null
-try {
-  const payload = await getAllDocs(language)
-  docs = payload?.docs || []
-  sidebar = payload?.sidebar || null
-} catch {}
-
-const title = `Docs (${language}) | Ifitwala Ed`
+// …your existing frontmatter (getAllDocs, etc.)
 ---
-
-<html lang={language || 'en'}>
-  <head>
-    <meta charset="utf-8" />
-    <title>{title}</title>
-    <meta name="description" content="Ifitwala Ed documentation" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body class="bg-panel text-ink">
-    <main class="mx-auto max-w-6xl px-6 py-10">
-      <h1 class="text-3xl font-bold text-primary mb-6">Documentation — {language}</h1>
-
-      {sidebar?.categories ? (
-        <div class="grid md:grid-cols-3 gap-6">
-          {sidebar.categories.map((cat:any) => (
-            <a href={`/docs/${language}/${cat.name}`} class="block bg-white border rounded-2xl p-5 hover:shadow-card transition">
-              <div class="text-xl font-semibold mb-1">{cat.label}</div>
-              <p class="text-slate text-sm">{cat.description || ''}</p>
-            </a>
-          ))}
-        </div>
-      ) : (
-        <ul class="grid md:grid-cols-2 gap-3">
-          {docs.map((d:any) => (
-            <li>
-              <a class="block bg-white border rounded-2xl p-4 hover:shadow-card transition" href={`/docs/${language}/${d.slug}`}>
-                <div class="font-medium text-primary">{d.title}</div>
-                {d.summary && <div class="text-sm text-slate mt-1">{d.summary}</div>}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
-  </body>
-</html>

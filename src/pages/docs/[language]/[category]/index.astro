@@ -1,12 +1,28 @@
 ---
-import { getCategory, getDocsInCategory } from '@/lib/docsClient'
+import { getCategory, getDocsInCategory, getCategories } from '@/lib/docsClient'
+
+export async function getStaticPaths() {
+  const langs = ['en', 'th', 'fr', 'ar']   // adjust to your supported languages
+  const paths = []
+
+  for (const lang of langs) {
+    let cats = []
+    try {
+      cats = await getCategories(lang) // should return [{ slug, ... }, ...]
+    } catch { /* build should still continue even if empty */ }
+
+    for (const c of (cats || [])) {
+      if (c?.slug) paths.push({ params: { language: lang, category: c.slug } })
+    }
+  }
+  return paths
+}
 
 const { language, category } = Astro.params
 const cat  = await getCategory(category)
 const docs = await getDocsInCategory(language, category)
 
-// 1 JS/TS ONLY here — define data, not <svg> tags
-const ICON_PATHS: Record<string, string> = {
+const ICON_PATHS = {
   book:     'M4 19.5V6.75A2.25 2.25 0 016.25 4.5h11.5m-13.75 15A2.25 2.25 0 006.25 21h11.5m-13.75-1.5h13.5m0-15A2.25 2.25 0 0121 6.75V21M6.75 7.5h6',
   users:    'M16 14a4 4 0 10-8 0m-5 6a7 7 0 0114 0M12 8a4 4 0 110-8 4 4 0 010 8',
   check:    'M4.5 12.75l6 6 9-13.5',
@@ -16,8 +32,6 @@ const ICON_PATHS: Record<string, string> = {
 
 const title = `${(cat?.label || category)} — Docs (${language}) | Ifitwala Ed`
 ---
-
-<!-- 2) HTML/ASTRO TEMPLATE starts here — safe to use <svg> -->
 <html lang={language || 'en'}>
   <head>
     <meta charset="utf-8" />
@@ -54,10 +68,12 @@ const title = `${(cat?.label || category)} — Docs (${language}) | Ifitwala Ed`
 
       {docs?.length ? (
         <ul class="grid sm:grid-cols-2 gap-4">
-          {docs.map((d:any) => (
+          {docs.map((d) => (
             <li>
-              <a href={`/docs/${language}/${d.slug}`}
-                 class="block bg-white border rounded-2xl p-5 hover:shadow-lg transition">
+              <a
+                href={`/docs/${language}/${d.slug}`}
+                class="block bg-white border rounded-2xl p-5 hover:shadow-lg transition"
+              >
                 <div class="font-semibold">{d.title}</div>
                 {d.summary && <div class="text-sm text-slate mt-1">{d.summary}</div>}
               </a>
