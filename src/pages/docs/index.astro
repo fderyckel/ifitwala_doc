@@ -1,7 +1,7 @@
-import '@/styles/global.css'
+---
+import DocsShell from '@/layouts/DocsShell.astro'
 import { getCategories } from '@/lib/docsClient'
 
-// 1 Data: default to English at /docs/
 const language = 'en'
 let categories = []
 try {
@@ -10,7 +10,6 @@ try {
   categories = []
 }
 
-// 2 Icon path map (keys → minimal outline SVG paths)
 const ICON_PATHS = {
   book:     'M4 19.5V6.75A2.25 2.25 0 016.25 4.5h11.5m-13.75 15A2.25 2.25 0 006.25 21h11.5m-13.75-1.5h13.5m0-15A2.25 2.25 0 0121 6.75V21M6.75 7.5h6',
   users:    'M16 14a4 4 0 10-8 0m-5 6a7 7 0 0114 0M12 8a4 4 0 110-8 4 4 0 010 8',
@@ -23,71 +22,62 @@ const title = 'Documentation | Ifitwala Ed'
 const description = 'Explore Ifitwala Ed docs by category'
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
+<DocsShell lang={language} title={title} description={description}>
+  <main class="mx-auto max-w-6xl px-6 py-12">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight">Ifitwala Ed Documentation</h1>
+      <p class="text-slate mt-2">Start by choosing a category.</p>
+    </header>
 
-  <body class="bg-panel text-ink">
-    <main class="mx-auto max-w-6xl px-6 py-12">
-      <header class="mb-10">
-        <h1 class="text-3xl font-bold tracking-tight">Ifitwala Ed Documentation</h1>
-        <p class="text-slate mt-2">Start by choosing a category.</p>
-      </header>
-
-      {categories && categories.length > 0 ? (
-        <section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((c) => (
-            <a
-              href={`/docs/${c.language || language}/${c.slug}/`}
-              class="group block bg-white border rounded-2xl p-6 hover:shadow-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
-              aria-label={`Open category ${c.label}`}
-            >
-              <div class="h-1 w-10 rounded bg-brand-600 mb-4 opacity-90 group-hover:opacity-100"></div>
-              <div class="flex items-start gap-3">
-                {c.icon ? (
-                  ICON_PATHS[(c.icon || '').toLowerCase()] ? (
-                    <svg
-                      viewBox="0 0 24 24"
-                      class="w-6 h-6 opacity-80"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d={ICON_PATHS[(c.icon || '').toLowerCase()]} />
-                    </svg>
-                  ) : (
-                    <span class="text-xl">{c.icon}</span>
-                  )
-                ) : null}
-                <div>
-                  <div class="text-lg font-semibold group-hover:text-brand-700">
-                    {c.label}
-                  </div>
-                  {c.description ? (
-                    <p class="text-sm text-slate mt-1">{c.description}</p>
-                  ) : null}
-                </div>
-              </div>
-            </a>
-          ))}
-        </section>
-      ) : (
-        <div class="space-y-3">
-          <p class="text-slate">No categories found yet.</p>
+    {categories && categories.length > 0 ? (
+      <section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {categories.map((c) => (
           <a
-            class="inline-flex items-center gap-2 text-primary hover:underline"
-            href={`/docs/${language}`}
+            href={`/docs/${c.language || language}/${c.slug}/`}
+            class="group block bg-white border rounded-2xl p-6 hover:shadow-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            aria-label={`Open category ${c.label}`}
           >
-            Go to {language.toUpperCase()} docs <span aria-hidden>→</span>
+            <div class="h-1 w-10 rounded bg-brand-600 mb-4 opacity-90 group-hover:opacity-100"></div>
+            <div class="flex items-start gap-3">
+              {c.icon ? (
+                ICON_PATHS[(c.icon || '').toLowerCase()] ? (
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="w-6 h-6 opacity-80"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d={ICON_PATHS[(c.icon || '').toLowerCase()]} />
+                  </svg>
+                ) : (
+                  <span class="text-xl">{c.icon}</span>
+                )
+              ) : null}
+              <div>
+                <div class="text-lg font-semibold group-hover:text-brand-700">
+                  {c.label}
+                </div>
+                {c.description ? (
+                  <p class="text-sm text-slate mt-1">{c.description}</p>
+                ) : null}
+              </div>
+            </div>
           </a>
-        </div>
-      )}
-    </main>
-  </body>
-</html>
+        ))}
+      </section>
+    ) : (
+      <div class="space-y-3">
+        <p class="text-slate">No categories found yet.</p>
+        <a
+          class="inline-flex items-center gap-2 text-primary hover:underline"
+          href={`/docs/${language}`}
+        >
+          Go to {language.toUpperCase()} docs <span aria-hidden>→</span>
+        </a>
+      </div>
+    )}
+  </main>
+</DocsShell>

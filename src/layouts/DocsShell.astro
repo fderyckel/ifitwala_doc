@@ -1,0 +1,25 @@
+---
+import '@/styles/global.css'
+
+const {
+  lang = 'en',
+  title = 'Ifitwala Ed Docs',
+  description = '',
+  canonical,
+  bodyClass = 'bg-panel text-ink',
+} = Astro.props
+---
+
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body class={bodyClass}>
+    <slot />
+  </body>
+</html>
