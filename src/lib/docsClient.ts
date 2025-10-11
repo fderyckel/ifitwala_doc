@@ -69,20 +69,26 @@ export async function getOneDoc(language: string, slug: string): Promise<Doc> {
 
 
 export async function getCategories(language = 'en') {
-  const res = await fetch(`/api/method/ifitwala_doc.api.get_categories?language=${language}`)
-  const data = await res.json()
-  return data?.message || []
+  const url = normalizeUrl(
+    `/api/method/ifitwala_doc.api.get_categories?language=${encodeURIComponent(language)}`
+  );
+  const raw = await fetchJSON(url);
+  return unwrap(raw) || [];
 }
 
 export async function getCategory(slug: string) {
-  const res = await fetch(`/api/method/ifitwala_doc.api.get_category?slug=${encodeURIComponent(slug)}`)
-  const data = await res.json()
-  return data?.message || null
+  const url = normalizeUrl(
+    `/api/method/ifitwala_doc.api.get_category?slug=${encodeURIComponent(slug)}`
+  );
+  const raw = await fetchJSON(url);
+  return unwrap(raw) || null;
 }
 
 export async function getDocsInCategory(language: string, category_slug: string) {
-  const q = new URLSearchParams({ language, category_slug })
-  const res = await fetch(`/api/method/ifitwala_doc.api.get_docs_in_category?${q.toString()}`)
-  const data = await res.json()
-  return data?.message || []
+  const q = new URLSearchParams({ language, category_slug });
+  const url = normalizeUrl(
+    `/api/method/ifitwala_doc.api.get_docs_in_category?${q.toString()}`
+  );
+  const raw = await fetchJSON(url);
+  return unwrap(raw) || [];
 }

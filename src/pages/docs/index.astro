@@ -1,4 +1,4 @@
----
+import '@/styles/global.css'
 import { getCategories } from '@/lib/docsClient'
 
 // 1 Data: default to English at /docs/
@@ -42,7 +42,7 @@ const description = 'Explore Ifitwala Ed docs by category'
         <section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((c) => (
             <a
-              href={`/docs/${language}/${c.slug}/`}
+              href={`/docs/${c.language || language}/${c.slug}/`}
               class="group block bg-white border rounded-2xl p-6 hover:shadow-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               aria-label={`Open category ${c.label}`}
             >
