@@ -32,29 +32,32 @@ def run_astro_build():
     import os, shlex, shutil
     import frappe
 
-    # ── Paths
-    app_root  = frappe.get_app_path("ifitwala_doc")                  # apps/ifitwala_doc/ifitwala_doc
-    proj_root = os.path.dirname(app_root)                             # apps/ifitwala_doc
-    out_root  = frappe.utils.get_site_path("assets", "ifitwala_doc")  # /.../sites/assets/ifitwala_doc
+    # ───────────────────────── Paths ─────────────────────────
+    app_root  = frappe.get_app_path("ifitwala_doc")          # apps/ifitwala_doc/ifitwala_doc
+    proj_root = os.path.dirname(app_root)                    # apps/ifitwala_doc
 
-    # Ensure deploy targets exist (rsync --delete expects dirs to exist)
+    # Use the *shared* assets dir: <bench>/sites/assets/ifitwala_doc
+    # (Frappe serves static from sites/assets) :contentReference[oaicite:0]{index=0}
+    site_dir  = frappe.utils.get_site_path()                 # <bench>/sites/<site>
+    sites_dir = os.path.dirname(site_dir)                    # <bench>/sites
+    out_root  = os.path.join(sites_dir, "assets", "ifitwala_doc")
     dest_docs = os.path.join(out_root, "docs")
     dest_ast  = os.path.join(out_root, "_astro")
     os.makedirs(dest_docs, exist_ok=True)
     os.makedirs(dest_ast,  exist_ok=True)
 
-    # ── Environment (ensure yarn/node are discoverable in worker)
+    # ───────────────────── Environment ───────────────────────
     env = os.environ.copy()
-    extra_paths = ["/usr/local/bin", "/usr/bin", "/bin"]
-    env["PATH"] = os.pathsep.join(extra_paths + [env.get("PATH", "")])
-    env.setdefault("NODE_ENV", "production")  # build env is fine as production
+    # Make yarn/node visible in worker env
+    env["PATH"] = os.pathsep.join(["/usr/local/bin", "/usr/bin", "/bin", env.get("PATH", "")])
+    env.setdefault("NODE_ENV", "production")  # build env can be production
 
-    # Resolve yarn absolute path
     yarn_bin = shutil.which("yarn", path=env["PATH"])
     if not yarn_bin:
         frappe.throw("yarn not found on PATH for the worker. PATH=" + env.get("PATH", ""))
 
-    # ── 1) Install (force devDependencies so 'astro' is present)
+    # ─────────────────────── Build step ──────────────────────
+    # 1) Install with devDependencies so 'astro' exists
     _run(f"{shlex.quote(yarn_bin)} install --frozen-lockfile --check-files --production=false",
          cwd=proj_root, env=env)
 
@@ -62,22 +65,19 @@ def run_astro_build():
     _run(f"{shlex.quote(yarn_bin)} --version", cwd=proj_root, env=env)
     _run("node --version", cwd=proj_root, env=env)
 
-    # ── 2) Build via package.json script
+    # 2) Build via package.json script (runs 'astro build')
     _run(f"{shlex.quote(yarn_bin)} astro:build", cwd=proj_root, env=env)
 
-    # ── 3) Deploy built assets (use absolute paths)
+    # 3) Deploy built assets
     built_docs = os.path.join(proj_root, "dist", "docs")
     built_ast  = os.path.join(proj_root, "dist", "_astro")
     if not os.path.isdir(built_docs):
         frappe.throw("Astro build did not produce dist/docs")
 
-    _run(f"rsync -a --delete {shlex.quote(built_docs)}/ {shlex.quote(dest_docs)}/",
-         cwd="/", env=env)
-
+    # Absolute paths; neutral cwd avoids accidental relatives
+    _run(f"rsync -a --delete {shlex.quote(built_docs)}/ {shlex.quote(dest_docs)}/", cwd="/", env=env)
     if os.path.isdir(built_ast):
-        _run(f"rsync -a --delete {shlex.quote(built_ast)}/ {shlex.quote(dest_ast)}/",
-             cwd="/", env=env)
-
+        _run(f"rsync -a --delete {shlex.quote(built_ast)}/ {shlex.quote(dest_ast)}/", cwd="/", env=env)
 
 @frappe.whitelist(allow_guest=True)
 def debug_headers():
