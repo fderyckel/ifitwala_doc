@@ -10,6 +10,8 @@ def _require_token():
     if not expected or got != expected:
         frappe.throw("Unauthorized", frappe.PermissionError)
 
+
+
 def _run(cmd, cwd, env=None):
     proc = subprocess.run(
         cmd, cwd=cwd, shell=True, env=env,
@@ -19,8 +21,6 @@ def _run(cmd, cwd, env=None):
     if proc.returncode != 0:
         frappe.throw(f"Command failed: {cmd}\n{proc.stdout}")
 
-
-
 @frappe.whitelist(allow_guest=True)
 def trigger():
     _require_token()
@@ -28,23 +28,33 @@ def trigger():
     return {"queued": True}
 
 def run_astro_build():
+    """Build docs with Astro (yarn) and deploy to sites/assets/ifitwala_doc."""
     app_root = frappe.get_app_path("ifitwala_doc")              # apps/ifitwala_doc/ifitwala_doc
     proj_root = os.path.dirname(app_root)                        # apps/ifitwala_doc
-    out_dir   = get_site_path("assets", "ifitwala_doc", "docs")  # sites/assets/ifitwala_doc/docs
-    os.makedirs(out_dir, exist_ok=True)
+    out_root  = get_site_path("assets", "ifitwala_doc")         # sites/assets/ifitwala_doc
+    os.makedirs(out_root, exist_ok=True)
 
-    use_yarn = os.path.exists(os.path.join(proj_root, "yarn.lock"))
-    if use_yarn:
-        _run("yarn install --frozen-lockfile --check-files", cwd=proj_root)
-        _run("yarn astro:build", cwd=proj_root)
-    else:
-        _run("npm ci --prefer-offline --no-audit", cwd=proj_root)
-        _run("npx astro build", cwd=proj_root)
+    env = os.environ.copy()
+    env.setdefault("NODE_ENV", "production")
 
+    # 1) build (yarn only)
+    _run("yarn install --frozen-lockfile --check-files", cwd=proj_root, env=env)
+    _run("yarn astro:build", cwd=proj_root, env=env)
+
+    # 2) deploy (rsync both docs/ and _astro/)
     built_docs = os.path.join(proj_root, "dist", "docs")
+    built_ast  = os.path.join(proj_root, "dist", "_astro")
     if not os.path.isdir(built_docs):
         frappe.throw("Astro build did not produce dist/docs")
-    _run(f"rsync -a --delete {shlex.quote(built_docs)}/ {shlex.quote(out_dir)}/", cwd=proj_root)
+
+    _run(f"rsync -a --delete {shlex.quote(built_docs)}/ "
+         f"{shlex.quote(os.path.join(out_root, 'docs'))}/", cwd=proj_root, env=env)
+
+    if os.path.isdir(built_ast):
+        _run(f"rsync -a --delete {shlex.quote(built_ast)}/ "
+             f"{shlex.quote(os.path.join(out_root, '_astro'))}/", cwd=proj_root, env=env)
+
+
 
 @frappe.whitelist(allow_guest=True)
 def debug_headers():
