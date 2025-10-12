@@ -15,5 +15,6 @@ html, body { height: 100%; }
 
 /* Optional breadcrumb tint used in DocsLayout */
 @layer components {
-  .text-slate { @apply text-slate-600; }
+  .text-slate { color: var(--neutral-500); }
+  .dark .text-slate { color: var(--neutral-300); }
 }
