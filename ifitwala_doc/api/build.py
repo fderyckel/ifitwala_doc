@@ -28,15 +28,14 @@ def trigger():
     return {"queued": True}
 
 def run_astro_build():
-    """Build docs with Astro (yarn) and deploy to sites/<site>/assets/ifitwala_doc."""
+    """Build docs with Astro (yarn) and deploy to sites/assets/ifitwala_doc."""
     import os, shlex, shutil
     import frappe
 
-    # Paths
-    app_root  = frappe.get_app_path("ifitwala_doc")                 # apps/ifitwala_doc/ifitwala_doc
-    proj_root = os.path.dirname(app_root)                            # apps/ifitwala_doc
-    site_root = frappe.utils.get_site_path()                         # /.../sites/<site>
-    out_root  = os.path.join(site_root, "assets", "ifitwala_doc")    # /.../sites/<site>/assets/ifitwala_doc
+    # ── Paths
+    app_root  = frappe.get_app_path("ifitwala_doc")                  # apps/ifitwala_doc/ifitwala_doc
+    proj_root = os.path.dirname(app_root)                             # apps/ifitwala_doc
+    out_root  = frappe.utils.get_site_path("assets", "ifitwala_doc")  # /.../sites/assets/ifitwala_doc
 
     # Ensure deploy targets exist (rsync --delete expects dirs to exist)
     dest_docs = os.path.join(out_root, "docs")
@@ -44,26 +43,29 @@ def run_astro_build():
     os.makedirs(dest_docs, exist_ok=True)
     os.makedirs(dest_ast,  exist_ok=True)
 
-    # Environment (ensure yarn/node are discoverable in worker)
+    # ── Environment (ensure yarn/node are discoverable in worker)
     env = os.environ.copy()
     extra_paths = ["/usr/local/bin", "/usr/bin", "/bin"]
     env["PATH"] = os.pathsep.join(extra_paths + [env.get("PATH", "")])
-    # Keep production env for build, but force devDeps during install
-    env.setdefault("NODE_ENV", "production")
+    env.setdefault("NODE_ENV", "production")  # build env is fine as production
 
     # Resolve yarn absolute path
     yarn_bin = shutil.which("yarn", path=env["PATH"])
     if not yarn_bin:
         frappe.throw("yarn not found on PATH for the worker. PATH=" + env.get("PATH", ""))
 
-    # 1) Install (include devDependencies so 'astro' is present)
+    # ── 1) Install (force devDependencies so 'astro' is present)
     _run(f"{shlex.quote(yarn_bin)} install --frozen-lockfile --check-files --production=false",
          cwd=proj_root, env=env)
 
-    # 2) Build via package.json script
+    # (optional diagnostics)
+    _run(f"{shlex.quote(yarn_bin)} --version", cwd=proj_root, env=env)
+    _run("node --version", cwd=proj_root, env=env)
+
+    # ── 2) Build via package.json script
     _run(f"{shlex.quote(yarn_bin)} astro:build", cwd=proj_root, env=env)
 
-    # 3) Deploy built assets (use absolute paths and neutral cwd)
+    # ── 3) Deploy built assets (use absolute paths)
     built_docs = os.path.join(proj_root, "dist", "docs")
     built_ast  = os.path.join(proj_root, "dist", "_astro")
     if not os.path.isdir(built_docs):
