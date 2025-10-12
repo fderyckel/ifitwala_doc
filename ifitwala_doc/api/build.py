@@ -1,6 +1,6 @@
 # ifitwala_doc/ifitwala_doc/api/build.py
 
-import os, subprocess, shlex
+import os, subprocess, shlex, shutil
 import frappe
 from frappe.utils import get_site_path
 
@@ -36,10 +36,22 @@ def run_astro_build():
 
     env = os.environ.copy()
     env.setdefault("NODE_ENV", "production")
+    # Ensure workers can see node/yarn even if supervisor PATH is minimal
+    extra_paths = ["/usr/local/bin", "/usr/bin", "/bin"]
+    env["PATH"] = os.pathsep.join(extra_paths + [env.get("PATH", "")])
+
+    # Resolve yarn absolute path (better error if missing)
+    yarn_bin = shutil.which("yarn", path=env["PATH"])
+    if not yarn_bin:
+        frappe.throw(
+            "yarn not found on PATH for the worker. "
+            "Add /usr/local/bin to PATH or install yarn globally. "
+            "Tried PATH: " + env.get("PATH", "")
+        )
 
     # 1) build (yarn only)
-    _run("yarn install --frozen-lockfile --check-files", cwd=proj_root, env=env)
-    _run("yarn astro:build", cwd=proj_root, env=env)
+    _run(f"{shlex.quote(yarn_bin)} install --frozen-lockfile --check-files", cwd=proj_root, env=env)
+    _run(f"{shlex.quote(yarn_bin)} astro:build", cwd=proj_root, env=env)
 
     # 2) deploy (rsync both docs/ and _astro/)
     built_docs = os.path.join(proj_root, "dist", "docs")
