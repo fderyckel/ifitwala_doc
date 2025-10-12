@@ -2,7 +2,6 @@
 
 import os, subprocess, shlex, shutil
 import frappe
-from frappe.utils import get_site_path
 
 def _require_token():
     expected = frappe.conf.get("docs_build_token")
@@ -35,11 +34,35 @@ def run_astro_build():
     # ───────────────────────── Paths ─────────────────────────
     app_root  = frappe.get_app_path("ifitwala_doc")          # apps/ifitwala_doc/ifitwala_doc
     proj_root = os.path.dirname(app_root)                    # apps/ifitwala_doc
+    bench_root = os.path.dirname(os.path.dirname(proj_root)) # <bench>
 
     # Use the *shared* assets dir: <bench>/sites/assets/ifitwala_doc
     # (Frappe serves static from sites/assets) :contentReference[oaicite:0]{index=0}
-    site_dir  = frappe.utils.get_site_path()                 # <bench>/sites/<site>
-    sites_dir = os.path.dirname(site_dir)                    # <bench>/sites
+    site_candidates = [
+        getattr(frappe.local, "sites_path", None),
+        os.environ.get("FRAPPE_SITES_PATH"),
+        os.path.join(bench_root, "sites"),
+    ]
+    resolved_sites = []
+    for candidate in site_candidates:
+        if not candidate:
+            continue
+        if os.path.isabs(candidate):
+            resolved_sites.append(os.path.normpath(candidate))
+        else:
+            for anchor in (bench_root, os.getcwd()):
+                resolved_sites.append(os.path.normpath(os.path.join(anchor, candidate)))
+    sites_dir = next(
+        (
+            path
+            for path in resolved_sites
+            if os.path.isdir(path) and os.path.basename(path.rstrip(os.sep)) == "sites"
+        ),
+        None,
+    )
+    if not sites_dir:
+        sites_dir = os.path.join(bench_root, "sites")
+    sites_dir = os.path.normpath(sites_dir)
     out_root  = os.path.join(sites_dir, "assets", "ifitwala_doc")
     dest_docs = os.path.join(out_root, "docs")
     dest_ast  = os.path.join(out_root, "_astro")
