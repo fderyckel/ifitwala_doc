@@ -1,5 +1,7 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.cjs
 const path = require('path');
+
+const v = (name) => `var(${name})`;
 
 module.exports = {
   content: [
@@ -9,27 +11,40 @@ module.exports = {
     path.join(__dirname, 'src', '**/*.{astro,md,mdx,vue,js,ts,tsx}'),
     path.join(__dirname, 'node_modules', 'frappe-ui', '**/*.{vue,js}'),
   ],
-  safelist: [
-    'prose', 'prose-docs', 'max-w-3xl', 'mx-auto', 'px-6', 'py-10',
-  ],
+  safelist: ['prose','prose-docs','max-w-3xl','mx-auto','px-6','py-10'],
   theme: {
     extend: {
       colors: {
-        primary:  '#243B53',
-        secondary:'#2A7F62',
-        accent:   '#DFAF2B',
-        ink:      '#1F2933',
-        slate:    '#616E7C',
-        panel:    '#F8FAFC',
-        line:     '#E5E7EB'
+        // map design tokens → semantic names
+        primary:  v('--brand-500'),
+        secondary:v('--brand-700'),
+        accent:   v('--accent-500'),
+        ink:      v('--neutral-900'),
+        slate:    v('--neutral-500'),
+        panel:    v('--neutral-50'),
+        line:     v('--neutral-200'),
+
+        // (optional) expose full brand & neutral scales
+        brand: {
+          50: v('--brand-50'), 100: v('--brand-100'), 200: v('--brand-200'),
+          300: v('--brand-300'), 400: v('--brand-400'), 500: v('--brand-500'),
+          600: v('--brand-600'), 700: v('--brand-700'), 800: v('--brand-800'), 900: v('--brand-900'),
+        },
+        neutral: {
+          50: v('--neutral-50'), 100: v('--neutral-100'), 200: v('--neutral-200'),
+          300: v('--neutral-300'), 400: v('--neutral-400'), 500: v('--neutral-500'),
+          600: v('--neutral-600'), 700: v('--neutral-700'), 800: v('--neutral-800'), 900: v('--neutral-900'),
+        },
+        success: v('--success-500'),
+        info:    v('--info-500'),
+        warning: v('--warning-500'),
+        danger:  v('--danger-500'),
       },
       borderRadius: { lg: '12px' },
       boxShadow: { card: '0 6px 24px rgba(0,0,0,0.06)' },
       typography: ({ theme }) => ({
-        // use as: class="prose prose-docs"
         docs: {
           css: {
-            /* tokens */
             '--tw-prose-body': theme('colors.ink'),
             '--tw-prose-headings': theme('colors.primary'),
             '--tw-prose-links': theme('colors.primary'),
@@ -45,41 +60,28 @@ module.exports = {
             '--tw-prose-th-borders': theme('colors.line'),
             '--tw-prose-td-borders': theme('colors.line'),
 
-            /* headings & links */
             a: { textDecoration: 'none' },
             'a:hover': { textDecoration: 'underline' },
             h1: { color: theme('colors.primary') },
             h2: { color: theme('colors.primary') },
             h3: { color: theme('colors.primary') },
 
-            /* code */
             code: { fontWeight: '600' },
             pre: { borderRadius: theme('borderRadius.lg') },
 
-            /* figures (screenshots) */
             figure: { margin: '1.25rem 0' },
             'figure img': {
               borderRadius: theme('borderRadius.lg'),
-              boxShadow: theme('boxShadow.sm', '0 1px 2px rgba(0,0,0,.05)'),
+              boxShadow: '0 1px 2px rgba(0,0,0,.05)',
             },
             figcaption: {
-              fontSize: theme('fontSize.sm')[0],
+              fontSize: '0.875rem',
               color: theme('colors.slate'),
               marginTop: '0.5rem',
             },
-
-            /* blockquotes */
             blockquote: { borderLeftColor: theme('colors.secondary') },
-
-            /* tables */
-            'thead th': {
-              borderBottomColor: theme('colors.line'),
-              color: theme('colors.slate'),
-            },
-            'tbody td': {
-              borderBottomColor: theme('colors.line'),
-              verticalAlign: 'top',
-            },
+            'thead th': { borderBottomColor: theme('colors.line'), color: theme('colors.slate') },
+            'tbody td': { borderBottomColor: theme('colors.line'), verticalAlign: 'top' },
           },
         },
       }),

@@ -10,19 +10,20 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import nowdate, get_site_path
+from ifitwala_doc.ifitwala_doc.image_utils import slugify, resize_and_save
 
 # ────────────────────────────────────────────────────────────────────────────
-# Local helpers
+# Local helpers (renamed to avoid colliding with image_utils.slugify)
 # ────────────────────────────────────────────────────────────────────────────
 SLUG_RE = re.compile(r"[^a-z0-9-]+")
 
-def slugify(s: str) -> str:
-    """Slugify for docs URL slugs (kebab-case, keep hyphens)."""
+def doc_slugify(s: str) -> str:
+    """Slug for Documentation URLs (kebab-case, keep hyphens)."""
     base = re.sub(r"\s+", "-", (s or "").strip().lower())
     return SLUG_RE.sub("", base).strip("-")
 
 def _safe_slug(s: str) -> str:
-    return slugify(s)
+    return doc_slugify(s)
 
 def _checksum_for(file_url: str) -> str | None:
     """MD5 of the public file content; None if not found."""
@@ -36,16 +37,11 @@ def _checksum_for(file_url: str) -> str | None:
 
 def _doctype_folder_for_doc_screens(slug: str) -> str:
     """
-    Return a single-level folder name to remain compatible with image_util.resize_and_save,
-    which creates one folder directly under Home/gallery_resized.
-
-    Examples:
-      slug = "student-attendance"  -> "docs_student-attendance_shots"
+    Single-level folder name to match image_utils.resize_and_save behavior.
+    Variants will live in: /files/gallery_resized/<folder>/<size>_<base>.webp
+    Example: slug='student-attendance' -> 'docs_student-attendance_shots'
     """
     return f"docs_{slug}_shots"
-
-# Reuse your existing image utility module (no aliases)
-from ifitwala_doc.ifitwala_doc import image_util
 
 VALID_SIZES = {"auto", "large", "medium", "small", "thumb"}
 SIZE_WIDTHS = {"large": 1280, "medium": 960, "small": 640, "thumb": 320}
@@ -57,12 +53,12 @@ SIZE_WIDTHS = {"large": 1280, "medium": 960, "small": 640, "thumb": 320}
 class Documentation(Document):
     def before_insert(self):
         if not self.slug and self.title:
-            self.slug = slugify(self.title)
-        self.slug = slugify(self.slug)
+            self.slug = doc_slugify(self.title)
+        self.slug = doc_slugify(self.slug)
 
     def validate(self):
         # normalize slug + publish date
-        self.slug = slugify(self.slug)
+        self.slug = doc_slugify(self.slug)
         if self.status == "Published" and not self.published_on:
             self.published_on = nowdate()
 
@@ -167,12 +163,12 @@ def _generate_row_variants(docname: str, row_idx: int):
     For the given Documentation doc + child row index:
       - read original image
       - write large/medium/small/thumb .webp into gallery_resized/<folder>/
-      - register File rows (handled by image_util.resize_and_save)
+      - register File rows (handled by image_utils.resize_and_save)
       - mark row.generated_variants = 1
     """
     doc = frappe.get_doc("Documentation", docname)
     slug = doc.slug or _safe_slug(doc.title)
-    doctype_folder = _doctype_folder_for_doc_screens(slug)  # single-level name
+    doctype_folder = _doctype_folder_for_doc_screens(slug)  # single-level folder name
 
     # locate the row
     row = next((r for r in (doc.screenshots or []) if int(r.idx) == int(row_idx)), None)
@@ -186,13 +182,13 @@ def _generate_row_variants(docname: str, row_idx: int):
         frappe.log_error(f"Original not found: {original_path}", "Doc Screenshot Variants")
         return
 
-    # base filename uses YOUR image util's slugify (underscores)
-    base_name = image_util.slugify(row.anchor_id or f"fig_{row.idx}")
+    # base filename uses YOUR image_utils.slugify (underscores)
+    base_name = slugify(row.anchor_id or f"fig_{row.idx}")
 
     # generate four sizes (webp) via your util
     for size_label, width in SIZE_WIDTHS.items():
         try:
-            image_util.resize_and_save(
+            resize_and_save(
                 doc=filedoc,                    # keep attached_to_* linkage
                 original_path=original_path,
                 base_filename=base_name,
