@@ -2,5 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* optional: small defaults */
+/* small defaults */
 html, body { height: 100%; }
+
+/* Helpers that typography plugin doesn't handle */
+@layer utilities {
+  /* Keep anchors from hiding under top nav (use on headings if needed) */
+  .scroll-mt-header { scroll-margin-top: 6rem; }
+}
+
+/* Optional breadcrumb tint used in DocsLayout */
+@layer components {
+  .text-slate { @apply text-slate-600; }
+}

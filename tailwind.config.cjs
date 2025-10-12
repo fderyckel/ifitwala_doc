@@ -3,17 +3,10 @@ const path = require('path');
 
 module.exports = {
   content: [
-    // 1) Frappe site assets (Jinja/HTML/inline JS/MD rendered by Frappe)
     path.join(__dirname, 'ifitwala_doc', 'ifitwala_doc', 'www', '**/*.{md,html,js}'),
     path.join(__dirname, 'ifitwala_doc', 'ifitwala_doc', 'templates', '**/*.{html,md,js}'),
-
-    // 2) Vue code inside the app package (same level as templates/www)
     path.join(__dirname, 'ifitwala_doc', 'src', '**/*.{vue,js,ts}'),
-
-    // 3) Astro code at repo root
     path.join(__dirname, 'src', '**/*.{astro,md,mdx,vue,js,ts,tsx}'),
-
-    // 4) frappe-ui components
     path.join(__dirname, 'node_modules', 'frappe-ui', '**/*.{vue,js}'),
   ],
   safelist: [
@@ -36,6 +29,7 @@ module.exports = {
         // use as: class="prose prose-docs"
         docs: {
           css: {
+            /* tokens */
             '--tw-prose-body': theme('colors.ink'),
             '--tw-prose-headings': theme('colors.primary'),
             '--tw-prose-links': theme('colors.primary'),
@@ -44,20 +38,48 @@ module.exports = {
             '--tw-prose-bullets': theme('colors.slate'),
             '--tw-prose-hr': theme('colors.line'),
             '--tw-prose-quotes': theme('colors.ink'),
-            '--tw-prose-quote-borders': theme('colors.line'),
+            '--tw-prose-quote-borders': theme('colors.secondary'),
             '--tw-prose-captions': theme('colors.slate'),
             '--tw-prose-code': theme('colors.primary'),
             '--tw-prose-pre-bg': theme('colors.panel'),
             '--tw-prose-th-borders': theme('colors.line'),
             '--tw-prose-td-borders': theme('colors.line'),
+
+            /* headings & links */
             a: { textDecoration: 'none' },
             'a:hover': { textDecoration: 'underline' },
             h1: { color: theme('colors.primary') },
             h2: { color: theme('colors.primary') },
             h3: { color: theme('colors.primary') },
+
+            /* code */
             code: { fontWeight: '600' },
             pre: { borderRadius: theme('borderRadius.lg') },
+
+            /* figures (screenshots) */
+            figure: { margin: '1.25rem 0' },
+            'figure img': {
+              borderRadius: theme('borderRadius.lg'),
+              boxShadow: theme('boxShadow.sm', '0 1px 2px rgba(0,0,0,.05)'),
+            },
+            figcaption: {
+              fontSize: theme('fontSize.sm')[0],
+              color: theme('colors.slate'),
+              marginTop: '0.5rem',
+            },
+
+            /* blockquotes */
             blockquote: { borderLeftColor: theme('colors.secondary') },
+
+            /* tables */
+            'thead th': {
+              borderBottomColor: theme('colors.line'),
+              color: theme('colors.slate'),
+            },
+            'tbody td': {
+              borderBottomColor: theme('colors.line'),
+              verticalAlign: 'top',
+            },
           },
         },
       }),

@@ -5,7 +5,9 @@ frappe.ui.form.on('Documentation', {
   refresh(frm) {
     if (frm.is_new()) return;
 
-    // Preview works for Draft or Published
+    // ───────────────────────────────────────────────────────────
+    // Existing Actions
+    // ───────────────────────────────────────────────────────────
     frm.add_custom_button('Preview', () => {
       const lang = frm.doc.language || 'en';
       const slug = frm.doc.slug;
@@ -13,7 +15,6 @@ frappe.ui.form.on('Documentation', {
       window.open(url, '_blank');
     }, 'Actions');
 
-    // One-click rebuild (no token in browser; we call server-side helper)
     frm.add_custom_button('Rebuild Docs', async () => {
       try {
         await frappe.call('ifitwala_doc.api.build.kick_build');
@@ -23,21 +24,29 @@ frappe.ui.form.on('Documentation', {
       }
     }, 'Actions');
 
-    // Publish/Unpublish toggles + rebuild
     if (frm.doc.status === 'Published') {
       frm.add_custom_button('Unpublish', () => toggle_status(frm, 'Draft'), 'Actions');
     } else {
       frm.add_custom_button('Publish', () => toggle_status(frm, 'Published'), 'Actions');
     }
+
+    // ───────────────────────────────────────────────────────────
+    // Screenshots grid toolbar (one-time bind)
+    // ───────────────────────────────────────────────────────────
+    bind_screenshot_toolbar(frm);
   },
 
   title(frm) {
-    if (!frm.doc.slug) {
+    // only auto-slug if slug is empty
+    if (!frm.doc.slug && frm.doc.title) {
       frm.set_value('slug', frappe.utils.slug(frm.doc.title));
     }
   }
 });
 
+// ───────────────────────────────────────────────────────────────
+// Helpers
+// ───────────────────────────────────────────────────────────────
 async function toggle_status(frm, status) {
   frappe.confirm(`Set status to ${status}?`, async () => {
     await frm.set_value('status', status);
@@ -49,4 +58,113 @@ async function toggle_status(frm, status) {
       frappe.msgprint({ title: 'Rebuild failed', message: e?.message || String(e), indicator: 'red' });
     }
   });
+}
+
+function bind_screenshot_toolbar(frm) {
+  const grid = frm.fields_dict?.screenshots?.grid;
+  if (!grid) return;
+  if (grid.__ifw_bound) return;
+  grid.__ifw_bound = true;
+
+  // Add grid menu actions
+  grid.add_custom_button && grid.add_custom_button('Copy Markdown (selected)', () => {
+    const rows = grid.get_selected_children() || [];
+    if (!rows.length) return frappe.show_alert({ message: 'No rows selected', indicator: 'orange' });
+    rows.forEach(r => copy_markdown(r));
+  });
+
+  grid.add_custom_button && grid.add_custom_button('Copy Token (selected)', () => {
+    const rows = grid.get_selected_children() || [];
+    if (!rows.length) return frappe.show_alert({ message: 'No rows selected', indicator: 'orange' });
+    rows.forEach(r => copy_token(r));
+  });
+
+  grid.add_custom_button && grid.add_custom_button('Queue Variants (selected)', async () => {
+    const rows = grid.get_selected_children() || [];
+    if (!rows.length) return frappe.show_alert({ message: 'No rows selected', indicator: 'orange' });
+
+    // quick client validation first
+    const issues = validate_screenshots_client(frm);
+    if (issues.length) {
+      frappe.msgprint({
+        title: 'Fix these before queuing',
+        message: `<ul>${issues.map(i => `<li>${frappe.utils.escape_html(i)}</li>`).join('')}</ul>`,
+        indicator: 'red'
+      });
+      return;
+    }
+
+    const docname = frm.doc.name;
+    let queued = 0, failed = 0;
+    for (const r of rows) {
+      try {
+        await frappe.call({
+          method: 'ifitwala_doc.ifitwala_doc.doctype.documentation.documentation._generate_row_variants',
+          args: { docname, row_idx: r.idx }
+        });
+        queued++;
+      } catch (e) {
+        failed++;
+      }
+    }
+    frappe.show_alert({ message: `Queued ${queued} row(s)${failed ? `, ${failed} failed` : ''}`, indicator: failed ? 'orange' : 'green' });
+    // refresh to reflect generated_variants after workers run & save
+    frm.reload_doc();
+  });
+
+  grid.add_custom_button && grid.add_custom_button('Validate Screenshots', () => {
+    const issues = validate_screenshots_client(frm);
+    if (issues.length) {
+      frappe.msgprint({
+        title: 'Screenshot Issues',
+        message: `<ul>${issues.map(i => `<li>${frappe.utils.escape_html(i)}</li>`).join('')}</ul>`,
+        indicator: 'red'
+      });
+    } else {
+      frappe.show_alert({ message: 'Looks good ✨', indicator: 'green' });
+    }
+  });
+}
+
+// Build the user-facing snippets
+function copy_markdown(r) {
+  const size = (r.display_size || 'auto').trim();
+  const fig  = (r.anchor_id || `fig-${r.idx}`).trim();
+  const alt  = (r.alt_text || '').replace(/\n/g, ' ').trim() || 'screenshot';
+  const md   = `![${alt}](docs://${fig}){data-size="${size}"}`;
+  frappe.utils.copy_to_clipboard(md);
+  frappe.show_alert({ message: `Copied Markdown for ${fig}`, indicator: 'green' });
+}
+
+function copy_token(r) {
+  const size = (r.display_size || 'auto').trim();
+  const fig  = (r.anchor_id || `fig-${r.idx}`).trim();
+  const tk   = `[[fig:${fig} size=${size}]]`;
+  frappe.utils.copy_to_clipboard(tk);
+  frappe.show_alert({ message: `Copied token for ${fig}`, indicator: 'green' });
+}
+
+// Lightweight client-side validation to catch obvious issues early
+function validate_screenshots_client(frm) {
+  const issues = [];
+  const rows = (frm.doc.screenshots || []);
+  const seen = new Set();
+
+  rows.forEach(r => {
+    const anchor = (r.anchor_id || '').trim();
+    if (!anchor) issues.push(`Row #${r.idx}: Anchor ID is required`);
+    const key = anchor.toLowerCase();
+    if (key) {
+      if (seen.has(key)) issues.push(`Duplicate Anchor ID: ${anchor} (row #${r.idx})`);
+      seen.add(key);
+    }
+    if (!r.image) issues.push(`Row #${r.idx}: Screenshot image is required`);
+    if (!r.alt_text) issues.push(`Row #${r.idx}: Alt Text is required`);
+    const size = (r.display_size || 'auto').trim().toLowerCase();
+    if (!['auto','large','medium','small','thumb'].includes(size)) {
+      issues.push(`Row #${r.idx}: Invalid display size "${r.display_size}"`);
+    }
+  });
+
+  return issues;
 }

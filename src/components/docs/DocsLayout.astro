@@ -2,11 +2,73 @@
 import { marked } from 'marked'
 
 const { doc } = Astro.props
+const lang = doc.language || 'en'
+const shots = doc.screenshots || []
 
 marked.use({ headerIds: true, mangle: false })
 
-const html = marked.parse(doc.body_md || '')
-const lang = doc.language || 'en'
+function figById(id) {
+  return shots.find(s => (s.fig || '').toLowerCase() === (id || '').toLowerCase())
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))
+}
+
+function toPictureHTML(fig, explicitSize) {
+  if (!fig) return ''
+  const size = explicitSize && explicitSize !== 'auto' ? explicitSize : (fig.display_size || 'auto')
+  const bucket = size === 'auto' ? 'medium' : size
+  const webp = fig.urls?.webp || {}
+  const src = webp[bucket] || webp.medium || webp.small || webp.thumb || ''
+
+  const alt = fig.alt || 'screenshot'
+  const caption = fig.caption_md ? marked.parse(fig.caption_md) : ''
+  if (!src) return ''
+
+  return `
+  <figure id="${fig.fig}">
+    <picture>
+      <source srcset="${src}" type="image/webp" />
+      <img src="${src}" alt="${escapeHtml(alt)}" loading="lazy" />
+    </picture>
+    ${caption ? `<figcaption class="text-slate mt-2">${caption}</figcaption>` : ''}
+  </figure>`
+}
+
+function transformMD(md) {
+  if (!md) return ''
+
+  // 1) Markdown image with docs://FIG  e.g.  ![alt](docs://fig-id){data-size="small"}
+  md = md.replace(/!\[[^\]]*?\]\(docs:\/\/([^)]+)\)(\{[^}]*\})?/gi, (_, id, attrs) => {
+    const size = (attrs || '').match(/data-size="([^"]+)"/i)?.[1]
+    const fig = figById(id)
+    return toPictureHTML(fig, size)
+  })
+
+  // 2) Token [[fig:fig-id size=small]]
+  md = md.replace(/\[\[fig:([a-z0-9\-_]+)(?:\s+size=(large|medium|small|thumb|auto))?\]\]/gi, (_, id, size) => {
+    const fig = figById(id)
+    return toPictureHTML(fig, size)
+  })
+
+  // 3) AUTO_GALLERY: dump remaining figs in declared order
+  if (md.includes('<!-- AUTO_GALLERY -->')) {
+    const used = new Set()
+    ;[/docs:\/\/([^)]+)\)/gi, /\[\[fig:([a-z0-9\-_]+)[^\]]*\]\]/gi].forEach(rx => {
+      md.replace(rx, (_, id) => { used.add((id || '').toLowerCase()) })
+    })
+    const gallery = shots
+      .filter(s => !used.has((s.fig || '').toLowerCase()))
+      .map(s => toPictureHTML(s))
+      .join('\n')
+    md = md.replace('<!-- AUTO_GALLERY -->', gallery)
+  }
+
+  return md
+}
+
+const html = marked.parse(transformMD(doc.body_md || ''))
 ---
 
 <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10">

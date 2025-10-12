@@ -1,5 +1,3 @@
-
-
 # apps/ifitwala_doc/ifitwala_doc/api/docs.py
 
 import re
@@ -9,6 +7,7 @@ from hashlib import md5
 from frappe import _
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$", re.M)
+SLUG_SAFE_RE = re.compile(r"[^a-z0-9-]+")
 
 def _extract_headings(md: str):
     return [m.group(2).strip() for m in HEADING_RE.finditer(md or "")]
@@ -68,7 +67,6 @@ def _load_tags_for(names: list[str]) -> dict[str, list[str]]:
             tags_by_name.setdefault(nm, []).append(r["tag"])
     return tags_by_name
 
-
 def _subcategory_column() -> str | None:
     columns = []
     try:
@@ -89,6 +87,53 @@ def _normalize_subcategory(record: dict, column: str | None):
         record["subcategory"] = record.pop(column, None)
     return record
 
+def _shot_folder(slug: str) -> str:
+    """
+    Folder name that matches image_util.resize_and_save (single level under gallery_resized).
+    Example: slug='student-attendance' -> 'docs_student-attendance_shots'
+    """
+    return f"docs_{slug}_shots"
+
+def _slug_safe(s: str) -> str:
+    """Kebab-case for URLs; keep hyphens."""
+    return SLUG_SAFE_RE.sub("", (s or "").strip().lower().replace(" ", "-")).strip("-")
+
+def _shot_manifest_for(docname: str, slug: str):
+    """
+    Build per-page screenshot manifest from child table rows.
+    Produces URLs that match your image_util output:
+      /files/gallery_resized/docs_<slug>_shots/<size>_<anchor>.webp
+    """
+    rows = frappe.get_all(
+        "Doc Screenshot",
+        filters={"parenttype": "Documentation", "parent": docname},
+        fields=["anchor_id", "title", "alt_text", "display_size", "caption_md", "idx"],
+        order_by="idx asc",
+        ignore_permissions=True,
+    )
+    folder = f"/files/gallery_resized/{_shot_folder(slug)}"
+    shots = []
+    for r in rows:
+        fig = (r.get("anchor_id") or f"fig-{r.get('idx')}").strip()
+        # anchor converted to kebab to match file names we generated
+        base = _slug_safe(fig)
+        shots.append({
+            "fig": fig,
+            "title": r.get("title") or "",
+            "alt": r.get("alt_text") or "",
+            "display_size": (r.get("display_size") or "auto").strip().lower(),
+            "caption_md": r.get("caption_md") or "",
+            "urls": {
+                "webp": {
+                    "large":  f"{folder}/large_{base}.webp",
+                    "medium": f"{folder}/medium_{base}.webp",
+                    "small":  f"{folder}/small_{base}.webp",
+                    "thumb":  f"{folder}/thumb_{base}.webp",
+                }
+            }
+        })
+    return shots
+
 @frappe.whitelist(allow_guest=True)
 def fetch_all(language: str | None = None):
     flt = {"status": "Published"}
@@ -105,7 +150,8 @@ def fetch_all(language: str | None = None):
         "Documentation",
         filters=flt,
         fields=fields,
-        order_by=f"category, {subcat_col}, doc_order, title" if subcat_col else "category, doc_order, title",
+        order_by=(f"category, {subcat_col}, doc_order, title" if subcat_col
+                  else "category, doc_order, title"),
         ignore_permissions=True,
     )
     tags = _load_tags_for([d["name"] for d in docs])
@@ -136,13 +182,14 @@ def fetch_one(language: str, slug: str):
     if not d:
         frappe.throw("Not Found", frappe.DoesNotExistError)
 
-    # subcategory is already aliased; normalize anyway (no-op if absent)
     _normalize_subcategory(d, subcat_col)
-
     tags = _load_tags_for([d.get("name")])
     d["tags"] = tags.get(d.get("name"), [])
-    return d
 
+    # ⬇️ include per-page screenshot manifest
+    d["screenshots"] = _shot_manifest_for(d["name"], d["slug"])
+
+    return d
 
 @frappe.whitelist(allow_guest=True)
 def search_index(language: str | None = None):
@@ -173,15 +220,9 @@ def search_index(language: str | None = None):
         return
     return {"items": items}
 
-
-
 @frappe.whitelist(allow_guest=True)
 def get_categories(language="en"):
-    """
-    Return Doc Category cards (ordered by cat_order, then label).
-    Note: 'language' is present for future per-language category copies,
-    but we don't filter by it for now (categories are language-agnostic).
-    """
+    """Doc Category cards (ordered)."""
     return frappe.get_all(
         "Doc Category",
         fields=["name", "slug", "label", "icon", "description", "cat_order"],
@@ -191,9 +232,7 @@ def get_categories(language="en"):
 
 @frappe.whitelist(allow_guest=True)
 def get_category(slug: str):
-    """
-    Fetch a single category by slug.
-    """
+    """Single category by slug."""
     return frappe.db.get_value(
         "Doc Category",
         {"slug": slug},
@@ -204,10 +243,9 @@ def get_category(slug: str):
 @frappe.whitelist(allow_guest=True)
 def get_docs_in_category(language: str, category_slug: str):
     """
-    Return Published Documentation records for (language, category.slug).
-    - 'Documentation.category' is a Link to 'Doc Category' (by name)
-    - We accept the category slug in the API, resolve to its 'name',
-      then filter Documentation by that Link field.
+    Docs for (language, category.slug).
+    'Documentation.category' is a Link to 'Doc Category' (by name),
+    so we resolve slug -> name first.
     """
     cat = frappe.db.get_value("Doc Category", {"slug": category_slug}, "name")
     if not cat:
@@ -216,7 +254,7 @@ def get_docs_in_category(language: str, category_slug: str):
     filters = {
         "status": "Published",
         "language": language,
-        "category": cat,  # link by name
+        "category": cat,
     }
     return frappe.get_all(
         "Documentation",
