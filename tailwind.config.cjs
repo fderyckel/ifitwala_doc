@@ -11,7 +11,7 @@ module.exports = {
     path.join(__dirname, 'src', '**/*.{astro,md,mdx,vue,js,ts,tsx}'),
     path.join(__dirname, 'node_modules', 'frappe-ui', '**/*.{vue,js}'),
   ],
-  safelist: ['prose','prose-docs','max-w-3xl','mx-auto','px-6','py-10'],
+  safelist: ['prose','prose-docs','max-w-3xl','mx-auto','px-6','py-10','not-prose'],
   theme: {
     extend: {
       colors: {
