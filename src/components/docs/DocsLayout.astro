@@ -7,6 +7,13 @@ const shots = doc.screenshots || []
 
 marked.use({ headerIds: true, mangle: false })
 
+const CALLOUT_CLASSES = {
+  info: 'border-info-500',
+  warning: 'border-warning-500',
+  tip: 'border-success-500',
+  note: 'border-neutral-400',
+}
+
 function figById(id) {
   return shots.find(s => (s.fig || '').toLowerCase() === (id || '').toLowerCase())
 }
@@ -36,7 +43,28 @@ function toPictureHTML(fig, explicitSize) {
   </figure>`
 }
 
-function transformMD(md) {
+function decodeEntities(str = '') {
+  return str
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+}
+
+function parseAttrs(str = '') {
+  const attrs = {}
+  const rx = /([^\s=]+)\s*=\s*("(?:[^"]*)"|'(?:[^']*)')/g
+  let match
+  while ((match = rx.exec(str))) {
+    const key = match[1]
+    const quoted = match[2]
+    attrs[key] = decodeEntities(quoted.slice(1, -1))
+  }
+  return attrs
+}
+
+function applyDocTransforms(md) {
   if (!md) return ''
 
   // 1) Markdown image with docs://FIG  e.g.  ![alt](docs://fig-id){data-size="small"}
@@ -68,7 +96,46 @@ function transformMD(md) {
   return md
 }
 
-const html = marked.parse(transformMD(doc.body_md || ''))
+function renderMarkdown(input, { allowCallouts = true } = {}) {
+  let md = applyDocTransforms(input || '')
+
+  if (!allowCallouts) {
+    return marked.parse(md)
+  }
+
+  const callouts = []
+  const CALL_REGEX = /(?:&lt;|<)Callout\b([^>]*?)(?:&gt;|>)([\s\S]*?)(?:&lt;|<)\/Callout(?:&gt;|>)/gi
+
+  md = md.replace(CALL_REGEX, (_, rawAttrs, rawBody) => {
+    const id = `callout-${callouts.length}`
+    const placeholder = `<div data-callout-placeholder="${id}"></div>`
+    callouts.push({
+      id,
+      attrs: parseAttrs(decodeEntities(rawAttrs || '')),
+      bodyMd: (rawBody || '').trim(),
+    })
+    return `\n\n${placeholder}\n\n`
+  })
+
+  let html = marked.parse(md)
+
+  for (const callout of callouts) {
+    const type = (callout.attrs.type || 'info').toLowerCase()
+    const title = callout.attrs.title || ''
+    const typeClass = CALLOUT_CLASSES[type] || CALLOUT_CLASSES.info
+    const bodyHtml = renderMarkdown(callout.bodyMd, { allowCallouts: true }).trim()
+    const titleHtml = title ? `<div class="font-semibold mb-1">${escapeHtml(title)}</div>` : ''
+    const calloutHtml = `<div class="border-l-4 p-3 rounded bg-neutral-50 ${typeClass}">${titleHtml}<div class="prose prose-brand max-w-none">${bodyHtml}</div></div>`
+    const placeholder = `<div data-callout-placeholder="${callout.id}"></div>`
+    if (html.includes(placeholder)) {
+      html = html.split(placeholder).join(calloutHtml)
+    }
+  }
+
+  return html
+}
+
+const html = renderMarkdown(doc.body_md || '')
 ---
 
 <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10">

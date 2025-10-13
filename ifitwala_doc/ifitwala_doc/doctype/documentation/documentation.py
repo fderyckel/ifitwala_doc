@@ -9,7 +9,7 @@ import hashlib
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import nowdate, get_site_path
+from frappe.utils import nowdate, get_site_path, cint
 from ifitwala_doc.ifitwala_doc.image_utils import slugify, resize_and_save
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -45,6 +45,51 @@ def _doctype_folder_for_doc_screens(slug: str) -> str:
 
 VALID_SIZES = {"auto", "large", "medium", "small", "thumb"}
 SIZE_WIDTHS = {"large": 1280, "medium": 960, "small": 640, "thumb": 320}
+
+
+def _ensure_flags_container(row):
+    if getattr(row, "flags", None) is None:
+        row.flags = frappe._dict()
+    return row.flags
+
+
+def _has_generated_variants_field(row) -> bool:
+    meta = getattr(row, "meta", None)
+    get_field = getattr(meta, "get_field", None)
+    return bool(callable(get_field) and get_field("generated_variants"))
+
+
+def _get_generated_variants(row) -> int:
+    if not row:
+        return 0
+    if _has_generated_variants_field(row):
+        try:
+            return cint(row.get("generated_variants") or 0)
+        except Exception:
+            return 0
+    flags = _ensure_flags_container(row)
+    return cint(flags.get("generated_variants") or 0)
+
+
+def _set_generated_variants(row, value: int):
+    if not row:
+        return
+    value = cint(value)
+    if _has_generated_variants_field(row):
+        row.set("generated_variants", value)
+    else:
+        flags = _ensure_flags_container(row)
+        flags.generated_variants = value
+
+
+def _log_missing_generated_variants_once(docname: str):
+    if getattr(frappe.flags, "_missing_generated_variants_logged", False):
+        return
+    frappe.flags._missing_generated_variants_logged = True
+    frappe.log_error(
+        f"'generated_variants' field missing on Doc Screenshot rows for Documentation {docname}",
+        "Doc Screenshot Schema Mismatch"
+    )
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -141,11 +186,14 @@ class Documentation(Document):
             cs = _checksum_for(row.image)
             if cs and cs != (row.checksum or ""):
                 row.checksum = cs
-                row.generated_variants = 0  # force regeneration
+                _set_generated_variants(row, 0)  # force regeneration when the image changes
 
     def _enqueue_variant_generation_if_needed(self):
         for row in (self.screenshots or []):
-            if row.image and not row.generated_variants:
+            generated_variants = _get_generated_variants(row)
+            if row.image and not generated_variants:
+                if not _has_generated_variants_field(row):
+                    _log_missing_generated_variants_once(self.name)
                 frappe.enqueue(
                     "ifitwala_doc.ifitwala_doc.doctype.documentation.documentation._generate_row_variants",
                     queue="short",
@@ -201,6 +249,9 @@ def _generate_row_variants(docname: str, row_idx: int):
             frappe.log_error(f"{e}", "Doc Screenshot Resize Error")
 
     # mark done
-    row.generated_variants = 1
-    # keep checksum as-is (already computed in validate)
-    doc.save(ignore_permissions=True)
+    _set_generated_variants(row, 1)
+    if _has_generated_variants_field(row):
+        # keep checksum as-is (already computed in validate)
+        doc.save(ignore_permissions=True)
+    else:
+        _log_missing_generated_variants_once(docname)
