@@ -7,14 +7,13 @@ const shots = doc.screenshots || []
 
 marked.use({ headerIds: true, mangle: false })
 
+const VITE_ENV = ((import.meta as any) || {}).env || {}
 const DOCS_BASE =
-  (typeof import.meta !== 'undefined' &&
-    (import.meta as any).env &&
-    (import.meta as any).env.PUBLIC_DOCS_API) ||
-  process.env.DOCS_API_BASE ||
+  VITE_ENV.PUBLIC_DOCS_API ||
+  (typeof globalThis !== 'undefined' && (globalThis as any)?.process?.env?.DOCS_API_BASE) ||
   'http://127.0.0.1:8000'
 
-const ASSET_BASE = (DOCS_BASE || '').replace(/\/$/, '')
+const ASSET_BASE = String(DOCS_BASE || '').replace(/\/$/, '')
 
 const CALLOUT_COLORS = {
   info: {
