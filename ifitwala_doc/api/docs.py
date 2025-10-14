@@ -5,6 +5,9 @@ import frappe
 from frappe.utils import format_datetime
 from hashlib import md5
 from frappe import _
+import os
+from frappe.utils import get_site_path
+from ifitwala_doc.ifitwala_doc.image_utils import slugify
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$", re.M)
 SLUG_SAFE_RE = re.compile(r"[^a-z0-9-]+")
@@ -98,41 +101,59 @@ def _slug_safe(s: str) -> str:
     """Kebab-case for URLs; keep hyphens."""
     return SLUG_SAFE_RE.sub("", (s or "").strip().lower().replace(" ", "-")).strip("-")
 
-def _shot_manifest_for(docname: str, slug: str):
+def _file_exists(url: str) -> bool:
+    """Check for /public files existence from a /files/... URL."""
+    if not url:
+        return False
+    path = get_site_path("public", url.lstrip("/"))
+    return os.path.exists(path)
+
+def _shot_manifest_for(docname: str, slug: str) -> dict:
     """
-    Build per-page screenshot manifest from child table rows.
-    Produces URLs that match your image_util output:
-      /files/gallery_resized/docs_<slug>_shots/<size>_<anchor>.webp
+    Build a manifest mapping each anchor_id -> image metadata + URLs.
+    Uses the SAME slug algorithm as the resizer so filenames match.
+    Only includes sizes that actually exist to avoid 404s.
     """
     rows = frappe.get_all(
         "Doc Screenshot",
         filters={"parenttype": "Documentation", "parent": docname},
-        fields=["anchor_id", "title", "alt_text", "display_size", "caption_md", "idx"],
-        order_by="idx asc",
+        fields=[
+            "idx", "anchor_id", "title", "image", "display_size",
+            "caption_md", "alt_text"
+        ],
+        order_by="IFNULL(image_order, 9999), idx",
         ignore_permissions=True,
     )
-    folder = f"/files/gallery_resized/{_shot_folder(slug)}"
-    shots = []
+
+    folder = f"docs_{slug}_shots"             # e.g. docs_student_shots
+    base_url = f"/files/gallery_resized/{folder}"
+    out: dict[str, dict] = {}
+
     for r in rows:
-        fig = (r.get("anchor_id") or f"fig-{r.get('idx')}").strip()
-        # anchor converted to kebab to match file names we generated
-        base = _slug_safe(fig)
-        shots.append({
-            "fig": fig,
+        anchor = (r.get("anchor_id") or f"fig_{r.get('idx')}").strip()
+        base   = slugify(anchor)               # >>> underscores (matches generated files)
+        sizes  = ("large", "medium", "small", "thumb")
+
+        srcset = {}
+        for s in sizes:
+            url = f"{base_url}/{s}_{base}.webp"
+            if _file_exists(url):
+                srcset[s] = url
+
+        # Choose a default for {data-size="auto"}: prefer medium, then small, then thumb, else original
+        auto_url = srcset.get("medium") or srcset.get("small") or srcset.get("thumb") or r.get("image")
+
+        out[anchor] = {
             "title": r.get("title") or "",
             "alt": r.get("alt_text") or "",
-            "display_size": (r.get("display_size") or "auto").strip().lower(),
             "caption_md": r.get("caption_md") or "",
-            "urls": {
-                "webp": {
-                    "large":  f"{folder}/large_{base}.webp",
-                    "medium": f"{folder}/medium_{base}.webp",
-                    "small":  f"{folder}/small_{base}.webp",
-                    "thumb":  f"{folder}/thumb_{base}.webp",
-                }
-            }
-        })
-    return shots
+            "display_size": (r.get("display_size") or "auto").lower(),
+            "srcset": srcset,
+            "auto": auto_url,
+        }
+
+    return out
+
 
 @frappe.whitelist(allow_guest=True)
 def fetch_all(language: str | None = None):
@@ -188,6 +209,7 @@ def fetch_one(language: str, slug: str):
 
     # ⬇️ include per-page screenshot manifest
     d["screenshots"] = _shot_manifest_for(d["name"], d["slug"])
+
 
     return d
 
