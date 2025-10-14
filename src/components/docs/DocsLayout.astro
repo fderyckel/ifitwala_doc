@@ -7,7 +7,39 @@ const shots = doc.screenshots || []
 
 marked.use({ headerIds: true, mangle: false })
 
-const ALLOWED_CALLOUT_TYPES = new Set(['info', 'warning', 'tip', 'note'])
+const DOCS_BASE =
+  (typeof import.meta !== 'undefined' &&
+    (import.meta as any).env &&
+    (import.meta as any).env.PUBLIC_DOCS_API) ||
+  process.env.DOCS_API_BASE ||
+  'http://127.0.0.1:8000'
+
+const ASSET_BASE = (DOCS_BASE || '').replace(/\/$/, '')
+
+const CALLOUT_COLORS = {
+  info: {
+    bg: 'rgba(43, 123, 187, 0.08)',
+    border: 'rgba(43, 123, 187, 0.24)',
+    accent: 'rgba(43, 123, 187, 0.72)',
+  },
+  warning: {
+    bg: 'rgba(208, 135, 0, 0.08)',
+    border: 'rgba(208, 135, 0, 0.24)',
+    accent: 'rgba(208, 135, 0, 0.72)',
+  },
+  tip: {
+    bg: 'rgba(41, 159, 101, 0.08)',
+    border: 'rgba(41, 159, 101, 0.24)',
+    accent: 'rgba(41, 159, 101, 0.72)',
+  },
+  note: {
+    bg: 'rgba(148, 163, 184, 0.12)',
+    border: 'rgba(148, 163, 184, 0.28)',
+    accent: 'rgba(148, 163, 184, 0.8)',
+  },
+}
+
+const ALLOWED_CALLOUT_TYPES = new Set(Object.keys(CALLOUT_COLORS))
 
 function figById(id) {
   return shots.find(s => (s.fig || '').toLowerCase() === (id || '').toLowerCase())
@@ -22,7 +54,15 @@ function toPictureHTML(fig, explicitSize) {
   const size = explicitSize && explicitSize !== 'auto' ? explicitSize : (fig.display_size || 'auto')
   const bucket = size === 'auto' ? 'medium' : size
   const webp = fig.urls?.webp || {}
-  const src = webp[bucket] || webp.medium || webp.small || webp.thumb || ''
+  const candidate =
+    webp[bucket] ||
+    webp.medium ||
+    webp.small ||
+    webp.thumb ||
+    fig.urls?.original ||
+    fig.urls?.fallback ||
+    ''
+  const src = resolveAssetUrl(candidate)
 
   const alt = fig.alt || 'screenshot'
   const caption = fig.caption_md ? marked.parse(fig.caption_md) : ''
@@ -57,6 +97,20 @@ function parseAttrs(str = '') {
     attrs[key] = decodeEntities(quoted.slice(1, -1))
   }
   return attrs
+}
+
+function resolveAssetUrl(input) {
+  if (!input) return ''
+  const trimmed = String(input || '').trim()
+  if (!trimmed) return ''
+  if (/^([a-z]+:)?\/\//i.test(trimmed) || trimmed.startsWith('data:')) {
+    return trimmed
+  }
+  const normalized = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
+  if (!ASSET_BASE) {
+    return normalized
+  }
+  return `${ASSET_BASE}${normalized}`
 }
 
 function applyDocTransforms(md) {
@@ -120,7 +174,9 @@ function renderMarkdown(input, { allowCallouts = true } = {}) {
     const title = callout.attrs.title || ''
     const bodyHtml = renderMarkdown(callout.bodyMd, { allowCallouts: true }).trim()
     const titleHtml = title ? `<div class="docs-callout-title">${escapeHtml(title)}</div>` : ''
-    const calloutHtml = `<div class="docs-callout not-prose docs-callout-${type}" data-callout-type="${type}">${titleHtml}<div class="docs-callout-body prose prose-brand max-w-none">${bodyHtml}</div></div>`
+    const palette = CALLOUT_COLORS[type] || CALLOUT_COLORS.info
+    const styleAttr = ` style="--callout-bg:${palette.bg};--callout-border:${palette.border};--callout-border-strong:${palette.accent}"`
+    const calloutHtml = `<div class="docs-callout not-prose docs-callout-${type}" data-callout-type="${type}"${styleAttr}>${titleHtml}<div class="docs-callout-body prose prose-brand max-w-none">${bodyHtml}</div></div>`
     const placeholder = `<div data-callout-placeholder="${callout.id}"></div>`
     if (html.includes(placeholder)) {
       html = html.split(placeholder).join(calloutHtml)

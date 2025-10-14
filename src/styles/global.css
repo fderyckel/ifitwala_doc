@@ -19,10 +19,11 @@ html, body { height: 100%; }
   .dark .text-slate { color: var(--neutral-300); }
 
   .docs-callout {
-    @apply border border-line rounded-lg p-4 shadow-card;
+    @apply border rounded-lg p-4 shadow-card;
+    border-color: var(--callout-border, var(--line));
     border-left-width: 6px;
-    border-left-color: var(--neutral-400);
-    background-color: var(--neutral-50);
+    border-left-color: var(--callout-border-strong, var(--neutral-400));
+    background-color: var(--callout-bg, var(--neutral-50));
   }
 
   .docs-callout-title {
@@ -31,29 +32,5 @@ html, body { height: 100%; }
 
   .docs-callout-body > :last-child {
     margin-bottom: 0;
-  }
-
-  .docs-callout-info {
-    background-color: rgba(43, 123, 187, 0.08);
-    border-color: rgba(43, 123, 187, 0.24);
-    border-left-color: rgba(43, 123, 187, 0.72);
-  }
-
-  .docs-callout-warning {
-    background-color: rgba(208, 135, 0, 0.08);
-    border-color: rgba(208, 135, 0, 0.24);
-    border-left-color: rgba(208, 135, 0, 0.72);
-  }
-
-  .docs-callout-tip {
-    background-color: rgba(41, 159, 101, 0.08);
-    border-color: rgba(41, 159, 101, 0.24);
-    border-left-color: rgba(41, 159, 101, 0.72);
-  }
-
-  .docs-callout-note {
-    background-color: rgba(148, 163, 184, 0.12);
-    border-color: rgba(148, 163, 184, 0.28);
-    border-left-color: rgba(148, 163, 184, 0.8);
   }
 }
