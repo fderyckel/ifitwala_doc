@@ -3,7 +3,56 @@ import { marked } from 'marked'
 
 const { doc } = Astro.props
 const lang = doc.language || 'en'
-const shots = doc.screenshots || []
+
+function normalizeShots(raw) {
+  const entries = Array.isArray(raw)
+    ? raw
+    : raw && typeof raw === 'object'
+      ? Object.entries(raw).map(([fig, value]) => ({ fig, ...(value || {}) }))
+      : []
+
+  return entries
+    .filter(Boolean)
+    .map((entry, index) => {
+      const figId =
+        String(
+          entry.fig ||
+            entry.anchor ||
+            entry.anchor_id ||
+            entry.id ||
+            entry.key ||
+            ''
+        ).trim() || `fig_${index + 1}`
+
+      const urls = { ...(entry.urls || {}) }
+      if (
+        !urls.webp &&
+        entry.srcset &&
+        typeof entry.srcset === 'object' &&
+        !Array.isArray(entry.srcset)
+      ) {
+        urls.webp = entry.srcset
+      }
+      if (!urls.webp || typeof urls.webp !== 'object') {
+        urls.webp = {}
+      }
+      if (!urls.original && entry.image) {
+        urls.original = entry.image
+      }
+      if (!urls.fallback && entry.auto) {
+        urls.fallback = entry.auto
+      }
+
+      return {
+        ...entry,
+        fig: figId,
+        urls,
+        display_size: (entry.display_size || 'auto').toLowerCase(),
+      }
+    })
+}
+
+const shots = normalizeShots(doc.screenshots)
 
 marked.use({ headerIds: true, mangle: false })
 
@@ -52,7 +101,7 @@ function toPictureHTML(fig, explicitSize) {
   if (!fig) return ''
   const size = explicitSize && explicitSize !== 'auto' ? explicitSize : (fig.display_size || 'auto')
   const bucket = size === 'auto' ? 'medium' : size
-  const webp = fig.urls?.webp || {}
+  const webp = fig.urls?.webp || fig.srcset || {}
   const candidate =
     webp[bucket] ||
     webp.medium ||
@@ -60,6 +109,8 @@ function toPictureHTML(fig, explicitSize) {
     webp.thumb ||
     fig.urls?.original ||
     fig.urls?.fallback ||
+    fig.auto ||
+    fig.image ||
     ''
   const src = resolveAssetUrl(candidate)
 

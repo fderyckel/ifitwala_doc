@@ -108,11 +108,43 @@ def _file_exists(url: str) -> bool:
     path = get_site_path("public", url.lstrip("/"))
     return os.path.exists(path)
 
-def _shot_manifest_for(docname: str, slug: str) -> dict:
+def _variant_bases(anchor: str) -> list[str]:
     """
-    Build a manifest mapping each anchor_id -> image metadata + URLs.
-    Uses the SAME slug algorithm as the resizer so filenames match.
-    Only includes sizes that actually exist to avoid 404s.
+    Return a list of candidate basename tokens for a screenshot anchor.
+    We primarily use image_utils.slugify (underscores), but we also consider
+    a kebab-case flavour so we gracefully handle legacy files that were saved
+    with hyphens.
+    """
+    seeds = [anchor or ""]
+    seed = seeds[0]
+    if seed:
+        for extra in (seed.replace("-", "_"), seed.replace("_", "-")):
+            if extra not in seeds:
+                seeds.append(extra)
+
+    candidates: list[str] = []
+
+    def _add(value: str | None):
+        value = (value or "").strip().strip("_-")
+        if not value:
+            return
+        if value not in candidates:
+            candidates.append(value)
+
+    for s in seeds:
+        _add(slugify(s))
+
+    for c in list(candidates):
+        kebab = c.replace("_", "-")
+        _add(kebab)
+
+    return candidates or [slugify(anchor or "")]
+
+def _shot_manifest_for(docname: str, slug: str) -> list[dict]:
+    """
+    Build a manifest containing metadata + URLs for each Doc Screenshot row.
+    Uses the SAME slug algorithm as the resizer so filenames match, but also
+    probes a kebab-case variant to avoid 404s when legacy files used hyphens.
     """
     rows = frappe.get_all(
         "Doc Screenshot",
@@ -127,32 +159,52 @@ def _shot_manifest_for(docname: str, slug: str) -> dict:
 
     folder = f"docs_{slug}_shots"             # e.g. docs_student_shots
     base_url = f"/files/gallery_resized/{folder}"
-    out: dict[str, dict] = {}
+    manifest: list[dict] = []
 
-    for r in rows:
-        anchor = (r.get("anchor_id") or f"fig_{r.get('idx')}").strip()
-        base   = slugify(anchor)               # >>> underscores (matches generated files)
+    for idx, r in enumerate(rows, start=1):
+        anchor = (r.get("anchor_id") or f"fig_{r.get('idx') or idx}").strip()
+        bases  = _variant_bases(anchor)
         sizes  = ("large", "medium", "small", "thumb")
 
         srcset = {}
         for s in sizes:
-            url = f"{base_url}/{s}_{base}.webp"
-            if _file_exists(url):
+            url = None
+            for base in bases:
+                candidate = f"{base_url}/{s}_{base}.webp"
+                if _file_exists(candidate):
+                    url = candidate
+                    break
+            if url:
                 srcset[s] = url
 
-        # Choose a default for {data-size="auto"}: prefer medium, then small, then thumb, else original
-        auto_url = srcset.get("medium") or srcset.get("small") or srcset.get("thumb") or r.get("image")
+        original = r.get("image") or ""
+        urls = {}
+        if srcset:
+            urls["webp"] = srcset
+        if original:
+            urls["original"] = original
+            urls.setdefault("fallback", original)
 
-        out[anchor] = {
+        # Choose a default for {data-size="auto"}: prefer medium, then small, then thumb, else original
+        auto_url = (
+            srcset.get("medium")
+            or srcset.get("small")
+            or srcset.get("thumb")
+            or original
+        )
+
+        manifest.append({
+            "fig": anchor,
             "title": r.get("title") or "",
             "alt": r.get("alt_text") or "",
             "caption_md": r.get("caption_md") or "",
             "display_size": (r.get("display_size") or "auto").lower(),
             "srcset": srcset,
             "auto": auto_url,
-        }
+            "urls": urls,
+        })
 
-    return out
+    return manifest
 
 
 @frappe.whitelist(allow_guest=True)
