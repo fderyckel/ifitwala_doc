@@ -1,3 +1,243 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><title>Getting Started | Ifitwala Ed Docs</title><meta name="description" content><link rel="canonical" href="/docs/en/getting-started"><meta name="viewport" content="width=device-width, initial-scale=1"></head> <body class="bg-panel text-ink"> <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10"> <nav class="not-prose text-sm text-slate mb-4"> <a href="/docs/en" class="hover:underline">Docs</a>   </nav> <h1 class="mb-1">Getting Started</h1>  <div class="mt-6"><h1>Hello</h1>
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><title>Getting Started | Ifitwala Ed Docs</title><link rel="canonical" href="/docs/en/getting-started"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/docs/_astro/index.CoKGrTbD.css"></head> <body class="bg-panel text-ink"> <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10"> <nav class="not-prose text-sm text-slate mb-4"> <a href="/docs/en" class="hover:underline">Docs</a>  <span class="mx-1">›</span> <a href="/docs/en/Getting Started" class="hover:underline"> Getting Started </a>   </nav> <h1 class="mb-1">Getting Started</h1>  <div class="mt-6"><h1>Hello</h1>
 <p>This is the first page.</p>
+<h1>Getting Started</h1>
+<p>Welcome to <strong>Ifitwala Ed</strong> — a modern, elegant education ERP &amp; LMS built on the Frappe framework. This guide walks you from zero to a working campus in minutes.</p>
+<p>&gt; <strong>What you’ll do</strong>
+&gt;
+&gt; 1. Install or connect to an Ifitwala Ed site
+&gt; 2. Run the first-time setup
+&gt; 3. Create core records (School, Academic Year, Programs, Courses)
+&gt; 4. Invite users and assign roles
+&gt; 5. Learn daily workflows (timetable, attendance, grading)</p>
+<hr>
+<h2>Requirements</h2>
+<ul>
+<li><strong>Server:</strong> Ubuntu 22.04+ (2 vCPU / 4 GB RAM minimum for small schools)</li>
+<li><strong>Stack:</strong> Python 3.10+, Node 18+, Redis, MariaDB 10.6+, Yarn, wkhtmltopdf</li>
+<li><strong>Frappe/Bench:</strong> Bench CLI with a production or dev site</li>
+<li><strong>Browser:</strong> Chrome/Edge/Firefox (latest)</li>
+</ul>
+<p>&gt; <strong>Tip</strong>: If you’re evaluating, start on a dev VM. You can migrate data later.</p>
+<hr>
+<h2>Install Options</h2>
+<h3>A) New server (self-host)</h3>
+<p>Create a new bench and site, then install the app:</p>
+<pre><code class="language-bash"># As a non-root user with sudo
+bench init frappe-bench --frappe-branch version-15
+cd frappe-bench
+
+# Create site
+bench new-site ifitwala.com   # use your domain or dev host
+# (answer DB + admin password prompts)
+
+# Get the Ifitwala apps
+bench get-app https://github.com/fderyckel/ifitwala_doc
+bench get-app https://github.com/fderyckel/ifitwala_ed
+
+# Install the school ERP into your site
+bench --site ifitwala.com install-app ifitwala_ed ifitwala_doc
+
+# Start (dev) or set up production
+bench start
+# or:
+# bench setup production &amp;lt;your-linux-user&amp;gt;
+</code></pre>
+<h3>B) Existing Frappe site</h3>
+<pre><code class="language-bash">bench get-app https://github.com/fderyckel/ifitwala_ed
+bench --site your.site install-app ifitwala_ed
+bench restart
+</code></pre>
+<hr>
+<h2>First-time Setup</h2>
+<p>When you log in as <strong>Administrator</strong>, you’ll see the setup assistant.</p>
+<ol>
+<li><strong>School profile</strong> — Name, logo, academic level (K-12, higher-ed, training).</li>
+<li><strong>Localization</strong> — Default currency, timezone, and <strong>language</strong> (you can add more later).</li>
+<li><strong>Email</strong> — Outgoing (SMTP) and incoming (optional).</li>
+<li><strong>Admin user</strong> — Create staff accounts (Principal, Registrar, Teachers).</li>
+<li><strong>Backup</strong> — Enable automatic S3 or local backups (recommended).</li>
+</ol>
+<p>&gt; <strong>Note</strong>: You can rerun parts of setup anytime via the System Settings and Email Account doctypes.</p>
+<hr>
+<h2>Core Concepts (at a glance)</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>What it is</th>
+<th>Typical examples</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>School</strong></td>
+<td>Your institution entity</td>
+<td>Ifitwala International School</td>
+</tr>
+<tr>
+<td><strong>Academic Year / Term</strong></td>
+<td>Time containers for courses &amp; grading</td>
+<td>2025–2026; Term 1</td>
+</tr>
+<tr>
+<td><strong>Program</strong></td>
+<td>Cohort or curriculum path</td>
+<td>Grade 7, B.Sc. Math, Level 2</td>
+</tr>
+<tr>
+<td><strong>Course</strong></td>
+<td>A teachable unit</td>
+<td>MATH-701, Physics I</td>
+</tr>
+<tr>
+<td><strong>Section</strong></td>
+<td>A course instance</td>
+<td>Grade 7 Math – Section A</td>
+</tr>
+<tr>
+<td><strong>Student / Guardian</strong></td>
+<td>Learner + parent/guardian links</td>
+<td>John Doe; Jane Doe (mother)</td>
+</tr>
+<tr>
+<td><strong>Staff</strong></td>
+<td>Faculty and admin users</td>
+<td>Teachers, Registrar</td>
+</tr>
+<tr>
+<td><strong>Timetable</strong></td>
+<td>When/where instruction happens</td>
+<td>Mon 10:00–10:50, Room 203</td>
+</tr>
+<tr>
+<td><strong>Attendance</strong></td>
+<td>Daily or per-period presence</td>
+<td>Present/Absent/Excused</td>
+</tr>
+<tr>
+<td><strong>Assessment</strong></td>
+<td>Graded work &amp; transcript</td>
+<td>Quizzes, Exams, Final grade</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Create Your First School Data</h2>
+<h3>1) School &amp; Year</h3>
+<ol>
+<li><strong>School</strong> → New → fill address, contact, logo.</li>
+<li><strong>Academic Year</strong> → New → <code>2025-2026</code>.</li>
+<li><strong>Academic Term</strong> → Term 1/2 (or Semester 1/2).</li>
+</ol>
+<h3>2) Programs &amp; Courses</h3>
+<ol>
+<li><strong>Program</strong> → New → <em>Grade 7</em>.</li>
+<li><strong>Course</strong> → New → <em>MATH-701 (Grade 7 Math)</em>, <em>SCI-701 (Science)</em>.</li>
+</ol>
+<h3>3) Sections &amp; Timetable</h3>
+<ol>
+<li><strong>Course Section</strong> → New → <em>MATH-701 Section A</em>, teacher, room, capacity.</li>
+<li><strong>Timetable</strong> → Add weekly slots (period, day, room).</li>
+</ol>
+<p>&gt; <strong>Pro-tip</strong>: Bulk import with Data Import for faster onboarding (Programs, Courses, Students).</p>
+<hr>
+<h2>Add Students &amp; Staff</h2>
+<h3>Students</h3>
+<ul>
+<li><strong>Student</strong> → New → basic info + link a <strong>Guardian</strong> (email is useful for portal).</li>
+<li>Enroll into a <strong>Program</strong> and assign <strong>Sections</strong>.</li>
+</ul>
+<h3>Staff</h3>
+<ul>
+<li><p><strong>User</strong> → New (email as ID) → assign <strong>Roles</strong>:</p>
+<ul>
+<li>Teacher, Program Coordinator, Registrar, Accounts User, etc.</li>
+</ul>
+</li>
+</ul>
+<p>&gt; <strong>Security</strong>: Use 2-factor auth for admins; keep roles minimal.</p>
+<hr>
+<h2>Daily Workflows</h2>
+<h3>Take Attendance</h3>
+<ul>
+<li><strong>Attendance</strong> → choose date, section, mark Present/Absent/Excused.</li>
+<li>For daily attendance, enable the daily mode in <strong>Education Settings</strong>.</li>
+</ul>
+<h3>Grade Work</h3>
+<ul>
+<li><strong>Assessment</strong> → create components (Quiz, Midterm, Final).</li>
+<li>Enter marks per student → submit → transcript aggregates automatically.</li>
+</ul>
+<h3>Communicate</h3>
+<ul>
+<li>Send announcements via <strong>Email Campaign</strong> or <strong>Newsletter</strong>.</li>
+<li>Use built-in comments/mentions on records to collaborate.</li>
+</ul>
+<hr>
+<h2>Multi-Language (Docs &amp; App)</h2>
+<ul>
+<li>App UI supports multiple languages. Set default in <strong>System Settings → Language</strong>.</li>
+<li>Documentation pages use <strong>language codes</strong> (e.g., <code>/docs/en/...</code>, <code>/docs/fr/...</code>).</li>
+<li>To add docs in another language: create a <strong>Documentation</strong> record with the right <code>Language Code</code>.</li>
+</ul>
+<p>&gt; <strong>Authoring tip</strong>: Use clear headings (<code>#</code>, <code>##</code>, <code>###</code>) — our site auto-generates a TOC and search index from headings.</p>
+<hr>
+<h2>Backups &amp; Updates</h2>
+<ul>
+<li><p><strong>Backups</strong>: Set schedule (daily offsite recommended).</p>
+</li>
+<li><p><strong>Update</strong>:</p>
+<pre><code class="language-bash">cd ~/frappe-bench
+bench update --reset
+</code></pre>
+</li>
+<li><p><strong>Before updating</strong>: take a manual backup and snapshot (if on a cloud VM).</p>
+</li>
+</ul>
+<hr>
+<h2>Troubleshooting</h2>
+<p>&gt; <strong>Docs page 404?</strong>
+&gt; Check Nginx alias for <code>/docs/</code> and verify files under <code>sites/assets/ifitwala_doc/docs/</code>.</p>
+<p>&gt; <strong>Emails not sending?</strong>
+&gt; Verify SMTP credentials in <strong>Email Account</strong>; check <strong>Email Queue</strong> for errors.</p>
+<p>&gt; <strong>Slow during peak hours?</strong>
+&gt; Add RAM/CPU, enable Redis cache, and tune MariaDB buffers.</p>
+<hr>
+<h2>FAQ</h2>
+<p><strong>Can I import legacy students/courses?</strong>
+Yes. Use <strong>Data Import</strong> (CSV) for Students, Guardians, Programs, Courses, Sections.</p>
+<p><strong>Does it support multiple schools?</strong>
+Yes. Create additional <strong>School</strong> records and scope programs/years per school.</p>
+<p><strong>Where are logs?</strong>
+Bench logs in <code>~/frappe-bench/logs/</code>. App-specific log: <code>ifitwala_doc.log</code>.</p>
+<hr>
+<h2>What’s Next?</h2>
+<ul>
+<li><strong>Set up payments</strong> (if you use Fees/Invoices).</li>
+<li><strong>Deploy production</strong> with HTTPS + regular backups.</li>
+<li>Explore feature docs: attendance policies, grading schemes, transcripts, portals.</li>
+</ul>
+<hr>
+<h2>Changelog</h2>
+<ul>
+<li>v0.1 — Initial “Getting Started” draft with install, setup, and first workflows.</li>
+</ul>
+<hr>
+<h3>Authoring checklist (for editors)</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Title = <code>Getting Started</code></li>
+<li><input disabled="" type="checkbox"> Slug = <code>getting-started</code></li>
+<li><input disabled="" type="checkbox"> Language = <code>en</code></li>
+<li><input disabled="" type="checkbox"> Status = <code>Published</code></li>
+<li><input disabled="" type="checkbox"> Category = <code>Introduction</code> (optional)</li>
+<li><input disabled="" type="checkbox"> Order = <code>0</code></li>
+<li><input disabled="" type="checkbox"> Paste content into <strong>Body (Markdown)</strong></li>
+<li><input disabled="" type="checkbox"> Add tags: <code>onboarding</code>, <code>basics</code></li>
+</ul>
+<p>&gt; <strong>Screenshot placeholders</strong>
+&gt;
+&gt; * Dashboard after login
+&gt; * School form
+&gt; * Program and Course list
+&gt; * Timetable grid
+&gt; * Attendance sheet
+&gt;   <em>(Upload images and embed with standard Markdown: <code>![Alt](/assets/ifitwala_doc/docs/img/...)</code> once you decide your image path.)</em></p>
 </div> </main> </body></html>

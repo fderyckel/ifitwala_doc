@@ -7,19 +7,24 @@
  "field_order": [
   "section_break_cdhp",
   "title",
-  "slug",
   "language",
-  "summary",
   "version",
-  "status",
-  "published_on",
-  "doc_order",
-  "body_md",
-  "body_html",
   "author",
-  "last_edited",
+  "column_break_samu",
+  "slug",
+  "published_on",
   "category",
-  "subcategory"
+  "subcategory",
+  "column_break_z8yu",
+  "status",
+  "last_edited",
+  "doc_order",
+  "section_break_s3mc",
+  "body_md",
+  "summary",
+  "body_html",
+  "section_break_1xdj",
+  "screenshots"
  ],
  "fields": [
   {
@@ -38,7 +43,8 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Slug",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "language",
@@ -59,6 +65,8 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Status",
    "options": "Draft\nPublished\nArchived"
   },
@@ -103,12 +111,34 @@
    "fieldname": "doc_order",
    "fieldtype": "Int",
    "label": "Doc Order"
+  },
+  {
+   "fieldname": "column_break_z8yu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_s3mc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_samu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_1xdj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "screenshots",
+   "fieldtype": "Table",
+   "label": "Doc Screenshots",
+   "options": "Doc Screenshot"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-09 22:09:46.354298",
+ "modified": "2025-10-13 07:17:06.903186",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Documentation",

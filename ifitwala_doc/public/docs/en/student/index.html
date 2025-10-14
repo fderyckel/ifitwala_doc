@@ -1,0 +1,293 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><title>Student | Ifitwala Ed Docs</title><link rel="canonical" href="/docs/en/student"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/docs/_astro/index.CoKGrTbD.css"></head> <body class="bg-panel text-ink"> <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10"> <nav class="not-prose text-sm text-slate mb-4"> <a href="/docs/en" class="hover:underline">Docs</a>  <span class="mx-1">›</span> <a href="/docs/en/Student" class="hover:underline"> Student </a>   </nav> <h1 class="mb-1">Student</h1>  <div class="mt-6"><h2>Overview</h2>
+<p>The <strong>Student</strong> doctype is one of the core entities in the ERP. Many other doctypes link to or depend on Student (e.g. enrollments, attendance, student log, guardians, etc.).<br><strong>Main / Title field</strong>: <code>student_full_name</code> (constructed from first, middle, last name)</p>
+<div class="docs-callout not-prose docs-callout-info" data-callout-type="info" style="--callout-bg:rgba(43, 123, 187, 0.08);--callout-border:rgba(43, 123, 187, 0.24);--callout-border-strong:rgba(43, 123, 187, 0.72)"><div class="docs-callout-title">Why Student matters</div><div class="docs-callout-body prose prose-brand max-w-none"><p>This doctype is foundational. It not only captures demographic data (name, dates, contact) but also triggers creation and sync of User, Contact, Patient, and linked name propagation across other doctypes.</p></div></div>
+
+
+
+<hr>
+<h2>Fields / JSON Structure</h2>
+<p>Here is a simplified table of the key fields for that doctype.</p>
+<table>
+<thead>
+<tr>
+<th>Field Name</th>
+<th>Type</th>
+<th>Purpose / Label</th>
+<th>Constraints / Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>student_first_name</code></td>
+<td>Data</td>
+<td>First name</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>student_middle_name</code></td>
+<td>Data</td>
+<td>Middle name (optional)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>student_last_name</code></td>
+<td>Data</td>
+<td>Last name</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>student_full_name</code></td>
+<td>Data</td>
+<td>Full name (auto-generated)</td>
+<td>Computed in <code>validate()</code></td>
+</tr>
+<tr>
+<td><code>student_date_of_birth</code></td>
+<td>Date</td>
+<td>Date of birth</td>
+<td>Must be &lt; today; must precede joining date</td>
+</tr>
+<tr>
+<td><code>student_joining_date</code></td>
+<td>Date</td>
+<td>Enrollment / joining date</td>
+<td>≤ exit date if provided</td>
+</tr>
+<tr>
+<td><code>student_exit_date</code></td>
+<td>Date</td>
+<td>Leaving / exit date</td>
+<td>Optional</td>
+</tr>
+<tr>
+<td><code>student_email</code></td>
+<td>Email</td>
+<td>Email address</td>
+<td>If given, validated</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>Checkbox / Int</td>
+<td>Active / inactive flag</td>
+<td>Syncs with Student Patient status</td>
+</tr>
+<tr>
+<td><code>student_image</code></td>
+<td>File / URL</td>
+<td>Profile image link / path</td>
+<td>Renaming / moving logic applies</td>
+</tr>
+<tr>
+<td><code>siblings</code></td>
+<td>Child table (Student Sibling)</td>
+<td>List of siblings</td>
+<td>No self-reference or duplicates allowed</td>
+</tr>
+</tbody></table>
+<div class="docs-callout not-prose docs-callout-warning" data-callout-type="warning" style="--callout-bg:rgba(208, 135, 0, 0.08);--callout-border:rgba(208, 135, 0, 0.24);--callout-border-strong:rgba(208, 135, 0, 0.72)"><div class="docs-callout-title">Name Uniqueness Constraint</div><div class="docs-callout-body prose prose-brand max-w-none"><p>The field <code>student_full_name</code> must be <strong>globally unique</strong> (i.e. no two Students can have the same full name). If another record already has that name, save/validate will throw an error.</p></div></div>
+
+
+
+<hr>
+<h2>How to Create / Use</h2>
+<ol>
+<li>There are many ways to get to students beside using the &quot;awesome bar&quot;; you can use the Academics workspace, the admission workspace or the counselor workspace (depending of your permissions or roles).  In the UI: go to <strong>Academics → Students → New Student</strong>  </li>
+<li>Fill in fields: name parts, dates, email, image, siblings, etc.  </li>
+<li>Save (or Submit) → triggers validations and downstream logic  </li>
+<li>On insert: User, Patient, Contact are created/linked  </li>
+<li>On updates: name propagation, image sync, sibling sync, contact sync happen</li>
+</ol>
+<div class="docs-callout not-prose docs-callout-tip" data-callout-type="tip" style="--callout-bg:rgba(41, 159, 101, 0.08);--callout-border:rgba(41, 159, 101, 0.24);--callout-border-strong:rgba(41, 159, 101, 0.72)"><div class="docs-callout-title">Name Changes Propagate</div><div class="docs-callout-body prose prose-brand max-w-none"><p>If you later change first/middle/last names, the system will automatically propagate the updated <code>student_full_name</code> into other doctypes that reference <code>student_name</code>, keeping your data consistent.</p></div></div>
+
+
+
+<hr>
+<h2>Stuedt List View</h2>
+  <figure id="student-listview">
+    <picture>
+      <source srcset="https://ifitwala.com/files/gallery_resized/docs_student_shots/medium_student-listview.webp" type="image/webp" />
+      <img src="https://ifitwala.com/files/gallery_resized/docs_student_shots/medium_student-listview.webp" alt="View of Student List" loading="lazy" />
+    </picture>
+    <figcaption class="text-slate mt-2"><p>Student List View</p>
+</figcaption>
+  </figure>
+
+<h2>Validation &amp; Constraints</h2>
+<ul>
+<li><p><code>validate()</code> logic enforces:</p>
+<ul>
+<li>Construction of <code>student_full_name</code></li>
+<li>Email format via <code>validate_email_address()</code> (if provided)</li>
+<li><code>_validate_siblings_list()</code> to eliminate self-references &amp; duplicates</li>
+<li>Date order checks: DOB &lt; today, DOB &lt; joining date, joining ≤ exit date</li>
+<li>Name uniqueness: no other Student may already use the same full name</li>
+</ul>
+</li>
+<li><p>Siblings list rules:</p>
+<ul>
+<li>A student cannot list themselves as sibling</li>
+<li>Duplicate sibling entries are pruned before save</li>
+</ul>
+</li>
+</ul>
+<div class="docs-callout not-prose docs-callout-note" data-callout-type="note" style="--callout-bg:rgba(148, 163, 184, 0.12);--callout-border:rgba(148, 163, 184, 0.28);--callout-border-strong:rgba(148, 163, 184, 0.8)"><div class="docs-callout-title">When validations run</div><div class="docs-callout-body prose prose-brand max-w-none"><p>These validations run server-side in the <code>validate()</code> method. Even if client UI prevents invalid data, server checks ensure data integrity.</p></div></div>
+
+
+
+<hr>
+<h2>Server-Side Logic (Python)</h2>
+<h3>Lifecycle Hooks &amp; Methods</h3>
+<ul>
+<li><p><strong><code>onload(self)</code></strong><br>Load linked address &amp; contact data so they show up in the form UI.</p>
+</li>
+<li><p><strong><code>validate(self)</code></strong><br>See above: builds name, performs checks, triggers propagation.</p>
+</li>
+<li><p><strong><code>after_insert(self)</code></strong><br>Calls <code>create_student_user()</code>, <code>create_student_patient()</code>, <code>ensure_contact_and_link()</code>.</p>
+</li>
+<li><p><strong><code>on_update(self)</code></strong><br>Triggers:</p>
+<ul>
+<li><code>rename_student_image()</code></li>
+<li><code>ensure_contact_and_link()</code></li>
+<li><code>update_student_enabled_status()</code></li>
+<li><code>sync_student_contact_image()</code></li>
+<li><code>sync_reciprocal_siblings()</code></li>
+</ul>
+</li>
+</ul>
+<h3>Helper / Supporting Methods</h3>
+<ul>
+<li><p><strong><code>create_student_user()</code></strong><br>If the student’s email does not map to an existing User, create one (Website User) with “Student” role.</p>
+</li>
+<li><p><strong><code>create_student_patient()</code></strong><br>Ensures a <code>Student Patient</code> doc exists tied to this Student.</p>
+</li>
+<li><p><strong><code>update_student_name_in_linked_doctype()</code></strong><br>Uses <code>get_linked_doctypes(&quot;Student&quot;)</code> to find references and update their <code>student_name</code> fields when the full name changes.</p>
+</li>
+<li><p><strong><code>rename_student_image()</code></strong><br>If a <code>student_image</code> is present and not already following naming convention <code>{student_id}_{random6}</code>, rename it:</p>
+<ul>
+<li>Generate random suffix  </li>
+<li>Move file on disk  </li>
+<li>Update File doc and <code>student_image</code> field  </li>
+<li>Call <code>process_single_file()</code> for further processing  </li>
+<li>Log or report errors if operations fail</li>
+</ul>
+</li>
+<li><p><strong><code>sync_student_contact_image()</code></strong><br>If there&#39;s a linked Contact via Dynamic Link and their image does not match, update it.</p>
+</li>
+<li><p><strong><code>_validate_siblings_list()</code></strong><br>Prevents self-references and deduplicates sibling entries before saving.</p>
+</li>
+<li><p><strong><code>sync_reciprocal_siblings()</code></strong><br>Maintains bidirectional sibling relationships:</p>
+<ul>
+<li>Ensures the other student reciprocally lists this one  </li>
+<li>Deletes mirror rows if relation was removed  </li>
+<li>Uses <code>frappe.flags._in_sibling_sync</code> as recursion guard</li>
+</ul>
+</li>
+<li><p><strong><code>ensure_contact_and_link()</code></strong>  </p>
+<ul>
+<li>Ensures a Contact exists for the student (and email)  </li>
+<li>Ensures that Contact has a Dynamic Link to this Student (if missing)</li>
+</ul>
+</li>
+<li><p><strong><code>get_contact_linked_to_student(student_name)</code></strong><br>A whitelisted function to fetch the Contact name linked to a Student via Dynamic Link.</p>
+</li>
+<li><p><strong><code>on_doctype_update()</code></strong><br>Adds DB indexes on <code>Student Sibling</code> table for faster queries on <code>student</code> and <code>parent</code> fields.</p>
+</li>
+</ul>
+<hr>
+<h2>Client-Side / UI Logic</h2>
+<p>You didn’t provide a JS or client script file, so here are suggestions (and placeholders) to document when you have them:</p>
+<ul>
+<li>On name field changes (first / middle / last) → update displayed <code>student_full_name</code> live  </li>
+<li>On siblings list editing → immediate validation for duplicates or self-references  </li>
+<li>On email field → inline format hint or validation  </li>
+<li>On image upload → preview or immediate file name check</li>
+</ul>
+<p>If you supply the client script, I’ll insert the exact code and behaviors here.</p>
+<hr>
+<h2>Relationships / Linked Doctypes</h2>
+<ul>
+<li><strong>Student Patient</strong> (1:1) — every Student gets a corresponding Patient record  </li>
+<li><strong>User</strong> — if email is present, a User is created for the Student  </li>
+<li><strong>Contact</strong> — created/linked and Dynamic Linked  </li>
+<li><strong>Student Sibling</strong> — child doctype representing sibling relationships  </li>
+<li><strong>Other Doctypes referencing Student</strong> — via <code>link_doctype = &quot;Student&quot;</code> in many modules; those with <code>student_name</code> fields will have name updates</li>
+</ul>
+<div class="docs-callout not-prose docs-callout-info" data-callout-type="info" style="--callout-bg:rgba(43, 123, 187, 0.08);--callout-border:rgba(43, 123, 187, 0.24);--callout-border-strong:rgba(43, 123, 187, 0.72)"><div class="docs-callout-title">Propagation of Name Change</div><div class="docs-callout-body prose prose-brand max-w-none"><p>Any doctype that links to Student and has a <code>student_name</code> field will automatically receive updates to that field when the Student’s name changes — via <code>update_student_name_in_linked_doctype()</code>.</p></div></div>
+
+
+
+<hr>
+<table>
+<thead>
+<tr>
+<th>Doctype</th>
+<th>Slug</th>
+<th>Description / Relationship to Student</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Student Patient</strong></td>
+<td><code>student-patient</code></td>
+<td>Each Student has a corresponding Patient record. Created in <code>after_insert()</code>, status synced when Student is disabled.</td>
+</tr>
+<tr>
+<td><strong>Student Group</strong></td>
+<td><code>student-group</code></td>
+<td>Groups or cohorts of students (e.g. for classes, batches) that the Student may belong to.</td>
+</tr>
+<tr>
+<td><strong>Student Log</strong></td>
+<td><code>student-log</code></td>
+<td>Historical log / audit trail of student changes (e.g. name changes, status changes) — useful for tracking.</td>
+</tr>
+</tbody></table>
+<h2>Example / Use Case</h2>
+<p>&gt; <strong>Scenario</strong>: Registering a student and later renaming, handling siblings &amp; image</p>
+<ol>
+<li><p><strong>New Student creation</strong>  </p>
+<ul>
+<li>Fill in name, DOB, joining date, email, siblings, image  </li>
+<li>Save → triggers validation → after_insert hooks → User, Patient, Contact created</li>
+</ul>
+</li>
+<li><p><strong>Updating name</strong>  </p>
+<ul>
+<li>Change <code>student_middle_name</code> or first/last name  </li>
+<li>On save, system recomputes <code>student_full_name</code>  </li>
+<li><code>update_student_name_in_linked_doctype()</code> ensures consistency across linked records</li>
+</ul>
+</li>
+<li><p><strong>Uploading a profile image</strong>  </p>
+<ul>
+<li><code>rename_student_image()</code> enforces naming standard  </li>
+<li>Image is moved and File doc updated  </li>
+<li><code>sync_student_contact_image()</code> ensures Contact mirrors the image</li>
+</ul>
+</li>
+<li><p><strong>Adding or removing a sibling</strong>  </p>
+<ul>
+<li>Change <code>siblings</code> table  </li>
+<li><code>_validate_siblings_list()</code> prunes invalid entries  </li>
+<li><code>sync_reciprocal_siblings()</code> ensures bidirectional consistency</li>
+</ul>
+</li>
+</ol>
+<div class="docs-callout not-prose docs-callout-tip" data-callout-type="tip" style="--callout-bg:rgba(41, 159, 101, 0.08);--callout-border:rgba(41, 159, 101, 0.24);--callout-border-strong:rgba(41, 159, 101, 0.72)"><div class="docs-callout-title">Best Practice for Sibling Edits</div><div class="docs-callout-body prose prose-brand max-w-none"><p>When editing siblings, make sure you manage both sides carefully (though system tries to auto-mirror). If a student is deleted or re-IDed later, sibling relationships might require manual maintenance.</p></div></div>
+
+
+
+<hr>
+<h2>Notes, Tips &amp; Caveats</h2>
+<div class="docs-callout not-prose docs-callout-note" data-callout-type="note" style="--callout-bg:rgba(148, 163, 184, 0.12);--callout-border:rgba(148, 163, 184, 0.28);--callout-border-strong:rgba(148, 163, 184, 0.8)"><div class="docs-callout-title">Performance &amp; Edge Cases</div><div class="docs-callout-body prose prose-brand max-w-none"><ul>
+<li>Renaming student image moves files on disk — ensure file permissions and existence are valid.  </li>
+<li>Linked doctypes update via SQL — if there’s custom logic or triggers, test carefully.  </li>
+<li>Sibling sync avoids recursive save loops via <code>frappe.flags._in_sibling_sync</code>, but complex edits may still need attention.</li>
+</ul></div></div>
+
+
+
+
+
+<div class="docs-callout not-prose docs-callout-warning" data-callout-type="warning" style="--callout-bg:rgba(208, 135, 0, 0.08);--callout-border:rgba(208, 135, 0, 0.24);--callout-border-strong:rgba(208, 135, 0, 0.72)"><div class="docs-callout-title">Caution on Email / Contact Logic</div><div class="docs-callout-body prose prose-brand max-w-none"><p>If <code>student_email</code> is missing or changed, Contact or User creation/linking may break. Always ensure the email is valid when creating or editing a Student.</p></div></div>
+
+
+</div> </main> </body></html>

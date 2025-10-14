@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-12 22:53:24.993290",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "image_order",
+  "anchor_id",
+  "title",
+  "image",
+  "version",
+  "display_size",
+  "caption_md",
+  "alt_text",
+  "checksum",
+  "generated_variants"
+ ],
+ "fields": [
+  {
+   "fieldname": "image_order",
+   "fieldtype": "Int",
+   "label": "Image Order"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image"
+  },
+  {
+   "fieldname": "version",
+   "fieldtype": "Data",
+   "label": "Version"
+  },
+  {
+   "fieldname": "display_size",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Display Size",
+   "options": "auto\nlarge\nmedium\nsmall\nthumb"
+  },
+  {
+   "fieldname": "caption_md",
+   "fieldtype": "Data",
+   "label": "Caption MD"
+  },
+  {
+   "fieldname": "alt_text",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Alt Text",
+   "reqd": 1
+  },
+  {
+   "fieldname": "checksum",
+   "fieldtype": "Data",
+   "label": "Checksum",
+   "read_only": 1
+  },
+  {
+   "fieldname": "anchor_id",
+   "fieldtype": "Data",
+   "label": "Anchor ID"
+  },
+  {
+   "default": "0",
+   "fieldname": "generated_variants",
+   "fieldtype": "Check",
+   "label": "Generated Variants",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-10-13 16:45:17.465139",
+ "modified_by": "Administrator",
+ "module": "Ifitwala Doc",
+ "name": "Doc Screenshot",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
