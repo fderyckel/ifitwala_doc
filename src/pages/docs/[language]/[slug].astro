@@ -3,27 +3,43 @@ import DocsLayout from '@/components/docs/DocsLayout.astro'
 import DocsShell from '@/layouts/DocsShell.astro'
 import { getAllDocs, getOneDoc } from '@/lib/docsClient'
 
+const LANGUAGE_CODE_RX = /^[a-z]{2}$/i
+
 export async function getStaticPaths() {
-  const langs = ['en', 'th', 'fr', 'ar'] // adjust to your seeded languages
-  const paths = []
+  try {
+    const payload = await getAllDocs()
+    const docs = Array.isArray(payload?.docs) ? payload.docs : []
+    const seen = new Set<string>()
+    const paths = []
 
-  for (const language of langs) {
-    try {
-      const { docs = [] } = await getAllDocs(language)
-      for (const d of docs) {
-        if (d?.slug) {
-          paths.push({ params: { language, slug: d.slug } })
-        }
+    for (const d of docs) {
+      const rawLanguage = typeof d?.language === 'string' ? d.language.trim() : ''
+      if (!LANGUAGE_CODE_RX.test(rawLanguage)) {
+        continue
       }
-    } catch {
-      // ignore languages without data
+      const language = rawLanguage.toLowerCase()
+      const slug = typeof d?.slug === 'string' ? d.slug.trim() : ''
+      if (!language || !slug) {
+        continue
+      }
+      const key = `${language}::${slug}`
+      if (seen.has(key)) {
+        continue
+      }
+      seen.add(key)
+      paths.push({ params: { language, slug } })
     }
-  }
 
-  return paths
+    return paths
+  } catch {
+    return []
+  }
 }
 
-const { language, slug } = Astro.params
+const languageParam = typeof Astro.params.language === 'string' ? Astro.params.language : ''
+const slugParam = typeof Astro.params.slug === 'string' ? Astro.params.slug : ''
+const language = LANGUAGE_CODE_RX.test(languageParam || '') ? languageParam.toLowerCase() : 'en'
+const slug = slugParam
 let doc
 try {
   doc = await getOneDoc(language, slug)

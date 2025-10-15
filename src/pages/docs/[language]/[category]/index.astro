@@ -1,27 +1,64 @@
 ---
 import DocsShell from '@/layouts/DocsShell.astro'
-import { getCategory, getDocsInCategory, getCategories } from '@/lib/docsClient'
+import { getAllDocs, getCategory, getDocsInCategory, getCategories } from '@/lib/docsClient'
+
+const LANGUAGE_CODE_RX = /^[a-z]{2}$/i
 
 export async function getStaticPaths() {
-  const langs = ['en', 'th', 'fr', 'ar']   // adjust to your supported languages
-  const paths = []
+  try {
+    const [payload, categoriesRaw] = await Promise.all([
+      getAllDocs(),
+      getCategories(),
+    ])
 
-  for (const lang of langs) {
-    let cats = []
-    try {
-      cats = await getCategories(lang) // should return [{ slug, ... }, ...]
-    } catch {
-      // ignore fetch issues per language; keep building others
+    const docs = Array.isArray(payload?.docs) ? payload.docs : []
+    const categories = Array.isArray(categoriesRaw) ? categoriesRaw : []
+    const slugByName = new Map<string, string>()
+
+    for (const cat of categories) {
+      const name = typeof cat?.name === 'string' ? cat.name : ''
+      const slug = typeof cat?.slug === 'string' ? cat.slug.trim() : ''
+      if (!name || !slug) {
+        continue
+      }
+      slugByName.set(name, slug)
     }
 
-    for (const c of (cats || [])) {
-      if (c?.slug) paths.push({ params: { language: lang, category: c.slug } })
+    const seen = new Set<string>()
+    const paths = []
+
+    for (const d of docs) {
+      const rawLanguage = typeof d?.language === 'string' ? d.language.trim() : ''
+      if (!LANGUAGE_CODE_RX.test(rawLanguage)) {
+        continue
+      }
+      const language = rawLanguage.toLowerCase()
+      const categoryName = typeof d?.category === 'string' ? d.category : ''
+      if (!language || !categoryName) {
+        continue
+      }
+      const categorySlug = slugByName.get(categoryName)
+      if (!categorySlug) {
+        continue
+      }
+      const key = `${language}::${categorySlug}`
+      if (seen.has(key)) {
+        continue
+      }
+      seen.add(key)
+      paths.push({ params: { language, category: categorySlug } })
     }
+
+    return paths
+  } catch {
+    return []
   }
-  return paths
 }
 
-const { language, category } = Astro.params
+const languageParam = typeof Astro.params.language === 'string' ? Astro.params.language : ''
+const categoryParam = typeof Astro.params.category === 'string' ? Astro.params.category : ''
+const language = LANGUAGE_CODE_RX.test(languageParam || '') ? languageParam.toLowerCase() : 'en'
+const category = categoryParam
 const cat  = await getCategory(category)
 const docs = await getDocsInCategory(language, category)
 

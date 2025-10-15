@@ -1,13 +1,16 @@
 ---
 import DocsShell from '@/layouts/DocsShell.astro'
-import { getCategories } from '@/lib/docsClient'
+import { getCategories, getAvailableLanguages } from '@/lib/docsClient'
+
+const LANGUAGE_CODE_RX = /^[a-z]{2}$/i
 
 export async function getStaticPaths() {
-  const langs = ['en'] // add 'th','fr','ar' when ready
-  return langs.map((language) => ({ params: { language } }))
+  const languages = await getAvailableLanguages()
+  return languages.map((language) => ({ params: { language } }))
 }
 
-const language = Astro.params.language || 'en'
+const languageParam = typeof Astro.params.language === 'string' ? Astro.params.language : ''
+const language = LANGUAGE_CODE_RX.test(languageParam || '') ? languageParam.toLowerCase() : 'en'
 let categories = []
 try {
   categories = await getCategories(language)

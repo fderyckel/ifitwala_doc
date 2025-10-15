@@ -1,8 +1,9 @@
 ---
 import DocsShell from '@/layouts/DocsShell.astro'
-import { getCategories } from '@/lib/docsClient'
+import { getCategories, getAvailableLanguages } from '@/lib/docsClient'
 
-const language = 'en'
+const detectedLanguages = await getAvailableLanguages()
+const language = (detectedLanguages[0] || 'en').toLowerCase()
 let categories = []
 try {
   categories = await getCategories(language)

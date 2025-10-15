@@ -49,6 +49,19 @@ function unwrap<T = any>(data: any): T {
   return data && typeof data === 'object' && 'message' in data ? data.message : data;
 }
 
+const LANGUAGE_CODE_RX = /^[a-z]{2}$/i;
+
+function normalizeLanguageCode(input: unknown): string | null {
+  if (typeof input !== 'string') {
+    return null;
+  }
+  const trimmed = input.trim();
+  if (!LANGUAGE_CODE_RX.test(trimmed)) {
+    return null;
+  }
+  return trimmed.toLowerCase();
+}
+
 export async function getAllDocs(lang?: string): Promise<AllDocsPayload> {
   const qp = lang ? `?language=${encodeURIComponent(lang)}` : '';
   const raw = await fetchJSON(
@@ -91,4 +104,35 @@ export async function getDocsInCategory(language: string, category_slug: string)
   );
   const raw = await fetchJSON(url);
   return unwrap(raw) || [];
+}
+
+export async function getAvailableLanguages(): Promise<string[]> {
+  try {
+    const payload = await getAllDocs();
+    const add = (value: unknown, bucket: Set<string>) => {
+      const normalized = normalizeLanguageCode(value);
+      if (normalized) {
+        bucket.add(normalized);
+      }
+    };
+
+    const bucket = new Set<string>();
+    const docs = Array.isArray(payload?.docs) ? payload.docs : [];
+    for (const doc of docs) {
+      add(doc?.language, bucket);
+    }
+
+    const fromPayload = (payload as any)?.languages;
+    if (Array.isArray(fromPayload)) {
+      for (const value of fromPayload) {
+        add(value, bucket);
+      }
+    }
+
+    const languages = Array.from(bucket).sort();
+    return languages.length ? languages : ['en'];
+  } catch (error) {
+    console.warn('[docsClient] Failed to detect languages from docs payload.', error);
+    return ['en'];
+  }
 }
