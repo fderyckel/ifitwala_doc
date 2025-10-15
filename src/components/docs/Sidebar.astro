@@ -6,7 +6,7 @@ const items = Array.isArray(headings) ? headings : []
 const hasItems = items.length > 0
 ---
 {hasItems && (
-  <aside class="hidden w-full max-w-xs flex-shrink-0 lg:block">
+  <aside class="hidden w-full max-w-[14rem] flex-shrink-0 lg:block">
     <TOC headings={items} />
   </aside>
 )}

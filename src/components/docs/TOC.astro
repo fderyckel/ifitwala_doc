@@ -5,11 +5,11 @@ const items = (Array.isArray(headings) ? headings : []).filter(
 )
 ---
 {items.length > 0 && (
-  <div class="rounded-2xl border bg-white p-4 text-sm shadow-sm lg:sticky lg:top-24">
-    <div class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate">
+  <div class="rounded-2xl border bg-white p-3 text-xs shadow-sm lg:sticky lg:top-24">
+    <div class="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-slate">
       On this page
     </div>
-    <ul class="space-y-2">
+    <ul class="space-y-1.5">
       {items.map(h => (
         <li>
           <a

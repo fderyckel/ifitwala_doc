@@ -234,11 +234,21 @@ function extractHeadings(md) {
   return out
 }
 
-function renderMarkdown(input, { allowCallouts = true, alreadyTransformed = false } = {}) {
+function renderMarkdown(
+  input,
+  { allowCallouts = true, alreadyTransformed = false, slugger } = {}
+) {
   let md = alreadyTransformed ? (input || '') : applyDocTransforms(input || '')
+  const activeSlugger = slugger || createSlugger()
+
+  const renderer = new marked.Renderer()
+  renderer.heading = (text, level) => {
+    const id = activeSlugger(text)
+    return `<h${level} id="${escapeHtml(id)}">${text}</h${level}>`
+  }
 
   if (!allowCallouts) {
-    return marked.parse(md)
+    return marked.parse(md, { renderer, mangle: false })
   }
 
   const callouts = []
@@ -255,13 +265,16 @@ function renderMarkdown(input, { allowCallouts = true, alreadyTransformed = fals
     return `\n\n${placeholder}\n\n`
   })
 
-  let html = marked.parse(md)
+  let html = marked.parse(md, { renderer, mangle: false })
 
   for (const callout of callouts) {
     const typeRaw = (callout.attrs.type || 'info').toLowerCase()
     const type = ALLOWED_CALLOUT_TYPES.has(typeRaw) ? typeRaw : 'info'
     const title = callout.attrs.title || ''
-    const bodyHtml = renderMarkdown(callout.bodyMd, { allowCallouts: true }).trim()
+    const bodyHtml = renderMarkdown(callout.bodyMd, {
+      allowCallouts: true,
+      slugger: activeSlugger,
+    }).trim()
     const titleHtml = title ? `<div class="docs-callout-title">${escapeHtml(title)}</div>` : ''
     const palette = CALLOUT_COLORS[type] || CALLOUT_COLORS.info
     const styleAttr = ` style="--callout-bg:${palette.bg};--callout-border:${palette.border};--callout-border-strong:${palette.accent}"`
@@ -284,7 +297,7 @@ const html = renderMarkdown(transformedMarkdown, { allowCallouts: true, alreadyT
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:flex-row">
   <Sidebar headings={headings} />
 
-  <main class="prose prose-docs w-full flex-1 min-w-0 max-w-3xl">
+  <main class="prose prose-docs w-full flex-1 min-w-0 max-w-3xl lg:max-w-4xl">
     <nav class="not-prose mb-4 text-sm text-slate">
       <a href={`/docs/${lang}`} class="hover:underline">Docs</a>
       {doc.category && <>
