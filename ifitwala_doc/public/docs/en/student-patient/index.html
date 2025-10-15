@@ -1,2 +1,189 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><title>Student Patient | Ifitwala Ed Docs</title><link rel="canonical" href="/docs/en/student-patient"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/docs/_astro/index.CoKGrTbD.css"></head> <body class="bg-panel text-ink"> <main class="prose prose-docs mx-auto max-w-3xl px-6 py-10"> <nav class="not-prose text-sm text-slate mb-4"> <a href="/docs/en" class="hover:underline">Docs</a>   </nav> <h1 class="mb-1">Student Patient</h1>  <div class="mt-6"><p>Heere is student patient</p>
-</div> </main> </body></html>
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><title>Student Patient | Ifitwala Ed Docs</title><link rel="canonical" href="/docs/en/student-patient"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/docs/_astro/index.BT7Y3lkG.css"></head> <body class="bg-panel text-ink"> <div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:flex-row"> <aside class="hidden w-full max-w-[14rem] flex-shrink-0 lg:block"><div class="rounded-2xl border bg-white p-3 text-xs shadow-sm lg:sticky lg:top-24"><div class="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-slate">
+On this page
+</div><ul class="space-y-1.5"><li><a href="#student-patient" class="block leading-snug text-slate hover:text-primary">Student Patient</a></li><li><a href="#overview" class="block leading-snug text-slate hover:text-primary">Overview</a></li><li><a href="#how-to-create" class="block leading-snug text-slate hover:text-primary">How to create</a></li><li><a href="#validation-rules" class="block leading-snug text-slate hover:text-primary">Validation rules</a></li><li><a href="#key-features-python-js" class="block leading-snug text-slate hover:text-primary">Key features (Python &amp; JS)</a></li><li><a href="#permissions-r-w-c-d" class="block leading-snug text-slate hover:text-primary">Permissions (R / W / C / D)</a></li><li><a href="#linked-doctypes" class="block leading-snug text-slate hover:text-primary">Linked doctypes</a></li><li><a href="#suggested-screenshots" class="block leading-snug text-slate hover:text-primary">Suggested screenshots</a></li><li><a href="#enhancements-nicetohave" class="block leading-snug text-slate hover:text-primary">Enhancements (nice‑to‑have)</a></li></ul></div></aside> <main class="prose prose-docs w-full flex-1 min-w-0 max-w-3xl lg:max-w-4xl"> <nav class="not-prose mb-4 text-sm text-slate"> <a href="/docs/en" class="hover:underline">Docs</a>  <span class="mx-1">›</span> <a href="/docs/en/Student" class="hover:underline"> Student </a>   </nav> <h1 class="mb-1">Student Patient</h1>  <div class="lg:hidden"> <div class="rounded-2xl border bg-white p-3 text-xs shadow-sm lg:sticky lg:top-24"><div class="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-slate">
+On this page
+</div><ul class="space-y-1.5"><li><a href="#student-patient" class="block leading-snug text-slate hover:text-primary">Student Patient</a></li><li><a href="#overview" class="block leading-snug text-slate hover:text-primary">Overview</a></li><li><a href="#how-to-create" class="block leading-snug text-slate hover:text-primary">How to create</a></li><li><a href="#validation-rules" class="block leading-snug text-slate hover:text-primary">Validation rules</a></li><li><a href="#key-features-python-js" class="block leading-snug text-slate hover:text-primary">Key features (Python &amp; JS)</a></li><li><a href="#permissions-r-w-c-d" class="block leading-snug text-slate hover:text-primary">Permissions (R / W / C / D)</a></li><li><a href="#linked-doctypes" class="block leading-snug text-slate hover:text-primary">Linked doctypes</a></li><li><a href="#suggested-screenshots" class="block leading-snug text-slate hover:text-primary">Suggested screenshots</a></li><li><a href="#enhancements-nicetohave" class="block leading-snug text-slate hover:text-primary">Enhancements (nice‑to‑have)</a></li></ul></div> </div> <div class="mt-6"><hundefined id="student-patient">Student Patient</hundefined><blockquote>
+<p><strong>Purpose</strong></p>
+<p>The <strong>Student Patient</strong> doctype stores a student’s essential health profile for school nurses and authorized administrators. It centralizes allergies, relevant medical history, vaccination records, and a short, shareable note for teaching staff.</p>
+</blockquote>
+<hr>
+<hundefined id="overview">Overview</hundefined><p><strong>Module:</strong> Health
+<strong>Naming:</strong> <code>PAT-{YYYY}-{####}</code>
+<strong>One record per student:</strong> <code>student</code> is required and unique.</p>
+<hundefined id="key-fields-from-json">Key fields (from JSON)</hundefined><ul>
+<li><p><strong>Identity &amp; basics</strong></p>
+<ul>
+<li><code>student</code> (Link → Student, <strong>reqd</strong>, <strong>unique</strong>)</li>
+<li><code>student_name</code> (Data, fetched, read‑only)</li>
+<li><code>preferred_name</code> (Data, fetched, read‑only)</li>
+<li><code>student_age</code> (Data, read‑only; computed in form UI)</li>
+<li><code>photo</code> (Attach Image, read‑only; <strong>synced from Student on validate</strong>)</li>
+<li><code>student_info</code> (HTML; compact info panel rendered by JS)</li>
+</ul>
+</li>
+<li><p><strong>Vitals</strong></p>
+<ul>
+<li><code>blood_group</code> (Select: A Positive, A Negative, AB Positive, AB Negative, B Positive, B Negative, O Positive, O Negative)</li>
+<li><code>status</code> (Select: Active, Disabled)</li>
+<li><code>completion_state</code> (Select: Completed, Missing Info)</li>
+</ul>
+</li>
+<li><p><strong>Allergies &amp; medical history</strong></p>
+<ul>
+<li><code>allergies</code> (Check)</li>
+<li>Details: <code>food_allergies</code>, <code>insect_bites</code>, <code>medication_allergies</code>, <code>others</code></li>
+<li>History (Small Text fields): <code>asthma</code>, <code>seizures</code>, <code>bone_joints_scoliosis</code>, <code>blood_disorder_info</code>, <code>fainting_spells</code>, <code>g6pd</code>, <code>hearing_problems</code>, <code>recurrent_ear_infections</code>, <code>speech_problem</code>, <code>vision_problem</code>, <code>birth_defect</code>, <code>bladder__bowel_problems</code>, <code>diabetes</code>, <code>heart_problems</code>, <code>recurrent_nose_bleeding</code>, <code>dental_problems</code>, <code>headache_migraine</code></li>
+</ul>
+</li>
+<li><p><strong>Other data</strong></p>
+<ul>
+<li><code>diet_requirements</code> (Small Text)</li>
+<li><code>medical_surgeries__hospitalizations</code> (Text)</li>
+<li><code>other_medical_information</code> (Text Editor) — nurse notes</li>
+<li><code>medical_info</code> (Text Editor) — <strong>brief, shareable note for instructors</strong> (shown via red‑cross indicator on student cards)</li>
+</ul>
+</li>
+<li><p><strong>Vaccinations</strong></p>
+<ul>
+<li><p><code>vaccinations</code> (Table → <strong>Student Patient Vaccination</strong>)</p>
+<ul>
+<li>Child fields: <code>vaccine_name</code> (Data), <code>date</code> (Date), <code>vaccination_proof</code> (Attach Image), <code>additional_notes</code> (Data)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<hundefined id="how-to-create">How to create</hundefined><ol>
+<li>Go to <strong>Desk → Health → Student Patient → New</strong>.</li>
+<li>Select <strong>Student</strong>. The form fetches name/preferred name, shows <strong>Student Info</strong>, and computes <strong>Student Age</strong>.</li>
+<li>Set <strong>Blood Group</strong> and <strong>Status</strong>.</li>
+<li>If applicable, tick <strong>Any allergies</strong> and fill detail fields.</li>
+<li>Add medical history and <strong>Other Data</strong> as needed.</li>
+<li>Add <strong>Vaccinations</strong> rows (name + date; attach proof if available).</li>
+<li>(Optional) Add a concise <strong>Medical Info</strong> note for instructors.</li>
+<li><strong>Save</strong>.</li>
+</ol>
+<p><strong>Helpful actions</strong></p>
+<ul>
+<li><strong>Guardian Details</strong> button → shows guardians (name, relation, email, mobile).</li>
+<li><strong>Student Visit</strong> button → opens a new <strong>Student Patient Visit</strong> prefilled with student, patient record, and arrival time.</li>
+</ul>
+<hr>
+<hundefined id="validation-rules">Validation rules</hundefined><ul>
+<li>On <strong>validate</strong>, <code>photo</code> is <strong>synced from Student.student_image</strong> so nurses always see the latest picture.</li>
+<li><code>student</code> must be set and is <strong>unique</strong> (one health record per student).</li>
+<li>Allergy detail fields are relevant when <code>allergies</code> is checked.</li>
+</ul>
+<hr>
+<hundefined id="key-features-python-js">Key features (Python & JS)</hundefined><ul>
+<li><p><strong>Controller (Python)</strong></p>
+<ul>
+<li><p><code>validate()</code> → <code>sync_photo_from_student()</code> copies <code>Student.student_image</code> to this doc’s <code>photo</code>.</p>
+</li>
+<li><p>Whitelisted:</p>
+<ul>
+<li><code>get_student_basic_info(student)</code> — returns basic student profile (enforces read permission on <em>Student Patient</em>).</li>
+<li><code>get_guardian_details(student_name)</code> — returns guardians (name, relation, email, mobile) from the linked <strong>Student</strong>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Client script (JS)</strong></p>
+<ul>
+<li>On <strong>load/refresh</strong>: fetches basic info, renders the <strong>Student Info</strong> panel, computes and sets <code>student_age</code> (in years/months/days).</li>
+<li>Adds <strong>Guardian Details</strong> dialog and <strong>Student Visit</strong> quick‑action.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>Privacy note</strong>
+Teachers <strong>do not</strong> access full Student Patient records. Use <strong>Medical Info</strong> to surface only minimal, essential details to instructors.</p>
+</blockquote>
+<hr>
+<hundefined id="permissions-r-w-c-d">Permissions (R / W / C / D)</hundefined><p><strong>Legend:</strong> 🟢 Allowed · ◻️ Not allowed</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th align="center">Read</th>
+<th align="center">Write</th>
+<th align="center">Create</th>
+<th align="center">Delete</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>System Manager</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+</tr>
+<tr>
+<td><strong>Nurse</strong></td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+</tr>
+<tr>
+<td>Admission Manager</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+</tr>
+<tr>
+<td>Admission Officer</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+</tr>
+<tr>
+<td>Academic Admin</td>
+<td align="center">🟢</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+</tr>
+<tr>
+<td>Academic Assistant</td>
+<td align="center">🟢</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>Keep scope tight: only nurses and necessary admins should have write access. For teaching staff, rely on the short <strong>Medical Info</strong> note.</p>
+</blockquote>
+<hr>
+<hundefined id="linked-doctypes">Linked doctypes</hundefined><ul>
+<li><strong>Student</strong> (Link) — identity &amp; demographics source</li>
+<li><strong>Student Patient Vaccination</strong> (Child Table) — vaccination entries</li>
+<li><strong>Student Patient Visit</strong> — logs of nurse‑office visits</li>
+<li><strong>Guardian</strong> (via Student.guardians) — surfaced by <strong>Guardian Details</strong></li>
+</ul>
+<p><strong>See also</strong></p>
+<ul>
+<li><code>student-patient-visit</code></li>
+<li><code>student-log</code></li>
+<li><code>student-group</code></li>
+</ul>
+<hr>
+<hundefined id="suggested-screenshots">Suggested screenshots</hundefined><ul>
+<li>Header after selecting <strong>Student</strong> (shows Student Info and Age).</li>
+<li><strong>Allergies</strong> section toggled on with details.</li>
+<li><strong>Vaccinations</strong> table with a sample entry and proof image.</li>
+<li><strong>Guardian Details</strong> dialog.</li>
+<li><strong>Student Visit</strong> button in the form menu.</li>
+</ul>
+<hr>
+<hundefined id="enhancements-nicetohave">Enhancements (nice‑to‑have)</hundefined><ul>
+<li>Auto‑set <code>completion_state = Completed</code> when core fields are filled.</li>
+<li>A concise <strong>Health Summary</strong> print format (field‑trip friendly).</li>
+<li>List‑view indicators for <strong>Missing Info</strong> and allergy presence.</li>
+<li>Optional school‑level toggle limiting edit rights to <strong>Nurse</strong> only.</li>
+</ul>
+</div> </main> </div> </body></html>

@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-15 18:11:38.821741",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "label",
+  "href",
+  "item_order",
+  "target_blank",
+  "feature_flag"
+ ],
+ "fields": [
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Label",
+   "reqd": 1
+  },
+  {
+   "description": "Absolute or site-relative URL (e.g., /features)",
+   "fieldname": "href",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "URL (href)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "item_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Item Order",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "target_blank",
+   "fieldtype": "Check",
+   "label": "Open in New Tab"
+  },
+  {
+   "description": "Optional flag your Vue can use to conditionally render",
+   "fieldname": "feature_flag",
+   "fieldtype": "Data",
+   "label": "Feature Flag (optional)"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-10-15 18:16:16.156346",
+ "modified_by": "Administrator",
+ "module": "Ifitwala Doc",
+ "name": "Navigation Menu Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
