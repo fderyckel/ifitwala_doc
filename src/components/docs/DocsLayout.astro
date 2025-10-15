@@ -1,5 +1,5 @@
 ---
-import { marked } from 'marked'
+import { marked, Slugger } from 'marked'
 import Sidebar from './Sidebar.astro'
 import TOC from './TOC.astro'
 
@@ -200,7 +200,7 @@ function applyDocTransforms(md) {
 function extractHeadings(md) {
   if (!md) return []
   const tokens = marked.lexer(md)
-  const slugger = new marked.Slugger()
+  const slugger = typeof Slugger === 'function' ? new Slugger() : null
   const out = []
   for (const token of tokens) {
     if (token.type === 'heading' && typeof token.depth === 'number' && token.depth >= 1) {
@@ -208,7 +208,14 @@ function extractHeadings(md) {
       out.push({
         depth: token.depth,
         text,
-        slug: slugger.slug(text),
+        slug: slugger
+          ? slugger.slug(text)
+          : (text || '')
+              .toLowerCase()
+              .trim()
+              .replace(/[^\w\s-]/g, '')
+              .replace(/\s+/g, '-')
+              .replace(/-+/g, '-'),
       })
     }
   }
