@@ -1,5 +1,5 @@
 ---
-import { marked, Slugger } from 'marked'
+import { marked } from 'marked'
 import Sidebar from './Sidebar.astro'
 import TOC from './TOC.astro'
 
@@ -197,10 +197,29 @@ function applyDocTransforms(md) {
   return md
 }
 
+function createSlugger() {
+  const seen = new Map()
+  return text => {
+    let base = (text || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+    if (!base) {
+      base = 'section'
+    }
+    const count = seen.get(base) || 0
+    seen.set(base, count + 1)
+    return count ? `${base}-${count}` : base
+  }
+}
+
 function extractHeadings(md) {
   if (!md) return []
   const tokens = marked.lexer(md)
-  const slugger = typeof Slugger === 'function' ? new Slugger() : null
+  const slug = createSlugger()
   const out = []
   for (const token of tokens) {
     if (token.type === 'heading' && typeof token.depth === 'number' && token.depth >= 1) {
@@ -208,14 +227,7 @@ function extractHeadings(md) {
       out.push({
         depth: token.depth,
         text,
-        slug: slugger
-          ? slugger.slug(text)
-          : (text || '')
-              .toLowerCase()
-              .trim()
-              .replace(/[^\w\s-]/g, '')
-              .replace(/\s+/g, '-')
-              .replace(/-+/g, '-'),
+        slug: slug(text),
       })
     }
   }
