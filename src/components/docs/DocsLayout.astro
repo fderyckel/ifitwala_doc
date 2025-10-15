@@ -199,8 +199,19 @@ function applyDocTransforms(md) {
 
 function createSlugger() {
   const seen = new Map()
-  return text => {
-    let base = (text || '')
+  return input => {
+    const raw =
+      typeof input === 'string'
+        ? input
+        : Array.isArray(input)
+          ? input.join(' ')
+          : (input && typeof input === 'object' && 'text' in input && typeof input.text === 'string')
+            ? input.text
+            : (input && typeof input === 'object' && 'raw' in input && typeof input.raw === 'string')
+              ? input.raw
+              : String(input ?? '')
+
+    let base = raw
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '')
@@ -242,9 +253,16 @@ function renderMarkdown(
   const activeSlugger = slugger || createSlugger()
 
   const renderer = new marked.Renderer()
-  renderer.heading = (text, level) => {
-    const id = activeSlugger(text)
-    return `<h${level} id="${escapeHtml(id)}">${text}</h${level}>`
+  renderer.heading = (text, level, raw) => {
+    const source = typeof raw === 'string' ? raw : text
+    const id = activeSlugger(source)
+    const label =
+      typeof text === 'string'
+        ? text
+        : (text && typeof text === 'object' && 'text' in text && typeof text.text === 'string')
+          ? text.text
+          : String(text ?? '')
+    return `<h${level} id="${escapeHtml(id)}">${label}</h${level}>`
   }
 
   if (!allowCallouts) {
