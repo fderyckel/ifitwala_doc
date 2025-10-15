@@ -1,5 +1,7 @@
 ---
 import { marked } from 'marked'
+import Sidebar from './Sidebar.astro'
+import TOC from './TOC.astro'
 
 const { doc } = Astro.props
 const lang = doc.language || 'en'
@@ -195,8 +197,26 @@ function applyDocTransforms(md) {
   return md
 }
 
-function renderMarkdown(input, { allowCallouts = true } = {}) {
-  let md = applyDocTransforms(input || '')
+function extractHeadings(md) {
+  if (!md) return []
+  const tokens = marked.lexer(md)
+  const slugger = new marked.Slugger()
+  const out = []
+  for (const token of tokens) {
+    if (token.type === 'heading' && typeof token.depth === 'number' && token.depth >= 1) {
+      const text = token.text || ''
+      out.push({
+        depth: token.depth,
+        text,
+        slug: slugger.slug(text),
+      })
+    }
+  }
+  return out
+}
+
+function renderMarkdown(input, { allowCallouts = true, alreadyTransformed = false } = {}) {
+  let md = alreadyTransformed ? (input || '') : applyDocTransforms(input || '')
 
   if (!allowCallouts) {
     return marked.parse(md)
@@ -236,28 +256,39 @@ function renderMarkdown(input, { allowCallouts = true } = {}) {
   return html
 }
 
-const html = renderMarkdown(doc.body_md || '')
+const rawMarkdown = doc.body_md || ''
+const transformedMarkdown = applyDocTransforms(rawMarkdown)
+const headings = extractHeadings(transformedMarkdown)
+const html = renderMarkdown(transformedMarkdown, { allowCallouts: true, alreadyTransformed: true })
 ---
 
-<main class="prose prose-docs mx-auto max-w-3xl px-6 py-10">
-  <nav class="not-prose text-sm text-slate mb-4">
-    <a href={`/docs/${lang}`} class="hover:underline">Docs</a>
-    {doc.category && <>
-      <span class="mx-1">›</span>
-      <a href={`/docs/${lang}/${doc.category}`} class="hover:underline">
-        {doc.category_label || doc.category}
-      </a>
-    </>}
-    {doc.sub_category && <>
-      <span class="mx-1">›</span>
-      <a href={`/docs/${lang}/${doc.category}/${doc.sub_category}`} class="hover:underline">
-        {doc.sub_category_label || doc.sub_category}
-      </a>
-    </>}
-  </nav>
+<div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:flex-row">
+  <Sidebar headings={headings} />
 
-  <h1 class="mb-1">{doc.title}</h1>
-  {doc.summary && <p class="text-slate">{doc.summary}</p>}
+  <main class="prose prose-docs w-full flex-1 min-w-0 max-w-3xl">
+    <nav class="not-prose mb-4 text-sm text-slate">
+      <a href={`/docs/${lang}`} class="hover:underline">Docs</a>
+      {doc.category && <>
+        <span class="mx-1">›</span>
+        <a href={`/docs/${lang}/${doc.category}`} class="hover:underline">
+          {doc.category_label || doc.category}
+        </a>
+      </>}
+      {doc.sub_category && <>
+        <span class="mx-1">›</span>
+        <a href={`/docs/${lang}/${doc.category}/${doc.sub_category}`} class="hover:underline">
+          {doc.sub_category_label || doc.sub_category}
+        </a>
+      </>}
+    </nav>
 
-  <div class="mt-6" set:html={html} />
-</main>
+    <h1 class="mb-1">{doc.title}</h1>
+    {doc.summary && <p class="text-slate">{doc.summary}</p>}
+
+    <div class="lg:hidden">
+      <TOC headings={headings} />
+    </div>
+
+    <div class="mt-6" set:html={html} />
+  </main>
+</div>
