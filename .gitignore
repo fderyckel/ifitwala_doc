@@ -1,7 +1,18 @@
 .DS_Store
-*.pyc
-*.egg-info
+
+# Vim swap/ctags
 *.swp
 tags
-node_modules
-__pycache__
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pyaudit/
+
+# Node/Astro dependencies and caches
+node_modules/
+.astro/
+
+# Build output
+dist/
