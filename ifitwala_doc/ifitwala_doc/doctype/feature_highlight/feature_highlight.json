@@ -1,25 +1,44 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:eyebrow",
  "creation": "2025-10-16 18:32:16.897054",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_cznj"
+  "eyebrow",
+  "intro",
+  "items"
  ],
  "fields": [
   {
-   "fieldname": "section_break_cznj",
-   "fieldtype": "Section Break"
+   "fieldname": "eyebrow",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Eyebrow / Section Title",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "intro",
+   "fieldtype": "Small Text",
+   "label": "Intro / Lead Text"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Feature Items",
+   "options": "Feature Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-16 18:32:16.897054",
+ "modified": "2025-10-16 19:15:05.008705",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Feature Highlight",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -31,6 +50,30 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Website Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Content Editor",
    "share": 1,
    "write": 1
   }
