@@ -7,7 +7,7 @@ from frappe import _
 
 ALLOWED_BLOCK_TYPES = {"Hero", "Feature Highlights", "Trust Logos", "Testimonial Group", "CTA"}
 
-class WebPage(Document):
+class IfitwalaWebPage(Document):
     def validate(self):
         self._validate_slug_unique()
         self._validate_has_sections()
