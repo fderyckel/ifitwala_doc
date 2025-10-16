@@ -1,0 +1,51 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-16 15:13:35.990844",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "label",
+  "href",
+  "variant"
+ ],
+ "fields": [
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Label",
+   "reqd": 1
+  },
+  {
+   "fieldname": "href",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "URL (href)",
+   "reqd": 1
+  },
+  {
+   "default": "primary",
+   "fieldname": "variant",
+   "fieldtype": "Select",
+   "label": "variant",
+   "options": "primary\nsecondary"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-10-16 15:15:13.759936",
+ "modified_by": "Administrator",
+ "module": "Ifitwala Doc",
+ "name": "Hero Action",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
