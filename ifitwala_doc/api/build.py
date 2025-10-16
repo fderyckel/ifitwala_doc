@@ -31,6 +31,61 @@ def run_astro_build():
     import os, shlex, shutil
     import frappe
 
+    def _normalize_path_entries(value):
+        """Return a list of absolute path entries from strings / iterables."""
+        if not value:
+            return []
+        if isinstance(value, (list, tuple, set)):
+            raw_entries = value
+        else:
+            raw_entries = str(value).split(os.pathsep)
+        entries = []
+        for entry in raw_entries:
+            if not entry:
+                continue
+            entry = os.path.expanduser(str(entry)).strip()
+            if entry:
+                entries.append(os.path.normpath(entry))
+        return entries
+
+    def _resolve_yarn(execution_env, project_root):
+        """Return (yarn_invocation_path, requires_node_wrapper)."""
+        explicit_bins = [
+            execution_env.get("IFITWALA_DOC_YARN_BIN"),
+            frappe.conf.get("docs_build_yarn_bin"),
+        ]
+        for candidate in explicit_bins:
+            if not candidate:
+                continue
+            candidate_path = os.path.expanduser(str(candidate))
+            if os.path.isfile(candidate_path):
+                return candidate_path, False
+
+        local_wrappers = [
+            os.path.join(project_root, "node_modules", ".bin", "yarn"),
+            os.path.join(project_root, ".yarn", "bin", "yarn"),
+        ]
+        for candidate in local_wrappers:
+            if os.path.isfile(candidate):
+                return candidate, False
+
+        releases_dir = os.path.join(project_root, ".yarn", "releases")
+        if os.path.isdir(releases_dir):
+            release_files = sorted(
+                (
+                    name
+                    for name in os.listdir(releases_dir)
+                    if name.startswith("yarn-") and name.endswith((".cjs", ".js"))
+                ),
+                reverse=True,
+            )
+            for name in release_files:
+                release_path = os.path.join(releases_dir, name)
+                if os.path.isfile(release_path):
+                    return release_path, True  # run via `node`
+
+        return shutil.which("yarn", path=execution_env.get("PATH") or ""), False
+
     # ───────────────────────── Paths ─────────────────────────
     app_root  = frappe.get_app_path("ifitwala_doc")          # apps/ifitwala_doc/ifitwala_doc
     proj_root = os.path.dirname(app_root)                    # apps/ifitwala_doc
@@ -71,25 +126,49 @@ def run_astro_build():
 
     # ───────────────────── Environment ───────────────────────
     env = os.environ.copy()
-    # Make yarn/node visible in worker env
-    env["PATH"] = os.pathsep.join(["/usr/local/bin", "/usr/bin", "/bin", env.get("PATH", "")])
     env.setdefault("NODE_ENV", "production")  # build env can be production
 
-    yarn_bin = shutil.which("yarn", path=env["PATH"])
-    if not yarn_bin:
-        frappe.throw("yarn not found on PATH for the worker. PATH=" + env.get("PATH", ""))
+    original_path = env.get("PATH", "")
+    path_hints = [
+        "/usr/local/bin",
+        "/usr/local/sbin",
+        "/usr/bin",
+        "/usr/sbin",
+        "/bin",
+        os.path.join(proj_root, "node_modules", ".bin"),
+        os.path.join(proj_root, ".yarn", "bin"),
+    ]
+    path_hints.extend(_normalize_path_entries(frappe.conf.get("docs_build_yarn_paths")))
+    path_hints.extend(_normalize_path_entries(env.get("IFITWALA_DOC_YARN_PATHS")))
+    if original_path:
+        path_hints.append(original_path)
+    env["PATH"] = os.pathsep.join(filter(None, path_hints))
+
+    yarn_path, needs_node_wrapper = _resolve_yarn(env, proj_root)
+    if not yarn_path:
+        searched = "\n".join(f"  - {entry}" for entry in path_hints if entry)
+        frappe.throw(
+            "yarn not found for docs build.\n"
+            "Checked:\n"
+            f"{searched}\n"
+            f"PATH={env.get('PATH', '')}"
+        )
+    yarn_prefix = f"node {shlex.quote(yarn_path)}" if needs_node_wrapper else shlex.quote(yarn_path)
+
+    def run_yarn(args):
+        command = yarn_prefix if not args else f"{yarn_prefix} {args}"
+        _run(command, cwd=proj_root, env=env)
 
     # ─────────────────────── Build step ──────────────────────
     # 1) Install with devDependencies so 'astro' exists
-    _run(f"{shlex.quote(yarn_bin)} install --frozen-lockfile --check-files --production=false",
-         cwd=proj_root, env=env)
+    run_yarn("install --frozen-lockfile --check-files --production=false")
 
     # (optional diagnostics)
-    _run(f"{shlex.quote(yarn_bin)} --version", cwd=proj_root, env=env)
+    run_yarn("--version")
     _run("node --version", cwd=proj_root, env=env)
 
     # 2) Build via package.json script (runs 'astro build')
-    _run(f"{shlex.quote(yarn_bin)} astro:build", cwd=proj_root, env=env)
+    run_yarn("astro:build")
 
     # 3) Deploy built assets
     built_docs = os.path.join(proj_root, "dist", "docs")
