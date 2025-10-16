@@ -10,7 +10,8 @@
   "tagline",
   "primary_cta_label",
   "primary_cta_url",
-  "footer_md"
+  "footer_md",
+  "brand_logo_alt"
  ],
  "fields": [
   {
@@ -41,14 +42,19 @@
   {
    "fieldname": "footer_md",
    "fieldtype": "Data",
-   "label": "Footer MD"
+   "label": "Footer (Markdown/HTML)"
+  },
+  {
+   "fieldname": "brand_logo_alt",
+   "fieldtype": "Data",
+   "label": "Logo Alt Text"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-15 12:03:56.379579",
+ "modified": "2025-10-15 18:35:05.080519",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Ifitwala Website Settings",
@@ -61,6 +67,16 @@
    "print": 1,
    "read": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Website Manager",
    "share": 1,
    "write": 1
   }

@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-16 14:02:49.141969",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "block_type",
+  "notes",
+  "block_doctype",
+  "block_ref"
+ ],
+ "fields": [
+  {
+   "fieldname": "block_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Block Type",
+   "options": "Hero\nFeature Highlights\nTrust Logos\nTestimonial Group\nCTA",
+   "reqd": 1
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  },
+  {
+   "description": "Select the Block DocType (e.g., Hero Block).",
+   "fieldname": "block_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Block DocType",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "block_ref",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "label": "Block Reference",
+   "options": "block_doctype",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-10-16 14:28:38.230057",
+ "modified_by": "Administrator",
+ "module": "Ifitwala Doc",
+ "name": "Ifitwala Web Page Section",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
