@@ -31,6 +31,7 @@ app_license = "mit"
 # include js, css files in header of web template
 # web_include_css = "/assets/ifitwala_doc/css/ifitwala_doc.css"
 # web_include_js = "/assets/ifitwala_doc/js/ifitwala_doc.js"
+web_include_js = ["assets/ifitwala_doc/js/marketing.js"]
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "ifitwala_doc/public/scss/website"

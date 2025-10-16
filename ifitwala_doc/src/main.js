@@ -1,43 +1,50 @@
-import { createApp } from 'vue';
+// src/main.js
+
+import { createApp } from "vue";
+
 import { FrappeUI } from 'frappe-ui';
 import { createRouter, createWebHistory } from 'vue-router';
 
-const router = createRouter({
-	history: createWebHistory(),
-	routes: []
-});
-
+// Map RPC "type" → component
 const registry = {
-	Hero: () => import('@/components/Hero.vue'),
-	TestimonialCarousel: () => import('@/components/TestimonialCarousel.vue'),
-	DocToc: () => import('@/components/DocToc.vue'),
-	DocsSidebar: () => import('@/components/DocsSidebar.vue')
+  "Hero": () => import("./components/Hero.vue"),
+  "Feature Highlights": () => import("./components/FeatureHighlights.vue"), // create if not present
 };
 
-function parseProps(el) {
-	const raw = el.getAttribute('data-props');
-	if (!raw) return {};
-	try {
-		return JSON.parse(raw);
-	} catch (e) {
-		console.warn('[ifitwala_doc] Invalid JSON in data-props:', e);
-		return {};
-	}
+// Fetch a page from Frappe
+async function getPage(slug = "/") {
+  const res = await fetch(`/api/method/ifitwala_doc.api.site.get_page?slug=${encodeURIComponent(slug)}`);
+  const { message } = await res.json();
+  return message;
 }
 
-document.querySelectorAll('[data-vue]').forEach(async (el) => {
-	const name = el.getAttribute('data-vue');
-	const loader = registry[name];
-	if (!loader) {
-		console.warn(`[ifitwala_doc] No component registered for "${name}"`);
-		return;
-	}
-	const mod = await loader();
-	const Comp = mod.default || mod;
-	const props = parseProps(el);
+// Create and mount each section island
+async function mountSection(type, props, parent) {
+  const loader = registry[type];
+  if (!loader) return;
+  const mod = await loader();
+  const Comp = mod.default || mod;
+  const el = document.createElement("div");
+  el.setAttribute("data-vue", type);
+  parent.appendChild(el);
+  createApp(Comp, props).mount(el);
+}
 
-	const app = createApp(Comp, props);
-	app.use(FrappeUI);
-	app.use(router);
-	app.mount(el);
-});
+// Boot on marketing pages
+export async function renderMarketingPage() {
+  const root = document.querySelector("#home-sections") || document.body;
+  const slug = window.location.pathname || "/";
+  const page = await getPage(slug);
+
+  for (const { type, props } of page.sections || []) {
+    // Mount in order coming from the Desk
+    await mountSection(type, props, root);
+  }
+
+  // (Optional) set title/SEO on client; SSR later in Jinja
+  if (page.seo?.title) document.title = page.seo.title;
+}
+
+if (document.documentElement.matches('[data-marketing="home"]')) {
+  renderMarketingPage();
+}
