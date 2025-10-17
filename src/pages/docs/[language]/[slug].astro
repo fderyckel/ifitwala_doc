@@ -30,8 +30,10 @@ export async function getStaticPaths() {
       paths.push({ params: { language, slug } })
     }
 
+    console.log(`[docs][slug] static paths: ${paths.length}`)
     return paths
-  } catch {
+  } catch (error) {
+    console.warn('[docs][slug] failed to build static paths.', error)
     return []
   }
 }

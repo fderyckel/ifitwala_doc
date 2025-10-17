@@ -49,8 +49,10 @@ export async function getStaticPaths() {
       paths.push({ params: { language, category: categorySlug } })
     }
 
+    console.log(`[docs][category] static paths: ${paths.length}`)
     return paths
-  } catch {
+  } catch (error) {
+    console.warn('[docs][category] failed to build static paths.', error)
     return []
   }
 }
