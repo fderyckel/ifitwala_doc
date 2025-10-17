@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Build with Astro (yarn) and deploy static files to sites/assets/ifitwala_doc
-# Usage: ./scripts/deploy_docs.sh
+# Build the marketing+docs site with Astro and deploy to sites/assets/ifitwala_doc
+# Usage: ./deploy_docs.sh
 # Env overrides:
 #   APP_ROOT=/home/.../apps/ifitwala_doc
 #   DEST_ROOT=/home/.../sites/assets/ifitwala_doc
@@ -25,35 +25,27 @@ if [[ -f ".env" ]]; then
   set +a
 fi
 
-echo "==> Docs API base: ${DOCS_API_BASE:-${PUBLIC_DOCS_API:-<unset>}}"
+API_BASE="${PUBLIC_SITE_API:-${SITE_API_BASE:-${PUBLIC_DOCS_API:-${DOCS_API_BASE:-<unset>}}}}"
+echo "==> Content API base: $API_BASE"
 echo "==> Installing deps (yarn)…"
 yarn install --frozen-lockfile --check-files
 
 echo "==> Building with Astro…"
 yarn astro:build
 
-# 2) Deploy (rsync docs/ and _astro/)
-DOCS_SRC="$SRC_ROOT/docs"
-ASTRO_SRC="$SRC_ROOT/_astro"
+# 2) Deploy (rsync entire dist/)
+DIST_SRC="$SRC_ROOT"
 
-if [[ ! -d "$DOCS_SRC" ]]; then
-  echo "ERROR: $DOCS_SRC not found. Did the build succeed?" >&2
+if [[ ! -d "$DIST_SRC" ]]; then
+  echo "ERROR: $DIST_SRC not found. Did the build succeed?" >&2
   exit 1
 fi
 
-mkdir -p "$DEST_ROOT/docs" "$DEST_ROOT/_astro"
+mkdir -p "$DEST_ROOT"
 
-echo "==> Rsync pages -> $DEST_ROOT/docs/"
-rsync -a --delete "$DOCS_SRC/" "$DEST_ROOT/docs/"
-
-if [[ -d "$ASTRO_SRC" ]]; then
-  echo "==> Rsync assets -> $DEST_ROOT/_astro/"
-  rsync -a --delete "$ASTRO_SRC/" "$DEST_ROOT/_astro/"
-else
-  echo "WARN: $ASTRO_SRC missing; skipping hashed assets"
-fi
+echo "==> Rsync dist/ -> $DEST_ROOT/"
+rsync -a --delete "$DIST_SRC/" "$DEST_ROOT/"
 
 echo
 echo "✅ Deployed:"
-echo "   - docs  -> $DEST_ROOT/docs"
-echo "   - _astro-> $DEST_ROOT/_astro"
+echo "   - dist  -> $DEST_ROOT"
