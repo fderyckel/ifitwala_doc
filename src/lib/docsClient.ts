@@ -97,7 +97,10 @@ export async function getAllDocs(lang?: string): Promise<AllDocsPayload> {
   const raw = await fetchJSON(
     normalizeUrl(`/api/method/ifitwala_doc.api.docs.fetch_all${qp}`)
   );
-  return unwrap<AllDocsPayload>(raw);
+  const payload = unwrap<AllDocsPayload>(raw);
+  const docs = Array.isArray(payload?.docs) ? payload.docs : [];
+  console.log(`[docsClient] getAllDocs(${lang || 'all'}) -> ${docs.length}`);
+  return payload;
 }
 
 export async function getOneDoc(language: string, slug: string): Promise<Doc> {
@@ -107,7 +110,9 @@ export async function getOneDoc(language: string, slug: string): Promise<Doc> {
     )}&slug=${encodeURIComponent(slug)}`
   );
   const raw = await fetchJSON(url);
-  return unwrap<Doc>(raw);
+  const doc = unwrap<Doc>(raw);
+  console.log(`[docsClient] getOneDoc(${language}, ${slug}) -> ${doc ? 'hit' : 'miss'}`);
+  return doc;
 }
 
 
@@ -116,7 +121,9 @@ export async function getCategories(language = 'en') {
     `/api/method/ifitwala_doc.api.docs.get_categories?language=${encodeURIComponent(language)}`
   );
   const raw = await fetchJSON(url);
-  return unwrap(raw) || [];
+  const categories = unwrap(raw) || [];
+  console.log(`[docsClient] getCategories(${language}) -> ${Array.isArray(categories) ? categories.length : 0}`);
+  return categories;
 }
 
 export async function getCategory(slug: string) {
@@ -124,7 +131,9 @@ export async function getCategory(slug: string) {
     `/api/method/ifitwala_doc.api.docs.get_category?slug=${encodeURIComponent(slug)}`
   );
   const raw = await fetchJSON(url);
-  return unwrap(raw) || null;
+  const category = unwrap(raw) || null;
+  console.log(`[docsClient] getCategory(${slug}) -> ${category ? 'hit' : 'miss'}`);
+  return category;
 }
 
 export async function getDocsInCategory(language: string, category_slug: string) {
@@ -133,7 +142,9 @@ export async function getDocsInCategory(language: string, category_slug: string)
     `/api/method/ifitwala_doc.api.docs.get_docs_in_category?${q.toString()}`
   );
   const raw = await fetchJSON(url);
-  return unwrap(raw) || [];
+  const docs = unwrap(raw) || [];
+  console.log(`[docsClient] getDocsInCategory(${language}, ${category_slug}) -> ${Array.isArray(docs) ? docs.length : 0}`);
+  return docs;
 }
 
 export async function getAvailableLanguages(): Promise<string[]> {
@@ -160,6 +171,7 @@ export async function getAvailableLanguages(): Promise<string[]> {
     }
 
     const languages = Array.from(bucket).sort();
+    console.log(`[docsClient] getAvailableLanguages -> ${languages.join(', ') || '<none>'}`);
     return languages.length ? languages : ['en'];
   } catch (error) {
     console.warn('[docsClient] Failed to detect languages from docs payload.', error);

@@ -5,15 +5,8 @@ import { getCategories, getAvailableLanguages } from '@/lib/docsClient'
 const LANGUAGE_CODE_RX = /^[a-z]{2}$/i
 
 export async function getStaticPaths() {
-  try {
-    const languages = await getAvailableLanguages()
-    const paths = languages.map((language) => ({ params: { language } }))
-    console.log(`[docs][language] static paths: ${paths.length}`)
-    return paths
-  } catch (error) {
-    console.warn('[docs][language] failed to build static paths.', error)
-    return []
-  }
+  const languages = await getAvailableLanguages()
+  return languages.map((language) => ({ params: { language } }))
 }
 
 const languageParam = typeof Astro.params.language === 'string' ? Astro.params.language : ''
