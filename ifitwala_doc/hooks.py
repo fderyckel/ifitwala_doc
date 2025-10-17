@@ -31,7 +31,13 @@ app_license = "mit"
 # include js, css files in header of web template
 # web_include_css = "/assets/ifitwala_doc/css/ifitwala_doc.css"
 # web_include_js = "/assets/ifitwala_doc/js/ifitwala_doc.js"
-web_include_js = ["assets/ifitwala_doc/js/marketing.js"]
+web_include_js = [
+    "assets/ifitwala_doc/js/marketing.js",        # (your nav: Header/Footer)
+    "assets/ifitwala_doc/dist/base.js",           # (Vite bundle from src/main.js)
+]
+web_include_css = [
+    "assets/ifitwala_doc/dist/site.css",          # (your Tailwind from vite input 'site')
+]
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "ifitwala_doc/public/scss/website"
