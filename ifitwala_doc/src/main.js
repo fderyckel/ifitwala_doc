@@ -45,6 +45,8 @@ export async function renderMarketingPage() {
   if (page.seo?.title) document.title = page.seo.title;
 }
 
-if (document.documentElement.matches('[data-marketing="home"]')) {
-  renderMarketingPage();
-}
+document.addEventListener('DOMContentLoaded', () => {
+   if (document.querySelector('#home-sections')) {
+    renderMarketingPage();
+  }
+});

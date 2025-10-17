@@ -161,3 +161,40 @@ def search_blocks(block_type: str, limit: int = 10) -> List[Dict[str, Any]]:
         order_by="modified desc",
     )
     return [{"doctype": dt, "name": r.name} for r in rows]
+
+
+# Copyright (c) 2025
+import frappe
+
+@frappe.whitelist(allow_guest=True)
+def get_page(slug="/"):
+    # Temporary stub so the home page renders something
+    if slug in ("/", "", None):
+        return {
+            "seo": {"title": "Ifitwala Ed — A campus where curiosity blooms"},
+            "sections": [
+                {
+                    "type": "Hero",
+                    "props": {
+                        "title": "Whole-school ERP on Frappe",
+                        "subtitle": "Flexible. Fast. Privacy-first.",
+                        "cta_label": "Explore the docs",
+                        "cta_href": "/docs/en/getting-started"
+                    },
+                },
+                {
+                    "type": "Feature Highlights",
+                    "props": {
+                        "eyebrow": "Why Ifitwala Ed",
+                        "intro": "Built for real schools: scheduling, attendance, learning, analytics.",
+                        "items": [
+                            {"order": 1, "icon": "layers", "label": "Frappe-native", "description": "Deep Desk & Portal integration", "href": "/docs/en/getting-started"},
+                            {"order": 2, "icon": "shield", "label": "Privacy-first", "description": "Granular roles & auditability"},
+                            {"order": 3, "icon": "trending-up", "label": "Analytics-ready", "description": "Attendance & learning insights"},
+                            {"order": 4, "icon": "clock", "label": "Fast to deploy", "description": "Ship an MVP in weeks", "href": "/contact"}
+                        ]
+                    },
+                },
+            ],
+        }
+    return {"seo": {"title": "Page"}, "sections": []}
