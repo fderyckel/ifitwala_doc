@@ -16,9 +16,16 @@ def _extract_headings(md: str):
     return [m.group(2).strip() for m in HEADING_RE.finditer(md or "")]
 
 def _set_cache_headers(payload: bytes, modified: str | None):
-    etag = md5(payload).hexdigest()
     resp = frappe.local.response
     resp["type"] = "json"
+
+    ua = (frappe.get_request_header("User-Agent") or "").lower()
+    if "astro-build" in ua:
+        if modified:
+            resp["Last-Modified"] = format_datetime(modified)
+        return False
+
+    etag = md5(payload).hexdigest()
     resp["ETag"] = etag
     if modified:
         resp["Last-Modified"] = format_datetime(modified)

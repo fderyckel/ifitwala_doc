@@ -25,23 +25,53 @@ function normalizeUrl(path: string) {
   return `${BASE.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 }
 
-async function fetchJSON(url: string) {
-  const res = await fetch(url, {
-    headers: {
-      'User-Agent': 'ifitwala-docs/astro-build',
-      'Accept': 'application/json',
-    },
-  });
+function withCacheBust(url: string, token?: string) {
+  const sep = url.includes('?') ? '&' : '?';
+  const value = token || Date.now().toString(36);
+  return `${url}${sep}__bust=${value}`;
+}
+
+async function fetchJSON(url: string, attempt = 1): Promise<any> {
+  const headers: Record<string, string> = {
+    'User-Agent': 'ifitwala-docs/astro-build',
+    'Accept': 'application/json',
+  };
+  // On retries we force upstream caches to refresh.
+  const targetUrl = attempt === 1 ? url : withCacheBust(url, `${Date.now()}_${attempt}`);
+  if (attempt > 1) {
+    headers['Cache-Control'] = 'no-cache, no-store';
+    headers['Pragma'] = 'no-cache';
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(targetUrl, { headers });
+  } catch (error) {
+    if (attempt < 3) {
+      console.warn(`[docsClient] ${targetUrl} fetch failed (${error}). Retrying without cache.`);
+      return fetchJSON(url, attempt + 1);
+    }
+    console.error(`[docsClient] ${targetUrl} fetch failed after ${attempt} attempts.`, error);
+    throw error;
+  }
+
+  // Some reverse proxies may answer 304 when ETag matches; retry once bypassing cache.
+  if (res.status === 304 && attempt < 3) {
+    console.warn(`[docsClient] ${targetUrl} -> 304 Not Modified. Retrying without cache.`);
+    return fetchJSON(url, attempt + 1);
+  }
+
   const text = await res.text();
   if (!res.ok) {
-    console.error(`[docsClient] ${url} -> ${res.status} ${res.statusText}\n${text}`);
-    throw new Error(`${url} -> ${res.status}`);
+    console.error(`[docsClient] ${targetUrl} -> ${res.status} ${res.statusText}\n${text}`);
+    throw new Error(`${targetUrl} -> ${res.status}`);
   }
+
   try {
     return JSON.parse(text);
   } catch {
-    console.error(`[docsClient] Non-JSON at ${url}:\n${text}`);
-    throw new Error(`Invalid JSON from ${url}`);
+    console.error(`[docsClient] Non-JSON at ${targetUrl}:\n${text}`);
+    throw new Error(`Invalid JSON from ${targetUrl}`);
   }
 }
 

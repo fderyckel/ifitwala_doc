@@ -5,7 +5,7 @@ import frappe
 from frappe.model.document import Document
 from frappe import _
 
-class FeatureHighlights(Document):
+class FeatureHighlight(Document):
     def validate(self):
         if not self.items:
             frappe.throw(_("Add at least one Feature Item."))
