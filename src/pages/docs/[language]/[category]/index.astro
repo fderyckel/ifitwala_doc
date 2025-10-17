@@ -50,8 +50,7 @@ export async function getStaticPaths() {
     }
 
     return paths
-  } catch (error) {
-    console.warn('[docs][category] getStaticPaths error:', error)
+  } catch {
     return []
   }
 }

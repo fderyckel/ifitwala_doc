@@ -31,8 +31,7 @@ export async function getStaticPaths() {
     }
 
     return paths
-  } catch (error) {
-    console.warn('[docs][slug] getStaticPaths error:', error)
+  } catch {
     return []
   }
 }

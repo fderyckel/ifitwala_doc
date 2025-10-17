@@ -36,7 +36,6 @@ async function fetchJSON(url: string, attempt = 1): Promise<any> {
     'User-Agent': 'ifitwala-docs/astro-build',
     'Accept': 'application/json',
   };
-  // On retries we force upstream caches to refresh.
   const targetUrl = attempt === 1 ? url : withCacheBust(url, `${Date.now()}_${attempt}`);
   if (attempt > 1) {
     headers['Cache-Control'] = 'no-cache, no-store';
@@ -48,29 +47,24 @@ async function fetchJSON(url: string, attempt = 1): Promise<any> {
     res = await fetch(targetUrl, { headers });
   } catch (error) {
     if (attempt < 3) {
-      console.warn(`[docsClient] ${targetUrl} fetch failed (${error}). Retrying without cache.`);
       return fetchJSON(url, attempt + 1);
     }
-    console.error(`[docsClient] ${targetUrl} fetch failed after ${attempt} attempts.`, error);
     throw error;
   }
 
-  // Some reverse proxies may answer 304 when ETag matches; retry once bypassing cache.
   if (res.status === 304 && attempt < 3) {
-    console.warn(`[docsClient] ${targetUrl} -> 304 Not Modified. Retrying without cache.`);
     return fetchJSON(url, attempt + 1);
   }
 
   const text = await res.text();
   if (!res.ok) {
-    console.error(`[docsClient] ${targetUrl} -> ${res.status} ${res.statusText}\n${text}`);
-    throw new Error(`${targetUrl} -> ${res.status}`);
+    throw new Error(`${targetUrl} -> ${res.status} ${res.statusText}
+${text}`);
   }
 
   try {
     return JSON.parse(text);
   } catch {
-    console.error(`[docsClient] Non-JSON at ${targetUrl}:\n${text}`);
     throw new Error(`Invalid JSON from ${targetUrl}`);
   }
 }
@@ -95,10 +89,7 @@ export async function getAllDocs(lang?: string): Promise<AllDocsPayload> {
   const raw = await fetchJSON(
     normalizeUrl(`/api/method/ifitwala_doc.api.docs.fetch_all${qp}`)
   );
-  const payload = unwrap<AllDocsPayload>(raw);
-  const docs = Array.isArray(payload?.docs) ? payload.docs : [];
-  console.log(`[docsClient] getAllDocs(${lang || 'all'}) -> ${docs.length}`);
-  return payload;
+  return unwrap<AllDocsPayload>(raw);
 }
 
 export async function getOneDoc(language: string, slug: string): Promise<Doc> {
@@ -108,20 +99,15 @@ export async function getOneDoc(language: string, slug: string): Promise<Doc> {
     )}&slug=${encodeURIComponent(slug)}`
   );
   const raw = await fetchJSON(url);
-  const doc = unwrap<Doc>(raw);
-  console.log(`[docsClient] getOneDoc(${language}, ${slug}) -> ${doc ? 'hit' : 'miss'}`);
-  return doc;
+  return unwrap<Doc>(raw);
 }
-
 
 export async function getCategories(language = 'en') {
   const url = normalizeUrl(
     `/api/method/ifitwala_doc.api.docs.get_categories?language=${encodeURIComponent(language)}`
   );
   const raw = await fetchJSON(url);
-  const categories = unwrap(raw) || [];
-  console.log(`[docsClient] getCategories(${language}) -> ${Array.isArray(categories) ? categories.length : 0}`);
-  return categories;
+  return unwrap(raw) || [];
 }
 
 export async function getCategory(slug: string) {
@@ -129,9 +115,7 @@ export async function getCategory(slug: string) {
     `/api/method/ifitwala_doc.api.docs.get_category?slug=${encodeURIComponent(slug)}`
   );
   const raw = await fetchJSON(url);
-  const category = unwrap(raw) || null;
-  console.log(`[docsClient] getCategory(${slug}) -> ${category ? 'hit' : 'miss'}`);
-  return category;
+  return unwrap(raw) || null;
 }
 
 export async function getDocsInCategory(language: string, category_slug: string) {
@@ -140,9 +124,7 @@ export async function getDocsInCategory(language: string, category_slug: string)
     `/api/method/ifitwala_doc.api.docs.get_docs_in_category?${q.toString()}`
   );
   const raw = await fetchJSON(url);
-  const docs = unwrap(raw) || [];
-  console.log(`[docsClient] getDocsInCategory(${language}, ${category_slug}) -> ${Array.isArray(docs) ? docs.length : 0}`);
-  return docs;
+  return unwrap(raw) || [];
 }
 
 export async function getAvailableLanguages(): Promise<string[]> {
@@ -175,10 +157,8 @@ export async function getAvailableLanguages(): Promise<string[]> {
     const languages = Array.from(rawBucket.values()).sort((a, b) =>
       a.localeCompare(b)
     );
-    console.log(`[docsClient] getAvailableLanguages -> ${languages.join(', ') || '<none>'}`);
     return languages.length ? languages : ['en'];
   } catch (error) {
-    console.warn('[docsClient] Failed to detect languages from docs payload.', error);
     return ['en'];
   }
 }
