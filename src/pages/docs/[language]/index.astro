@@ -1,33 +1,7 @@
 ---
 import DocsShell from '@/layouts/DocsShell.astro'
 import { getCategories, getAvailableLanguages } from '@/lib/docsClient'
-
-const DIACRITIC_RX = /[\u0300-\u036f]/g
-const NON_ALNUM_RX = /[^a-zA-Z0-9]+/g
-const EDGE_DASH_RX = /^-+|-+$/
-
-function describeLanguage(raw: unknown) {
-  if (typeof raw !== 'string') {
-    return { raw: '', slug: '' }
-  }
-  const trimmed = raw.trim()
-  if (!trimmed) {
-    return { raw: '', slug: '' }
-  }
-  const normalized = typeof trimmed.normalize === 'function' ? trimmed.normalize('NFKD') : trimmed
-  const ascii = normalized.replace(DIACRITIC_RX, '')
-  const slug = ascii.replace(NON_ALNUM_RX, '-').replace(EDGE_DASH_RX, '').toLowerCase()
-  if (slug) {
-    return { raw: trimmed, slug }
-  }
-  const fallback = Array.from(trimmed)
-    .map((char) => {
-      const code = char.codePointAt(0)
-      return code ? code.toString(16) : ''
-    })
-    .join('')
-  return { raw: trimmed, slug: fallback ? `lang-${fallback}` : 'lang' }
-}
+import { describeLanguage } from '@/lib/language'
 
 export const prerender = true
 

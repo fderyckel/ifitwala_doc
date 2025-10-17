@@ -73,44 +73,30 @@ def _seo_payload(page: Document) -> Dict[str, Any]:
         "canonical_url": page.canonical_url,
     }
 
+def _trust_logos_props(doc: Document):
+    rows = sorted(doc.logos or [], key=lambda r: (r.item_order or 0))
+    return {
+        "title": doc.title,
+        "logos": [
+            {"src": r.image, "alt": r.alt, "href": r.href, "order": r.item_order}
+            for r in rows
+        ],
+    }
+
+def _serialize_block(block_dt: str, name: str):
+    doc = frappe.get_doc(block_dt, name)
+    if block_dt == "Hero Block":
+        return {"type": "Hero", "props": _hero_props(doc)}
+    if block_dt == "Feature Highlights":
+        return {"type": "Feature Highlights", "props": _feature_highlights_props(doc)}
+    if block_dt == "Trust Logos":
+        return {"type": "Trust Logos", "props": _trust_logos_props(doc)}
+    return None
+
 
 # -----------------------
 # Public API
 # -----------------------
-
-@frappe.whitelist(allow_guest=True)
-def get_page(slug: str) -> Dict[str, Any]:
-    """Return a marketing page and its ordered sections as { type, props }.
-    GET /api/method/ifitwala_doc.api.site.get_page?slug=/
-    """
-    if not isinstance(slug, str) or not slug:
-        frappe.throw(_("slug is required"))
-
-    page_row = frappe.get_all(
-        "Ifitwala Web Page",
-        filters={"slug": slug, "is_published": 1},
-        fields=["name", "title", "meta_description", "og_image", "canonical_url"],
-        limit=1,
-    )
-    if not page_row:
-        frappe.throw(_("No published page found for slug: {0}").format(slug))
-
-    page_doc = frappe.get_doc("Ifitwala Web Page", page_row[0].name)
-
-    sections: List[SectionDict] = []
-    for row in sorted(page_doc.sections or [], key=lambda r: (r.section_order or 0)):
-        if not (row.block_doctype and row.block_ref):
-            continue
-        packed = _serialize_block(row.block_doctype, row.block_ref)
-        if packed:
-            sections.append(packed)
-
-    return {
-        "title": page_doc.title,
-        "seo": _seo_payload(page_doc),
-        "sections": sections,
-    }
-
 
 @frappe.whitelist(allow_guest=True)
 def get_nav(location: str = "Header") -> List[Dict[str, Any]]:
@@ -162,9 +148,6 @@ def search_blocks(block_type: str, limit: int = 10) -> List[Dict[str, Any]]:
     )
     return [{"doctype": dt, "name": r.name} for r in rows]
 
-
-# Copyright (c) 2025
-import frappe
 
 @frappe.whitelist(allow_guest=True)
 def get_page(slug="/"):

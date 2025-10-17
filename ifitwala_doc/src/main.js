@@ -7,7 +7,9 @@ import { createApp } from "vue";
 const registry = {
   "Hero": () => import("./components/Hero.vue"),
   "Feature Highlights": () => import("./components/FeatureHighlights.vue"),
+  "Trust Logos": () => import("./components/TrustLogos.vue"),
 };
+
 
 // Fetch a page from our whitelisted RPC
 async function getPage(slug = "/") {
