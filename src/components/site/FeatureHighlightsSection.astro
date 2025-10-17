@@ -1,0 +1,76 @@
+---
+interface FeatureItem {
+  order?: number
+  icon?: string
+  label?: string
+  description?: string
+  href?: string
+}
+
+interface Props {
+  id?: string
+  eyebrow?: string
+  intro?: string
+  items?: FeatureItem[]
+}
+
+const { id, eyebrow = 'Highlights', intro = '', items = [] }: Props = Astro.props
+const sorted = [...items].sort((a, b) => {
+  const aOrder = typeof a?.order === 'number' ? a.order : 0
+  const bOrder = typeof b?.order === 'number' ? b.order : 0
+  return aOrder - bOrder
+})
+---
+
+<section id={id} class="rounded-3xl border border-line bg-white px-6 py-12 md:px-10">
+  <header class="mx-auto max-w-3xl text-center">
+    {eyebrow && (
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand-500">
+        {eyebrow}
+      </p>
+    )}
+    {intro && (
+      <p class="mt-3 text-lg leading-relaxed text-slate">
+        {intro}
+      </p>
+    )}
+  </header>
+
+  {sorted.length > 0 && (
+    <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {sorted.map((item, idx) => (
+        <article
+          key={idx}
+          class="flex h-full flex-col rounded-2xl border border-line bg-panel/60 p-6 text-left shadow-card"
+        >
+          <div class="flex items-start gap-4">
+            {item?.icon && (
+              <div class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                <span class="text-xl font-semibold">{item.icon}</span>
+              </div>
+            )}
+            <div>
+              <h3 class="text-lg font-semibold text-ink">
+                {item?.label || `Feature ${idx + 1}`}
+              </h3>
+              {item?.description && (
+                <p class="mt-2 text-sm leading-snug text-slate">
+                  {item.description}
+                </p>
+              )}
+            </div>
+          </div>
+          {item?.href && (
+            <a
+              href={item.href}
+              class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            >
+              Learn more
+              <span aria-hidden="true">→</span>
+            </a>
+          )}
+        </article>
+      ))}
+    </div>
+  )}
+</section>

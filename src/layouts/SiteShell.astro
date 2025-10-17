@@ -1,0 +1,128 @@
+---
+import '@/styles/global.css'
+import { marked } from 'marked'
+
+import type { NavItem, SiteSettings } from '@/lib/siteClient'
+
+const {
+  lang = 'en',
+  title = 'Ifitwala Ed',
+  description = '',
+  canonical,
+  headerNav = [],
+  footerNav = [],
+  settings = {},
+  bodyClass = '',
+}: {
+  lang?: string
+  title?: string
+  description?: string
+  canonical?: string
+  headerNav?: NavItem[]
+  footerNav?: NavItem[]
+  settings?: SiteSettings
+  bodyClass?: string
+} = Astro.props
+
+const siteName = settings?.site_name || 'Ifitwala Ed'
+const resolvedTitle = title || siteName
+const resolvedDescription = description || settings?.tagline || ''
+
+const siteOrigin = Astro.site ? Astro.site.toString() : 'https://ifitwala.com/'
+const canonicalHref =
+  canonical && canonical.startsWith('http')
+    ? canonical
+    : canonical
+    ? new URL(canonical.replace(/^\//, ''), siteOrigin).toString()
+    : undefined
+const footerHtml = settings?.footer_md ? marked.parse(settings.footer_md) : ''
+const headerItems = Array.isArray(headerNav) ? headerNav : []
+const footerItems = Array.isArray(footerNav) ? footerNav : []
+---
+
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <title>{resolvedTitle}</title>
+    {resolvedDescription && <meta name="description" content={resolvedDescription} />}
+    {canonicalHref && <link rel="canonical" href={canonicalHref} />}
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body class={`min-h-screen bg-panel text-ink antialiased ${bodyClass || ''}`}>
+    <div class="flex min-h-screen flex-col">
+      <header class="border-b border-line bg-white/95 backdrop-blur">
+        <div class="mx-auto flex w-full flex-col gap-4 px-6 py-5 md:max-w-6xl md:flex-row md:items-center md:justify-between">
+          <a href="/" class="flex items-center gap-3 text-lg font-semibold text-ink">
+            {settings?.brand_logo ? (
+              <img
+                src={settings.brand_logo}
+                alt={settings.brand_logo_alt || siteName}
+                class="h-10 w-auto rounded-lg border border-line bg-white p-1 shadow-sm"
+              />
+            ) : null}
+            <span>{siteName}</span>
+          </a>
+
+          {headerItems.length > 0 && (
+            <nav class="flex flex-wrap items-center gap-4 text-sm font-medium text-slate md:justify-center">
+              {headerItems.map((item) => (
+                <a
+                  href={item.href}
+                  target={item.target_blank ? '_blank' : undefined}
+                  rel={item.target_blank ? 'noreferrer' : undefined}
+                  class="rounded-lg px-2 py-1 transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          )}
+
+          {settings?.primary_cta_label && settings?.primary_cta_url ? (
+            <a
+              href={settings.primary_cta_url}
+              class="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            >
+              {settings.primary_cta_label}
+            </a>
+          ) : null}
+        </div>
+      </header>
+
+      <main class="flex-1">
+        <slot />
+      </main>
+
+      <footer class="border-t border-line bg-white/95">
+        <div class="mx-auto flex w-full flex-col gap-6 px-6 py-10 md:max-w-6xl md:flex-row md:items-start md:justify-between">
+          <div class="max-w-sm space-y-3">
+            <div class="text-lg font-semibold text-ink">{siteName}</div>
+            {settings?.tagline && <p class="text-sm text-slate">{settings.tagline}</p>}
+            {footerHtml && (
+              <div class="prose prose-sm prose-neutral" set:html={footerHtml}></div>
+            )}
+          </div>
+
+          {footerItems.length > 0 && (
+            <nav class="grid gap-2 text-sm text-slate md:text-right">
+              {footerItems.map((item) => (
+                <a
+                  href={item.href}
+                  target={item.target_blank ? '_blank' : undefined}
+                  rel={item.target_blank ? 'noreferrer' : undefined}
+                  class="transition hover:text-primary"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          )}
+        </div>
+        <div class="border-t border-line py-4 text-center text-xs text-slate">
+          © {new Date().getFullYear()} {siteName}. All rights reserved.
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

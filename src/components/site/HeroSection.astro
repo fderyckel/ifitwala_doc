@@ -1,0 +1,101 @@
+---
+interface Action {
+  label?: string
+  href?: string
+  variant?: string
+}
+
+interface Props {
+  id?: string
+  title?: string
+  subtitle?: string
+  bgImage?: string
+  align?: 'left' | 'center' | 'right'
+  theme?: 'light' | 'dark'
+  actions?: Action[]
+}
+
+const {
+  id,
+  title = 'A campus where curiosity blooms.',
+  subtitle = '',
+  bgImage,
+  align = 'left',
+  theme = 'light',
+  actions = [],
+}: Props = Astro.props
+
+const hasBackground = typeof bgImage === 'string' && bgImage.trim().length > 0
+const alignClass =
+  align === 'center'
+    ? 'items-center text-center'
+    : align === 'right'
+    ? 'items-end text-right sm:items-end sm:text-right'
+    : 'items-start text-left'
+
+const themeClass =
+  theme === 'dark'
+    ? 'bg-neutral-900 text-white'
+    : 'bg-white text-ink'
+
+const overlayClass =
+  theme === 'dark'
+    ? 'from-neutral-900/90 to-neutral-900/80'
+    : 'from-white/95 to-panel/90'
+
+function actionClass(variant?: string) {
+  if ((variant || 'primary').toLowerCase() === 'secondary') {
+    return 'border border-line bg-white text-ink hover:bg-panel'
+  }
+  return 'bg-primary text-white shadow hover:opacity-95'
+}
+---
+
+<section
+  id={id}
+  class={`relative overflow-hidden rounded-3xl border border-line px-6 py-16 shadow-sm transition md:px-12 ${
+    themeClass
+  }`}
+>
+  {hasBackground && (
+    <div
+      class="absolute inset-0 -z-10 bg-cover bg-center"
+      style={{ backgroundImage: `url(${bgImage})` }}
+      aria-hidden="true"
+    ></div>
+  )}
+  <div
+    class={`absolute inset-0 -z-10 bg-gradient-to-br ${overlayClass}`}
+    aria-hidden="true"
+  ></div>
+
+  <div class={`relative mx-auto flex max-w-3xl flex-col gap-6 ${alignClass}`}>
+    <p class="text-xs font-semibold uppercase tracking-wider text-brand-500">
+      Ifitwala Ed
+    </p>
+    <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">
+      {title}
+    </h1>
+    {subtitle && (
+      <p class="text-lg leading-relaxed text-slate md:text-xl">
+        {subtitle}
+      </p>
+    )}
+
+    {actions.length > 0 && (
+      <div class={`mt-6 flex flex-wrap gap-3 ${align === 'center' ? 'justify-center' : 'justify-start'}`}>
+        {actions.map((action, idx) => (
+          action?.label && action?.href ? (
+            <a
+              key={idx}
+              href={action.href}
+              class={`inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${actionClass(action.variant)}`}
+            >
+              {action.label}
+            </a>
+          ) : null
+        ))}
+      </div>
+    )}
+  </div>
+</section>

@@ -1,0 +1,73 @@
+---
+import SiteShell from '@/layouts/SiteShell.astro'
+import { getNav, getPage, getSiteSettings } from '@/lib/siteClient'
+import { resolveSectionComponent } from '@/components/site/sections'
+
+export const prerender = true
+
+const [page, settings, headerNav, footerNav] = await Promise.all([
+  getPage('/'),
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+])
+
+const sections = Array.isArray(page?.sections)
+  ? [...page.sections].sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0))
+  : []
+
+const siteName = settings?.site_name || 'Ifitwala Ed'
+const seoTitle = (page?.seo && page.seo.title) || page?.title || siteName
+const seoDescription =
+  (page?.seo && page.seo.description) || settings?.tagline || 'Ifitwala Ed'
+const canonical = (page?.seo && page.seo.canonical_url) || page?.slug || '/'
+
+const layoutVariant = (page?.layout || 'Landing').toLowerCase()
+const stackClasses =
+  layoutVariant === 'landing'
+    ? 'space-y-16 md:space-y-20'
+    : 'space-y-12'
+
+function sectionAnchor(label?: string | null, fallback?: string) {
+  const source = label || fallback
+  if (!source) return undefined
+  return source
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+}
+---
+
+<SiteShell
+  lang="en"
+  title={seoTitle}
+  description={seoDescription}
+  canonical={canonical}
+  headerNav={headerNav}
+  footerNav={footerNav}
+  settings={settings}
+>
+  <div class={`mx-auto w-full max-w-6xl px-6 py-16 md:py-24 ${stackClasses}`}>
+    {sections.length > 0 ? (
+      sections.map((section) => {
+        const Component = resolveSectionComponent(section?.type)
+        if (!Component) {
+          return null
+        }
+        const id =
+          sectionAnchor(section?.block?.label, section?.block?.name) ||
+          sectionAnchor(section?.type)
+        return <Component id={id} {...(section?.props || {})} />
+      })
+    ) : (
+      <section class="rounded-3xl border border-dashed border-line bg-white px-6 py-14 text-center text-slate">
+        <h1 class="text-2xl font-semibold text-ink">Marketing page coming soon</h1>
+        <p class="mt-3 text-sm">
+          Create sections in Frappe (Ifitwala Web Page → Sections) and rebuild the site.
+        </p>
+      </section>
+    )}
+  </div>
+</SiteShell>

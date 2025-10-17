@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind'
 import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
-  base: '/docs',
+  site: 'https://ifitwala.com',
   output: 'static',
   outDir: './dist',
   srcDir: './src',
