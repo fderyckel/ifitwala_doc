@@ -3,7 +3,13 @@ import DocsLayout from '@/components/docs/DocsLayout.astro'
 import DocsShell from '@/layouts/DocsShell.astro'
 import { getAllDocs, getOneDoc } from '@/lib/docsClient'
 
-const LANGUAGE_CODE_RX = /^[a-z]{2}$/i
+function normalizeLanguage(raw: unknown) {
+  if (typeof raw !== 'string') {
+    return ''
+  }
+  const trimmed = raw.trim()
+  return /^[a-z]{2}$/i.test(trimmed) ? trimmed.toLowerCase() : ''
+}
 
 export const prerender = true
 
@@ -15,11 +21,7 @@ export async function getStaticPaths() {
     const paths = []
 
     for (const d of docs) {
-      const rawLanguage = typeof d?.language === 'string' ? d.language.trim() : ''
-      if (!LANGUAGE_CODE_RX.test(rawLanguage)) {
-        continue
-      }
-      const language = rawLanguage.toLowerCase()
+      const language = normalizeLanguage(d?.language)
       const slug = typeof d?.slug === 'string' ? d.slug.trim() : ''
       if (!language || !slug) {
         continue
@@ -33,14 +35,15 @@ export async function getStaticPaths() {
     }
 
     return paths
-  } catch {
+  } catch (error) {
+    console.warn('[docs][slug] getStaticPaths error:', error)
     return []
   }
 }
 
 const languageParam = typeof Astro.params.language === 'string' ? Astro.params.language : ''
 const slugParam = typeof Astro.params.slug === 'string' ? Astro.params.slug : ''
-const language = LANGUAGE_CODE_RX.test(languageParam || '') ? languageParam.toLowerCase() : 'en'
+const language = normalizeLanguage(languageParam || '') || 'en'
 const slug = slugParam
 let doc
 try {
