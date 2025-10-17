@@ -4,6 +4,8 @@ import { getAllDocs, getCategory, getDocsInCategory, getCategories } from '@/lib
 
 const LANGUAGE_CODE_RX = /^[a-z]{2}$/i
 
+export const prerender = true
+
 export async function getStaticPaths() {
   try {
     const [payload, categoriesRaw] = await Promise.all([

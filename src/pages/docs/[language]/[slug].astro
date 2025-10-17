@@ -5,6 +5,8 @@ import { getAllDocs, getOneDoc } from '@/lib/docsClient'
 
 const LANGUAGE_CODE_RX = /^[a-z]{2}$/i
 
+export const prerender = true
+
 export async function getStaticPaths() {
   try {
     const payload = await getAllDocs()
