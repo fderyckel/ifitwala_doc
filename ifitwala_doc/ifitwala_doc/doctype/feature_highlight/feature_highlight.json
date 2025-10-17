@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "field:eyebrow",
- "creation": "2025-10-16 18:32:16.897054",
+ "creation": "2025-10-17 08:47:24.442565",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -34,7 +34,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-16 19:35:05.008705",
+ "modified": "2025-10-17 08:48:46.326619",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Feature Highlight",
@@ -67,7 +67,6 @@
   },
   {
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,

@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"O0Z9QCsHOR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Docs</span>\",\"col\":12}},{\"id\":\"z1motGbH3y\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Documentation\",\"col\":3}},{\"id\":\"efZ77ex5Ry\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Doc Category\",\"col\":3}}]",
+ "content": "[{\"id\":\"O0Z9QCsHOR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Docs</span>\",\"col\":12}},{\"id\":\"z1motGbH3y\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Documentation\",\"col\":3}},{\"id\":\"efZ77ex5Ry\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Doc Category\",\"col\":3}},{\"id\":\"nR451WtxGg\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"6PAvV5Tg2X\",\"type\":\"card\",\"data\":{\"card_name\":\"Ifitwala Website\",\"col\":4}}]",
  "creation": "2025-10-13 07:14:15.049791",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,8 +12,58 @@
  "indicator_color": "",
  "is_hidden": 0,
  "label": "Docs",
- "links": [],
- "modified": "2025-10-13 07:16:08.017867",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ifitwala Website",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ifitwala Web Page",
+   "link_count": 0,
+   "link_to": "Ifitwala Web Page",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Feature Highlight",
+   "link_count": 0,
+   "link_to": "Feature Highlight",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Hero Block",
+   "link_count": 0,
+   "link_to": "Hero Block",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Navigation Menu",
+   "link_count": 0,
+   "link_to": "Navigation Menu",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-10-17 09:25:16.863565",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Docs",

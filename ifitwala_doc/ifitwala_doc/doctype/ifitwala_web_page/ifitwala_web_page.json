@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:slug",
  "creation": "2025-10-16 19:24:30.824627",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -29,7 +30,8 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Slug",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "default": "1",
@@ -77,10 +79,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-16 19:49:34.611562",
+ "modified": "2025-10-16 19:57:29.930920",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Ifitwala Web Page",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -92,6 +95,30 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Website Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Content Editor",
    "share": 1,
    "write": 1
   }
