@@ -3,12 +3,31 @@ import DocsLayout from '@/components/docs/DocsLayout.astro'
 import DocsShell from '@/layouts/DocsShell.astro'
 import { getAllDocs, getOneDoc } from '@/lib/docsClient'
 
-function normalizeLanguage(raw: unknown) {
+const DIACRITIC_RX = /[\u0300-\u036f]/g
+const NON_ALNUM_RX = /[^a-zA-Z0-9]+/g
+const EDGE_DASH_RX = /^-+|-+$/
+
+function describeLanguage(raw: unknown) {
   if (typeof raw !== 'string') {
-    return ''
+    return { raw: '', slug: '' }
   }
   const trimmed = raw.trim()
-  return /^[a-z]{2}$/i.test(trimmed) ? trimmed.toLowerCase() : ''
+  if (!trimmed) {
+    return { raw: '', slug: '' }
+  }
+  const normalized = typeof trimmed.normalize === 'function' ? trimmed.normalize('NFKD') : trimmed
+  const ascii = normalized.replace(DIACRITIC_RX, '')
+  const slug = ascii.replace(NON_ALNUM_RX, '-').replace(EDGE_DASH_RX, '').toLowerCase()
+  if (slug) {
+    return { raw: trimmed, slug }
+  }
+  const fallback = Array.from(trimmed)
+    .map((char) => {
+      const code = char.codePointAt(0)
+      return code ? code.toString(16) : ''
+    })
+    .join('')
+  return { raw: trimmed, slug: fallback ? `lang-${fallback}` : 'lang' }
 }
 
 export const prerender = true
@@ -21,17 +40,20 @@ export async function getStaticPaths() {
     const paths = []
 
     for (const d of docs) {
-      const language = normalizeLanguage(d?.language)
-      const slug = typeof d?.slug === 'string' ? d.slug.trim() : ''
-      if (!language || !slug) {
+      const { raw: languageRaw, slug: languageSlug } = describeLanguage(d?.language)
+      const docSlug = typeof d?.slug === 'string' ? d.slug.trim() : ''
+      if (!languageRaw || !docSlug) {
         continue
       }
-      const key = `${language}::${slug}`
+      const key = `${languageSlug}::${docSlug}`
       if (seen.has(key)) {
         continue
       }
       seen.add(key)
-      paths.push({ params: { language, slug } })
+      paths.push({
+        params: { language: languageSlug, slug: docSlug },
+        props: { languageRaw, languageSlug },
+      })
     }
 
     return paths
@@ -41,31 +63,40 @@ export async function getStaticPaths() {
   }
 }
 
+const props = (Astro.props ?? {}) as Record<string, unknown>
 const languageParam = typeof Astro.params.language === 'string' ? Astro.params.language : ''
 const slugParam = typeof Astro.params.slug === 'string' ? Astro.params.slug : ''
-const language = normalizeLanguage(languageParam || '') || 'en'
+const propLanguageRaw = typeof props.languageRaw === 'string' ? props.languageRaw : ''
+const propLanguageSlug = typeof props.languageSlug === 'string' ? props.languageSlug : ''
+
+const initialLanguage = describeLanguage(propLanguageRaw || languageParam)
+const languageForApi = initialLanguage.raw || 'en'
+const languageSlugParam = propLanguageSlug || initialLanguage.slug || 'en'
+
 const slug = slugParam
 let doc
 try {
-  doc = await getOneDoc(language, slug)
+  doc = await getOneDoc(languageForApi, slug)
 } catch {
   doc = null
 }
 
-const lang = doc?.language || language || 'en'
+const docLanguage = describeLanguage(doc?.language || languageForApi)
+const langRaw = docLanguage.raw || languageForApi
+const langSlug = docLanguage.slug || languageSlugParam
 const title = doc ? `${doc.title} | Ifitwala Ed Docs` : 'Not Found | Ifitwala Ed Docs'
 const description = doc?.summary || ''
-const canonical = doc ? `/docs/${lang}/${doc.slug}` : undefined
+const canonical = doc ? `/docs/${langSlug}/${doc.slug}` : undefined
 ---
 
-<DocsShell lang={lang} title={title} description={description} canonical={canonical}>
+<DocsShell lang={langRaw || 'en'} title={title} description={description} canonical={canonical}>
   {!doc ? (
     <main class="mx-auto max-w-3xl px-6 py-10">
       <h1 class="text-2xl font-semibold text-primary mb-2">Page not found</h1>
       <p class="text-slate mb-6">
-        We couldn’t find <code class="font-mono">{slug}</code> in <strong>{lang}</strong>.
+        We couldn’t find <code class="font-mono">{slug}</code> in <strong>{langRaw || 'en'}</strong>.
       </p>
-      <a class="text-primary underline" href={`/docs/${lang}`}>Back to docs</a>
+      <a class="text-primary underline" href={`/docs/${langSlug || 'en'}`}>Back to docs</a>
     </main>
   ) : (
     <DocsLayout doc={doc} />

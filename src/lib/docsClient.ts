@@ -79,17 +79,15 @@ function unwrap<T = any>(data: any): T {
   return data && typeof data === 'object' && 'message' in data ? data.message : data;
 }
 
-const LANGUAGE_CODE_RX = /^[a-z]{2}$/i;
-
-function normalizeLanguageCode(input: unknown): string | null {
+function normalizeLanguageValue(input: unknown): string | null {
   if (typeof input !== 'string') {
     return null;
   }
   const trimmed = input.trim();
-  if (!LANGUAGE_CODE_RX.test(trimmed)) {
+  if (!trimmed) {
     return null;
   }
-  return trimmed.toLowerCase();
+  return trimmed;
 }
 
 export async function getAllDocs(lang?: string): Promise<AllDocsPayload> {
@@ -150,27 +148,33 @@ export async function getDocsInCategory(language: string, category_slug: string)
 export async function getAvailableLanguages(): Promise<string[]> {
   try {
     const payload = await getAllDocs();
-    const add = (value: unknown, bucket: Set<string>) => {
-      const normalized = normalizeLanguageCode(value);
-      if (normalized) {
-        bucket.add(normalized);
+    const rawBucket = new Map<string, string>();
+    const add = (value: unknown) => {
+      const normalized = normalizeLanguageValue(value);
+      if (!normalized) {
+        return;
+      }
+      const key = normalized.toLowerCase();
+      if (!rawBucket.has(key)) {
+        rawBucket.set(key, normalized);
       }
     };
 
-    const bucket = new Set<string>();
     const docs = Array.isArray(payload?.docs) ? payload.docs : [];
     for (const doc of docs) {
-      add(doc?.language, bucket);
+      add(doc?.language);
     }
 
     const fromPayload = (payload as any)?.languages;
     if (Array.isArray(fromPayload)) {
       for (const value of fromPayload) {
-        add(value, bucket);
+        add(value);
       }
     }
 
-    const languages = Array.from(bucket).sort();
+    const languages = Array.from(rawBucket.values()).sort((a, b) =>
+      a.localeCompare(b)
+    );
     console.log(`[docsClient] getAvailableLanguages -> ${languages.join(', ') || '<none>'}`);
     return languages.length ? languages : ['en'];
   } catch (error) {

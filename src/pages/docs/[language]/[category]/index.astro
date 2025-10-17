@@ -2,12 +2,31 @@
 import DocsShell from '@/layouts/DocsShell.astro'
 import { getAllDocs, getCategory, getDocsInCategory, getCategories } from '@/lib/docsClient'
 
-function normalizeLanguage(raw: unknown) {
+const DIACRITIC_RX = /[\u0300-\u036f]/g
+const NON_ALNUM_RX = /[^a-zA-Z0-9]+/g
+const EDGE_DASH_RX = /^-+|-+$/
+
+function describeLanguage(raw: unknown) {
   if (typeof raw !== 'string') {
-    return ''
+    return { raw: '', slug: '' }
   }
   const trimmed = raw.trim()
-  return /^[a-z]{2}$/i.test(trimmed) ? trimmed.toLowerCase() : ''
+  if (!trimmed) {
+    return { raw: '', slug: '' }
+  }
+  const normalized = typeof trimmed.normalize === 'function' ? trimmed.normalize('NFKD') : trimmed
+  const ascii = normalized.replace(DIACRITIC_RX, '')
+  const slug = ascii.replace(NON_ALNUM_RX, '-').replace(EDGE_DASH_RX, '').toLowerCase()
+  if (slug) {
+    return { raw: trimmed, slug }
+  }
+  const fallback = Array.from(trimmed)
+    .map((char) => {
+      const code = char.codePointAt(0)
+      return code ? code.toString(16) : ''
+    })
+    .join('')
+  return { raw: trimmed, slug: fallback ? `lang-${fallback}` : 'lang' }
 }
 
 export const prerender = true
@@ -36,21 +55,24 @@ export async function getStaticPaths() {
     const paths = []
 
     for (const d of docs) {
-      const language = normalizeLanguage(d?.language)
+      const { raw: languageRaw, slug: languageSlug } = describeLanguage(d?.language)
       const categoryName = typeof d?.category === 'string' ? d.category : ''
-      if (!language || !categoryName) {
+      if (!languageRaw || !categoryName) {
         continue
       }
       const categorySlug = slugByName.get(categoryName)
       if (!categorySlug) {
         continue
       }
-      const key = `${language}::${categorySlug}`
+      const key = `${languageSlug}::${categorySlug}`
       if (seen.has(key)) {
         continue
       }
       seen.add(key)
-      paths.push({ params: { language, category: categorySlug } })
+      paths.push({
+        params: { language: languageSlug, category: categorySlug },
+        props: { languageRaw, languageSlug },
+      })
     }
 
     return paths
@@ -60,12 +82,18 @@ export async function getStaticPaths() {
   }
 }
 
+const props = (Astro.props ?? {}) as Record<string, unknown>
 const languageParam = typeof Astro.params.language === 'string' ? Astro.params.language : ''
 const categoryParam = typeof Astro.params.category === 'string' ? Astro.params.category : ''
-const language = normalizeLanguage(languageParam || '') || 'en'
+const propLanguageRaw = typeof props.languageRaw === 'string' ? props.languageRaw : ''
+const propLanguageSlug = typeof props.languageSlug === 'string' ? props.languageSlug : ''
+
+const languageInfo = describeLanguage(propLanguageRaw || languageParam)
+const languageRaw = languageInfo.raw || 'en'
+const languageSlug = propLanguageSlug || languageInfo.slug || 'en'
 const category = categoryParam
 const cat  = await getCategory(category)
-const docs = await getDocsInCategory(language, category)
+const docs = await getDocsInCategory(languageRaw, category)
 
 const ICON_PATHS = {
   book:     'M4 19.5V6.75A2.25 2.25 0 016.25 4.5h11.5m-13.75 15A2.25 2.25 0 006.25 21h11.5m-13.75-1.5h13.5m0-15A2.25 2.25 0 0121 6.75V21M6.75 7.5h6',
@@ -75,14 +103,14 @@ const ICON_PATHS = {
   calendar: 'M6 8h12M7 4v4m10-4v4M6 20h12a2 2 0 002-2V8H4v10a2 2 0 002 2',
 }
 
-const title = `${cat?.label || category} — Docs (${language}) | Ifitwala Ed`
+const title = `${cat?.label || category} — Docs (${languageRaw}) | Ifitwala Ed`
 const description = cat?.description || 'Category'
 ---
 
-<DocsShell lang={language || 'en'} title={title} description={description}>
+<DocsShell lang={languageRaw || 'en'} title={title} description={description}>
   <main class="mx-auto max-w-6xl px-6 py-10">
     <nav class="text-sm text-slate mb-4">
-      <a class="hover:underline" href={`/docs/${language || 'en'}`}>Docs</a>
+      <a class="hover:underline" href={`/docs/${languageSlug || 'en'}`}>Docs</a>
       <span class="mx-1">›</span>
       <span>{cat?.label || category}</span>
     </nav>
@@ -116,7 +144,7 @@ const description = cat?.description || 'Category'
         {docs.map((d) => (
           <li>
             <a
-              href={`/docs/${language}/${d.slug}`}
+              href={`/docs/${languageSlug}/${d.slug}`}
               class="block bg-white border rounded-2xl p-5 hover:shadow-lg transition"
             >
               <div class="font-semibold">{d.title}</div>

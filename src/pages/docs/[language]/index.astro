@@ -2,26 +2,67 @@
 import DocsShell from '@/layouts/DocsShell.astro'
 import { getCategories, getAvailableLanguages } from '@/lib/docsClient'
 
-function normalizeLanguage(raw: unknown) {
+const DIACRITIC_RX = /[\u0300-\u036f]/g
+const NON_ALNUM_RX = /[^a-zA-Z0-9]+/g
+const EDGE_DASH_RX = /^-+|-+$/
+
+function describeLanguage(raw: unknown) {
   if (typeof raw !== 'string') {
-    return ''
+    return { raw: '', slug: '' }
   }
   const trimmed = raw.trim()
-  return /^[a-z]{2}$/i.test(trimmed) ? trimmed.toLowerCase() : ''
+  if (!trimmed) {
+    return { raw: '', slug: '' }
+  }
+  const normalized = typeof trimmed.normalize === 'function' ? trimmed.normalize('NFKD') : trimmed
+  const ascii = normalized.replace(DIACRITIC_RX, '')
+  const slug = ascii.replace(NON_ALNUM_RX, '-').replace(EDGE_DASH_RX, '').toLowerCase()
+  if (slug) {
+    return { raw: trimmed, slug }
+  }
+  const fallback = Array.from(trimmed)
+    .map((char) => {
+      const code = char.codePointAt(0)
+      return code ? code.toString(16) : ''
+    })
+    .join('')
+  return { raw: trimmed, slug: fallback ? `lang-${fallback}` : 'lang' }
 }
 
 export const prerender = true
 
 export async function getStaticPaths() {
   const languages = await getAvailableLanguages()
-  return languages.map((language) => ({ params: { language } }))
+  const seen = new Set<string>()
+  const paths = []
+  for (const language of languages) {
+    const info = describeLanguage(language)
+    if (!info.raw || !info.slug) {
+      continue
+    }
+    if (seen.has(info.slug)) {
+      continue
+    }
+    seen.add(info.slug)
+    paths.push({
+      params: { language: info.slug },
+      props: { languageRaw: info.raw, languageSlug: info.slug },
+    })
+  }
+  return paths
 }
 
+const props = (Astro.props ?? {}) as Record<string, unknown>
 const languageParam = typeof Astro.params.language === 'string' ? Astro.params.language : ''
-const language = normalizeLanguage(languageParam || '') || 'en'
+const propLanguageRaw = typeof props.languageRaw === 'string' ? props.languageRaw : ''
+const propLanguageSlug = typeof props.languageSlug === 'string' ? props.languageSlug : ''
+
+const languageInfo = describeLanguage(propLanguageRaw || languageParam)
+const languageRaw = languageInfo.raw || 'en'
+const languageSlug = propLanguageSlug || languageInfo.slug || 'en'
 let categories = []
 try {
-  categories = await getCategories(language)
+  categories = await getCategories(languageRaw)
 } catch {
   categories = []
 }
@@ -34,19 +75,19 @@ const ICON_PATHS = {
   calendar:'M6 8h12M7 4v4m10-4v4M6 20h12a2 2 0 002-2V8H4v10a2 2 0 002 2',
 }
 
-const title = `Documentation — ${language.toUpperCase()}`
+const title = `Documentation — ${languageRaw}`
 ---
 
-<DocsShell lang={language} title={title}>
+<DocsShell lang={languageRaw} title={title}>
   <main class="mx-auto max-w-6xl px-6 py-12">
-    <h1 class="text-3xl font-bold tracking-tight">Documentation — {language}</h1>
+    <h1 class="text-3xl font-bold tracking-tight">Documentation — {languageRaw}</h1>
     <p class="text-slate mt-2">Pick a category below.</p>
 
     {categories?.length ? (
       <section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {categories.map((c) => (
           <a
-            href={`/docs/${language}/${c.slug}/`}
+            href={`/docs/${languageSlug}/${c.slug}/`}
             class="group block bg-white border rounded-2xl p-6 hover:shadow-lg transition"
           >
             <div class="h-1 w-10 rounded bg-brand-600 mb-4 opacity-90 group-hover:opacity-100"></div>
