@@ -343,7 +343,6 @@ function renderMarkdown(
           : String(text ?? '')
     return `<h${level} id="${escapeHtml(id)}">${label}</h${level}>`
   }
-  const defaultLink = renderer.link.bind(renderer)
   renderer.link = (href, title, text) => {
     const original =
       typeof href === 'string'
@@ -351,8 +350,21 @@ function renderMarkdown(
         : href == null
           ? ''
           : String(href)
-    const resolved = rewriteDocHref(original)
-    return defaultLink(resolved, title, text)
+    const resolved = rewriteDocHref(original) || ''
+    const safeHref = escapeHtml(resolved || original || '')
+    const label =
+      typeof text === 'string'
+        ? text
+        : Array.isArray(text)
+          ? text.join('')
+          : text == null
+            ? ''
+            : String(text)
+    const titleAttr =
+      typeof title === 'string' && title.trim()
+        ? ` title="${escapeHtml(title)}"`
+        : ''
+    return `<a href="${safeHref}"${titleAttr}>${label}</a>`
   }
 
   if (!allowCallouts) {
