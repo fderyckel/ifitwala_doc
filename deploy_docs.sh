@@ -17,8 +17,16 @@ echo "==> Build output: $SRC_ROOT"
 echo
 
 # 1) Build (yarn only)
-echo "==> Installing deps (yarn)…"
 cd "$APP_ROOT"
+
+if [[ -f ".env" ]]; then
+  set -a
+  source ".env"
+  set +a
+fi
+
+echo "==> Docs API base: ${DOCS_API_BASE:-${PUBLIC_DOCS_API:-<unset>}}"
+echo "==> Installing deps (yarn)…"
 yarn install --frozen-lockfile --check-files
 
 echo "==> Building with Astro…"
