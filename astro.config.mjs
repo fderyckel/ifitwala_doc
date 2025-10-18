@@ -9,6 +9,9 @@ export default defineConfig({
   srcDir: './src',
   publicDir: './ifitwala_doc/public',
   trailingSlash: 'always',   // so folders like /docs/en/slug/ work nicely
+  build: {
+    assetsPrefix: '/assets/ifitwala_doc',
+  },
   integrations: [tailwind({
     config: './tailwind.config.cjs',   // reuse your Tailwind config
     applyBaseStyles: false             // you already have site.css; keep Astro minimal
