@@ -13,7 +13,14 @@ html, body { height: 100%; }
     background:
       radial-gradient(120% 120% at 80% 0%, rgba(47, 125, 98, 0.12) 0%, rgba(47, 125, 98, 0) 60%),
       radial-gradient(140% 140% at -10% 30%, rgba(235, 169, 78, 0.14) 0%, rgba(235, 169, 78, 0) 70%),
-      linear-gradient(180deg, var(--neutral-50) 0%, #ffffff 45%, #ffffff 100%);
+      linear-gradient(
+        180deg,
+        rgba(241, 237, 228, 0.96) 0%,
+        rgba(247, 243, 234, 0.98) 28%,
+        rgba(255, 255, 252, 1) 52%,
+        rgba(236, 246, 241, 0.98) 76%,
+        rgba(255, 255, 255, 1) 100%
+      );
     color: var(--neutral-800);
   }
 
