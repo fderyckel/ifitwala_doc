@@ -35,10 +35,10 @@ const description = 'Explore Ifitwala Ed docs by category'
         {categories.map((c) => (
           <a
             href={`/docs/${c.language || language}/${c.slug}/`}
-            class="group block bg-white border rounded-2xl p-6 hover:shadow-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            class="group block bg-white border border-border/60 rounded-2xl p-6 hover:shadow-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/60"
             aria-label={`Open category ${c.label}`}
           >
-            <div class="h-1 w-10 rounded bg-brand-600 mb-4 opacity-90 group-hover:opacity-100"></div>
+            <div class="h-1 w-10 rounded bg-leaf mb-4 opacity-90 group-hover:opacity-100"></div>
             <div class="flex items-start gap-3">
               {c.icon ? (
                 ICON_PATHS[(c.icon || '').toLowerCase()] ? (
@@ -56,9 +56,9 @@ const description = 'Explore Ifitwala Ed docs by category'
                 ) : (
                   <span class="text-xl">{c.icon}</span>
                 )
-              ) : null}
+                ) : null}
               <div>
-                <div class="text-lg font-semibold group-hover:text-brand-700">
+                <div class="text-lg font-semibold text-ink group-hover:text-canopy">
                   {c.label}
                 </div>
                 {c.description ? (

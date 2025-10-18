@@ -1,10 +1,10 @@
 <template>
 <div class="relative">
-<input v-model="q" type="search" placeholder="Search docs…" class="w-full rounded-xl border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-400" @keydown.down.prevent="down" @keydown.up.prevent="up" @keydown.enter.prevent="go" />
+<input v-model="q" type="search" placeholder="Search docs…" class="w-full rounded-xl border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-leaf/60" @keydown.down.prevent="down" @keydown.up.prevent="up" @keydown.enter.prevent="go" />
 <ul v-if="open && results.length" class="absolute z-50 mt-1 w-full bg-white border rounded-xl shadow-lg max-h-80 overflow-auto">
-<li v-for="(r,i) in results" :key="r.slug" @mousedown.prevent="navigate(r.slug)" :class="['px-3 py-2 cursor-pointer', i===idx ? 'bg-brand-50' : 'hover:bg-neutral-50']">
+<li v-for="(r,i) in results" :key="r.slug" @mousedown.prevent="navigate(r.slug)" :class="['px-3 py-2 cursor-pointer', i===idx ? 'bg-moss/30' : 'hover:bg-sand/80']">
 <div class="text-sm font-medium">{{ r.title }}</div>
-<div class="text-xs text-neutral-500">{{ r.path }}</div>
+<div class="text-xs text-slate">{{ r.path }}</div>
 </li>
 </ul>
 </div>

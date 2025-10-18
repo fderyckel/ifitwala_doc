@@ -49,6 +49,38 @@ export type SiteSettings = {
   updated_at?: string | null
 }
 
+export type ThemeTokens = {
+  ink_color: string
+  slate_color: string
+  canopy_color: string
+  leaf_color: string
+  moss_color: string
+  sky_color: string
+  sand_color: string
+  border_color: string
+  radius_lg: string
+  radius_xl: string
+  shadow_soft: string
+  shadow_strong: string
+  focus_ring: string
+}
+
+const DEFAULT_THEME: ThemeTokens = {
+  ink_color: '#0F172A',
+  slate_color: '#475569',
+  canopy_color: '#12563A',
+  leaf_color: '#2F855A',
+  moss_color: '#A6D6B1',
+  sky_color: '#E6F3F9',
+  sand_color: '#F4EFE7',
+  border_color: '#E2E8F0',
+  radius_lg: '1rem',
+  radius_xl: '1.25rem',
+  shadow_soft: '0 6px 20px rgba(15, 23, 42, 0.06)',
+  shadow_strong: '0 12px 32px rgba(15, 23, 42, 0.1)',
+  focus_ring: '0 0 0 3px rgba(47, 133, 90, 0.35)',
+}
+
 const BASE =
   (typeof import.meta !== 'undefined' &&
     (import.meta as any).env &&
@@ -160,4 +192,15 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   const url = normalizeUrl(`/api/method/ifitwala_doc.api.site.get_site_settings`)
   const raw = await fetchJSON(url)
   return unwrap<SiteSettings>(raw) || {}
+}
+
+export async function getThemeTokens(): Promise<ThemeTokens> {
+  try {
+    const url = normalizeUrl(`/api/method/ifitwala_doc.api.site.get_theme`)
+    const raw = await fetchJSON(url)
+    const theme = unwrap<ThemeTokens>(raw)
+    return { ...DEFAULT_THEME, ...(theme || {}) }
+  } catch (error) {
+    return { ...DEFAULT_THEME }
+  }
 }

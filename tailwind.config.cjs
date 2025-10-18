@@ -1,7 +1,8 @@
 // tailwind.config.cjs
 const path = require('path');
 
-const v = (name) => `var(${name})`;
+const color = (token) => `rgb(var(--${token}-rgb) / <alpha-value>)`;
+const raw = (token) => `var(${token})`;
 
 module.exports = {
   content: [
@@ -15,56 +16,51 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // map design tokens → semantic names
-        primary:  v('--brand-500'),
-        secondary:v('--brand-700'),
-        accent:   v('--accent-500'),
-        ink:      v('--neutral-900'),
-        slate:    v('--neutral-500'),
-        panel:    v('--neutral-50'),
-        line:     v('--neutral-200'),
+        // semantic aliases
+        ink:      color('ink'),
+        slate:    color('slate'),
+        canopy:   color('canopy'),
+        leaf:     color('leaf'),
+        moss:     color('moss'),
+        sky:      color('sky'),
+        sand:     color('sand'),
+        border:   color('border'),
 
-        // (optional) expose full brand & neutral scales
-        brand: {
-          50: v('--brand-50'), 100: v('--brand-100'), 200: v('--brand-200'),
-          300: v('--brand-300'), 400: v('--brand-400'), 500: v('--brand-500'),
-          600: v('--brand-600'), 700: v('--brand-700'), 800: v('--brand-800'), 900: v('--brand-900'),
-        },
-        neutral: {
-          50: v('--neutral-50'), 100: v('--neutral-100'), 200: v('--neutral-200'),
-          300: v('--neutral-300'), 400: v('--neutral-400'), 500: v('--neutral-500'),
-          600: v('--neutral-600'), 700: v('--neutral-700'), 800: v('--neutral-800'), 900: v('--neutral-900'),
-        },
-        success: v('--success-500'),
-        info:    v('--info-500'),
-        warning: v('--warning-500'),
-        danger:  v('--danger-500'),
+        primary:  color('canopy'),
+        secondary:color('leaf'),
       },
-      borderRadius: { lg: '12px' },
-      boxShadow: { card: '0 6px 24px rgba(0,0,0,0.06)' },
+      borderRadius: {
+        lg: raw('--radius-lg'),
+        xl: raw('--radius-xl'),
+      },
+      boxShadow: {
+        card: raw('--shadow-soft'),
+        soft: raw('--shadow-soft'),
+        strong: raw('--shadow-strong'),
+      },
       typography: ({ theme }) => ({
         docs: {
           css: {
             '--tw-prose-body': theme('colors.ink'),
-            '--tw-prose-headings': theme('colors.primary'),
-            '--tw-prose-links': theme('colors.primary'),
+            '--tw-prose-headings': theme('colors.ink'),
+            '--tw-prose-links': theme('colors.canopy'),
             '--tw-prose-bold': theme('colors.ink'),
             '--tw-prose-counters': theme('colors.slate'),
             '--tw-prose-bullets': theme('colors.slate'),
-            '--tw-prose-hr': theme('colors.line'),
+            '--tw-prose-hr': theme('colors.border'),
             '--tw-prose-quotes': theme('colors.ink'),
-            '--tw-prose-quote-borders': theme('colors.secondary'),
+            '--tw-prose-quote-borders': theme('colors.leaf'),
             '--tw-prose-captions': theme('colors.slate'),
-            '--tw-prose-code': theme('colors.primary'),
-            '--tw-prose-pre-bg': theme('colors.panel'),
-            '--tw-prose-th-borders': theme('colors.line'),
-            '--tw-prose-td-borders': theme('colors.line'),
+            '--tw-prose-code': theme('colors.canopy'),
+            '--tw-prose-pre-bg': theme('colors.sky'),
+            '--tw-prose-th-borders': theme('colors.border'),
+            '--tw-prose-td-borders': theme('colors.border'),
 
             a: { textDecoration: 'none' },
             'a:hover': { textDecoration: 'underline' },
-            h1: { color: theme('colors.primary') },
-            h2: { color: theme('colors.primary') },
-            h3: { color: theme('colors.primary') },
+            h1: { color: theme('colors.ink') },
+            h2: { color: theme('colors.ink') },
+            h3: { color: theme('colors.ink') },
 
             code: { fontWeight: '600' },
             pre: { borderRadius: theme('borderRadius.lg') },
@@ -79,9 +75,9 @@ module.exports = {
               color: theme('colors.slate'),
               marginTop: '0.5rem',
             },
-            blockquote: { borderLeftColor: theme('colors.secondary') },
-            'thead th': { borderBottomColor: theme('colors.line'), color: theme('colors.slate') },
-            'tbody td': { borderBottomColor: theme('colors.line'), verticalAlign: 'top' },
+            blockquote: { borderLeftColor: theme('colors.leaf') },
+            'thead th': { borderBottomColor: theme('colors.border'), color: theme('colors.slate') },
+            'tbody td': { borderBottomColor: theme('colors.border'), verticalAlign: 'top' },
           },
         },
       }),

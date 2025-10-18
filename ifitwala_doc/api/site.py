@@ -37,6 +37,23 @@ class PagePayload(TypedDict, total=False):
     created: Optional[str]
 
 
+THEME_DEFAULTS: Dict[str, str] = {
+    "ink_color": "#0F172A",
+    "slate_color": "#475569",
+    "canopy_color": "#12563A",
+    "leaf_color": "#2F855A",
+    "moss_color": "#A6D6B1",
+    "sky_color": "#E6F3F9",
+    "sand_color": "#F4EFE7",
+    "border_color": "#E2E8F0",
+    "radius_lg": "1rem",
+    "radius_xl": "1.25rem",
+    "shadow_soft": "0 6px 20px rgba(15, 23, 42, 0.06)",
+    "shadow_strong": "0 12px 32px rgba(15, 23, 42, 0.1)",
+    "focus_ring": "0 0 0 3px rgba(47, 133, 90, 0.35)",
+}
+
+
 # -----------------------
 # Block mappers
 # -----------------------
@@ -401,3 +418,25 @@ def get_site_settings() -> Dict[str, Any]:
         "footer_md": ws.footer_md,
         "updated_at": _format(ws.modified),
     }
+
+
+@frappe.whitelist(allow_guest=True)
+def get_theme() -> Dict[str, str]:
+    """Return design tokens defined in Ifitwala Theme Settings (with safe defaults)."""
+    payload: Dict[str, str] = {}
+    doc = None
+    try:
+        doc = frappe.get_single("Ifitwala Theme Settings")
+    except Exception:
+        doc = None
+
+    for key, default in THEME_DEFAULTS.items():
+        value = None
+        if doc:
+            try:
+                value = doc.get(key)
+            except Exception:
+                value = None
+        payload[key] = (value or default).strip() if isinstance(value, str) else default
+
+    return payload

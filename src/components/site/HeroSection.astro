@@ -36,15 +36,15 @@ const alignClass =
 function actionClass(variant?: string) {
   const intent = (variant || 'primary').toLowerCase()
   if (intent === 'secondary') {
-    return 'border border-brand-200 bg-white/80 text-brand-700 hover:bg-white shadow-sm'
+    return 'border border-leaf/40 bg-white/80 text-canopy hover:bg-white shadow-sm'
   }
-  return 'bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 text-white shadow-lg hover:shadow-xl border border-brand-500'
+  return 'bg-gradient-to-r from-canopy via-leaf to-canopy text-white shadow-lg hover:shadow-xl border border-canopy'
 }
 ---
 
 <section
   id={id}
-  class="relative overflow-hidden rounded-[36px] border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-neutral-50 px-6 py-20 shadow-lg transition md:px-16"
+  class="relative overflow-hidden rounded-[36px] border border-border/60 bg-gradient-to-br from-sky/70 via-white to-sand px-6 py-20 shadow-lg transition md:px-16"
 >
   {hasBackground && (
     <div
@@ -53,19 +53,19 @@ function actionClass(variant?: string) {
       aria-hidden="true"
     ></div>
   )}
-  <div class="absolute inset-0 -z-10 bg-gradient-to-br from-white/80 via-white/60 to-brand-50/40"></div>
-  <div class="absolute -top-24 right-[-15%] h-72 w-72 rounded-full bg-brand-200/30 blur-3xl"></div>
+  <div class="absolute inset-0 -z-10 bg-gradient-to-br from-white/80 via-white/60 to-moss/30"></div>
+  <div class="absolute -top-24 right-[-15%] h-72 w-72 rounded-full bg-moss/40 blur-3xl"></div>
   <div class="absolute -bottom-32 left-[-10%] h-80 w-80 rounded-full bg-accent-500/20 blur-3xl"></div>
 
   <div class={`relative mx-auto flex max-w-3xl flex-col gap-7 ${alignClass}`}>
-    <p class="inline-flex w-min whitespace-nowrap rounded-full border border-brand-200/60 bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-brand-600 shadow-sm backdrop-blur">
+    <p class="inline-flex w-min whitespace-nowrap rounded-full border border-leaf/50 bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-canopy shadow-sm backdrop-blur">
       Growing schools
     </p>
-    <h1 class="text-4xl font-semibold tracking-tight text-brand-800 md:text-5xl">
+    <h1 class="text-4xl font-semibold tracking-tight text-canopy md:text-5xl">
       {title}
     </h1>
     {subtitle && (
-      <p class="text-lg leading-relaxed text-neutral-600 md:text-xl">
+      <p class="text-lg leading-relaxed text-slate md:text-xl">
         {subtitle}
       </p>
     )}
@@ -77,7 +77,7 @@ function actionClass(variant?: string) {
             <a
               key={idx}
               href={action.href}
-              class={`inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${actionClass(action.variant)}`}
+              class={`inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/60 ${actionClass(action.variant)}`}
             >
               {action.label}
             </a>

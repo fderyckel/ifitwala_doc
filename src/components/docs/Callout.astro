@@ -1,8 +1,8 @@
 ---
 const { type = 'info', title, children } = Astro.props
-const map = { info:'border-info-500', warning:'border-warning-500', tip:'border-success-500', note:'border-neutral-400' }
+const map = { info:'border-leaf/70', warning:'border-[color:rgba(214,138,40,0.6)]', tip:'border-canopy/60', note:'border-border' }
 ---
-<div class={`border-l-4 p-3 rounded bg-neutral-50 ${map[type]}`}>
+<div class={`border-l-4 p-3 rounded bg-sky/60 ${map[type]}`}>
 {title && <div class="font-semibold mb-1">{title}</div>}
 <div class="prose prose-brand max-w-none">{children}</div>
 </div>

@@ -62,9 +62,9 @@ const title = `Documentation — ${languageRaw}`
         {categories.map((c) => (
           <a
             href={`/docs/${languageSlug}/${c.slug}/`}
-            class="group block bg-white border rounded-2xl p-6 hover:shadow-lg transition"
+            class="group block bg-white border border-border/60 rounded-2xl p-6 hover:shadow-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/60"
           >
-            <div class="h-1 w-10 rounded bg-brand-600 mb-4 opacity-90 group-hover:opacity-100"></div>
+            <div class="h-1 w-10 rounded bg-leaf mb-4 opacity-90 group-hover:opacity-100"></div>
             <div class="flex items-start gap-3">
               {c.icon && (ICON_PATHS[(c.icon || '').toLowerCase()] ? (
                 <svg
@@ -80,7 +80,7 @@ const title = `Documentation — ${languageRaw}`
                 </svg>
               ) : <span class="text-xl">{c.icon}</span>)}
               <div>
-                <div class="text-lg font-semibold group-hover:text-brand-700">{c.label}</div>
+                <div class="text-lg font-semibold text-ink group-hover:text-canopy">{c.label}</div>
                 {c.description && <p class="text-sm text-slate mt-1">{c.description}</p>}
               </div>
             </div>

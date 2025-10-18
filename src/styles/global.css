@@ -10,8 +10,8 @@ html, body { height: 100%; }
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background-color: var(--neutral-50);
-    color: var(--neutral-800);
+    background-color: var(--sand);
+    color: var(--ink);
     position: relative;
     min-height: 100%;
   }
@@ -39,11 +39,11 @@ html, body { height: 100%; }
   }
 
   a {
-    color: var(--brand-600);
+    color: var(--canopy);
   }
 
   strong {
-    color: var(--neutral-800);
+    color: var(--ink);
   }
 }
 
@@ -55,8 +55,8 @@ html, body { height: 100%; }
 
 /* Optional breadcrumb tint used in DocsLayout */
 @layer components {
-  .text-slate { color: var(--neutral-500); }
-  .dark .text-slate { color: var(--neutral-300); }
+  .text-slate { color: var(--slate); }
+  .dark .text-slate { color: var(--slate); }
 
   .glass-card {
     @apply rounded-[28px] border border-white/60 bg-white/70 backdrop-blur shadow-card;
@@ -64,10 +64,10 @@ html, body { height: 100%; }
 
   .docs-callout {
     @apply border rounded-lg p-4 shadow-card;
-    border-color: var(--callout-border, var(--line));
+    border-color: var(--callout-border, var(--border));
     border-left-width: 6px;
-    border-left-color: var(--callout-border-strong, var(--neutral-400));
-    background-color: var(--callout-bg, var(--neutral-50));
+    border-left-color: var(--callout-border-strong, color-mix(in srgb, var(--canopy) 35%, transparent));
+    background-color: var(--callout-bg, var(--sand));
   }
 
   .docs-callout-title {

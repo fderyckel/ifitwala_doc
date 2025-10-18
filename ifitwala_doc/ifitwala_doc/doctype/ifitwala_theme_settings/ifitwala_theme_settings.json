@@ -1,0 +1,154 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-15 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_palette",
+  "ink_color",
+  "slate_color",
+  "canopy_color",
+  "leaf_color",
+  "moss_color",
+  "sky_color",
+  "sand_color",
+  "border_color",
+  "section_effects",
+  "radius_lg",
+  "radius_xl",
+  "shadow_soft",
+  "shadow_strong",
+  "focus_ring"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_palette",
+   "fieldtype": "Section Break",
+   "label": "Palette"
+  },
+  {
+   "default": "#0F172A",
+   "fieldname": "ink_color",
+   "fieldtype": "Color",
+   "label": "Ink (Primary Text)",
+   "reqd": 1
+  },
+  {
+   "default": "#475569",
+   "fieldname": "slate_color",
+   "fieldtype": "Color",
+   "label": "Slate (Muted Text)",
+   "reqd": 1
+  },
+  {
+   "default": "#12563A",
+   "fieldname": "canopy_color",
+   "fieldtype": "Color",
+   "label": "Canopy (Brand Dark)",
+   "reqd": 1
+  },
+  {
+   "default": "#2F855A",
+   "fieldname": "leaf_color",
+   "fieldtype": "Color",
+   "label": "Leaf (Brand Mid)",
+   "reqd": 1
+  },
+  {
+   "default": "#A6D6B1",
+   "fieldname": "moss_color",
+   "fieldtype": "Color",
+   "label": "Moss (Surface Tint)",
+   "reqd": 1
+  },
+  {
+   "default": "#E6F3F9",
+   "fieldname": "sky_color",
+   "fieldtype": "Color",
+   "label": "Sky (Background Wash)",
+   "reqd": 1
+  },
+  {
+   "default": "#F4EFE7",
+   "fieldname": "sand_color",
+   "fieldtype": "Color",
+   "label": "Sand (Canvas)",
+   "reqd": 1
+  },
+  {
+   "default": "#E2E8F0",
+   "fieldname": "border_color",
+   "fieldtype": "Color",
+   "label": "Border",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_effects",
+   "fieldtype": "Section Break",
+   "label": "Effects & Radii"
+  },
+  {
+   "default": "1rem",
+   "fieldname": "radius_lg",
+   "fieldtype": "Data",
+   "label": "Radius LG",
+   "reqd": 1
+  },
+  {
+   "default": "1.25rem",
+   "fieldname": "radius_xl",
+   "fieldtype": "Data",
+   "label": "Radius XL",
+   "reqd": 1
+  },
+  {
+   "default": "0 6px 20px rgba(15, 23, 42, 0.06)",
+   "fieldname": "shadow_soft",
+   "fieldtype": "Data",
+   "label": "Shadow Soft",
+   "reqd": 1
+  },
+  {
+   "default": "0 12px 32px rgba(15, 23, 42, 0.1)",
+   "fieldname": "shadow_strong",
+   "fieldtype": "Data",
+   "label": "Shadow Strong",
+   "reqd": 1
+  },
+  {
+   "default": "0 0 0 3px rgba(47, 133, 90, 0.35)",
+   "fieldname": "focus_ring",
+   "fieldtype": "Data",
+   "label": "Focus Ring Outline",
+   "reqd": 1
+  }
+ ],
+ "istable": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-10-16 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Ifitwala Doc",
+ "name": "Ifitwala Theme Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1
+  },
+  {
+   "role": "Website Manager",
+   "read": 1,
+   "write": 1
+  },
+  {
+   "role": "Content Editor",
+   "read": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

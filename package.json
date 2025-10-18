@@ -5,7 +5,9 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
+		"preastro:dev": "node scripts/pull_theme_tokens.mjs --silent || true",
 		"astro:dev": "astro dev",
+		"preastro:build": "node scripts/pull_theme_tokens.mjs",
 		"astro:build": "astro build",
 		"preview": "vite preview",
 		"build:docs-index": "python3 scripts/build_docs_index.py || true"
