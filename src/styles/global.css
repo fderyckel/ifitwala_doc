@@ -7,6 +7,25 @@
 /* small defaults */
 html, body { height: 100%; }
 
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(120% 120% at 80% 0%, rgba(47, 125, 98, 0.12) 0%, rgba(47, 125, 98, 0) 60%),
+      radial-gradient(140% 140% at -10% 30%, rgba(235, 169, 78, 0.14) 0%, rgba(235, 169, 78, 0) 70%),
+      linear-gradient(180deg, var(--neutral-50) 0%, #ffffff 45%, #ffffff 100%);
+    color: var(--neutral-800);
+  }
+
+  a {
+    color: var(--brand-600);
+  }
+
+  strong {
+    color: var(--neutral-800);
+  }
+}
+
 /* Helpers that typography plugin doesn't handle */
 @layer utilities {
   /* Keep anchors from hiding under top nav (use on headings if needed) */
@@ -17,6 +36,10 @@ html, body { height: 100%; }
 @layer components {
   .text-slate { color: var(--neutral-500); }
   .dark .text-slate { color: var(--neutral-300); }
+
+  .glass-card {
+    @apply rounded-[28px] border border-white/60 bg-white/70 backdrop-blur shadow-card;
+  }
 
   .docs-callout {
     @apply border rounded-lg p-4 shadow-card;

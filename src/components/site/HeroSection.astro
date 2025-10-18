@@ -33,63 +33,51 @@ const alignClass =
     ? 'items-end text-right sm:items-end sm:text-right'
     : 'items-start text-left'
 
-const themeClass =
-  theme === 'dark'
-    ? 'bg-neutral-900 text-white'
-    : 'bg-white text-ink'
-
-const overlayClass =
-  theme === 'dark'
-    ? 'from-neutral-900/90 to-neutral-900/80'
-    : 'from-white/95 to-panel/90'
-
 function actionClass(variant?: string) {
-  if ((variant || 'primary').toLowerCase() === 'secondary') {
-    return 'border border-line bg-white text-ink hover:bg-panel'
+  const intent = (variant || 'primary').toLowerCase()
+  if (intent === 'secondary') {
+    return 'border border-brand-200 bg-white/80 text-brand-700 hover:bg-white shadow-sm'
   }
-  return 'bg-primary text-white shadow hover:opacity-95'
+  return 'bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 text-white shadow-lg hover:shadow-xl border border-brand-500'
 }
 ---
 
 <section
   id={id}
-  class={`relative overflow-hidden rounded-3xl border border-line px-6 py-16 shadow-sm transition md:px-12 ${
-    themeClass
-  }`}
+  class="relative overflow-hidden rounded-[36px] border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-neutral-50 px-6 py-20 shadow-lg transition md:px-16"
 >
   {hasBackground && (
     <div
-      class="absolute inset-0 -z-10 bg-cover bg-center"
+      class="absolute inset-0 -z-20 bg-cover bg-center opacity-70"
       style={{ backgroundImage: `url(${bgImage})` }}
       aria-hidden="true"
     ></div>
   )}
-  <div
-    class={`absolute inset-0 -z-10 bg-gradient-to-br ${overlayClass}`}
-    aria-hidden="true"
-  ></div>
+  <div class="absolute inset-0 -z-10 bg-gradient-to-br from-white/80 via-white/60 to-brand-50/40"></div>
+  <div class="absolute -top-24 right-[-15%] h-72 w-72 rounded-full bg-brand-200/30 blur-3xl"></div>
+  <div class="absolute -bottom-32 left-[-10%] h-80 w-80 rounded-full bg-accent-500/20 blur-3xl"></div>
 
-  <div class={`relative mx-auto flex max-w-3xl flex-col gap-6 ${alignClass}`}>
-    <p class="text-xs font-semibold uppercase tracking-wider text-brand-500">
-      Ifitwala Ed
+  <div class={`relative mx-auto flex max-w-3xl flex-col gap-7 ${alignClass}`}>
+    <p class="inline-flex w-min whitespace-nowrap rounded-full border border-brand-200/60 bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-brand-600 shadow-sm backdrop-blur">
+      Growing schools
     </p>
-    <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">
+    <h1 class="text-4xl font-semibold tracking-tight text-brand-800 md:text-5xl">
       {title}
     </h1>
     {subtitle && (
-      <p class="text-lg leading-relaxed text-slate md:text-xl">
+      <p class="text-lg leading-relaxed text-neutral-600 md:text-xl">
         {subtitle}
       </p>
     )}
 
     {actions.length > 0 && (
-      <div class={`mt-6 flex flex-wrap gap-3 ${align === 'center' ? 'justify-center' : 'justify-start'}`}>
+      <div class={`mt-4 flex flex-wrap gap-3 ${align === 'center' ? 'justify-center' : 'justify-start'}`}>
         {actions.map((action, idx) => (
           action?.label && action?.href ? (
             <a
               key={idx}
               href={action.href}
-              class={`inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${actionClass(action.variant)}`}
+              class={`inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${actionClass(action.variant)}`}
             >
               {action.label}
             </a>
