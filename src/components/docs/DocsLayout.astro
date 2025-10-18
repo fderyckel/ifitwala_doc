@@ -341,7 +341,8 @@ function renderMarkdown(
         : (text && typeof text === 'object' && 'text' in text && typeof text.text === 'string')
           ? text.text
           : String(text ?? '')
-    return `<h${level} id="${escapeHtml(id)}">${label}</h${level}>`
+    const safeLabel = label
+    return `<h${level} id="${escapeHtml(id)}" class="doc-heading doc-heading-${level}">${safeLabel}</h${level}>`
   }
   renderer.link = (href, title, text) => {
     const original =
