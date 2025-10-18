@@ -1,25 +1,63 @@
 ---
-import '@/styles/global.css'
+import SiteShell from './SiteShell.astro'
+import { getNav, getSiteSettings } from '@/lib/siteClient'
 
 const {
   lang = 'en',
   title = 'Ifitwala Ed Docs',
   description = '',
   canonical,
-  bodyClass = 'bg-panel text-ink',
+  bodyClass = '',
+  useShell = true,
 } = Astro.props
+
+let settings = {}
+let headerNav = []
+let footerNav = []
+if (useShell) {
+  try {
+    settings = await getSiteSettings()
+  } catch {
+    settings = {}
+  }
+  try {
+    headerNav = await getNav('Header')
+  } catch {
+    headerNav = []
+  }
+  try {
+    footerNav = await getNav('Footer')
+  } catch {
+    footerNav = []
+  }
+}
 ---
 
-<html lang={lang}>
-  <head>
-    <meta charset="utf-8" />
-    <title>{title}</title>
-    {description && <meta name="description" content={description} />}
-    {canonical && <link rel="canonical" href={canonical} />}
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-
-  <body class={bodyClass}>
+{useShell ? (
+  <SiteShell
+    lang={lang}
+    title={title}
+    description={description}
+    canonical={canonical}
+    bodyClass={bodyClass}
+    settings={settings}
+    headerNav={headerNav}
+    footerNav={footerNav}
+  >
     <slot />
-  </body>
-</html>
+  </SiteShell>
+) : (
+  <html lang={lang}>
+    <head>
+      <meta charset="utf-8" />
+      <title>{title}</title>
+      {description && <meta name="description" content={description} />}
+      {canonical && <link rel="canonical" href={canonical} />}
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+
+    <body class={bodyClass}>
+      <slot />
+    </body>
+  </html>
+)}
