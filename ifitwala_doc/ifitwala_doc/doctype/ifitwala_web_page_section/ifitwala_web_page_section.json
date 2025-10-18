@@ -9,7 +9,8 @@
   "block_type",
   "notes",
   "block_doctype",
-  "block_ref"
+  "block_ref",
+  "section_order"
  ],
  "fields": [
   {
@@ -41,13 +42,18 @@
    "label": "Block Reference",
    "options": "block_doctype",
    "reqd": 1
+  },
+  {
+   "fieldname": "section_order",
+   "fieldtype": "Int",
+   "label": "Section Order"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-10-16 14:28:38.230057",
+ "modified": "2025-10-17 15:55:50.512223",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Ifitwala Web Page Section",

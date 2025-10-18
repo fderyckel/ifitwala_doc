@@ -1,8 +1,8 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><title>Student | Ifitwala Ed Docs</title><link rel="canonical" href="/docs/en/student"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/docs/_astro/index.BT7Y3lkG.css"></head> <body class="bg-panel text-ink"> <div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:flex-row"> <aside class="hidden w-full max-w-[14rem] flex-shrink-0 lg:block"><div class="rounded-2xl border bg-white p-3 text-xs shadow-sm lg:sticky lg:top-24"><div class="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-slate">
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><title>Student | Ifitwala Ed Docs</title><link rel="canonical" href="/docs/en/student"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/ifitwala_doc/_astro/index.CxhENeOg.css"></head> <body class="bg-panel text-ink"> <div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:flex-row"> <aside class="hidden w-full max-w-[14rem] flex-shrink-0 lg:block"><div class="rounded-2xl border bg-white p-3 text-xs shadow-sm lg:sticky lg:top-24"><div class="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-slate">
 On this page
-</div><ul class="space-y-1.5"><li><a href="#overview" class="block leading-snug text-slate hover:text-primary">Overview</a></li><li><a href="#fields-json-structure" class="block leading-snug text-slate hover:text-primary">Fields / JSON Structure</a></li><li><a href="#how-to-create-use" class="block leading-snug text-slate hover:text-primary">How to Create / Use</a></li><li><a href="#student-list-view" class="block leading-snug text-slate hover:text-primary">Student List View</a></li><li><a href="#validation-amp-constraints" class="block leading-snug text-slate hover:text-primary">Validation &amp;amp; Constraints</a></li><li><a href="#server-side-logic-python" class="block leading-snug text-slate hover:text-primary">Server-Side Logic (Python)</a></li><li><a href="#relationships-linked-doctypes" class="block leading-snug text-slate hover:text-primary">Relationships / Linked Doctypes</a></li><li><a href="#example-use-case" class="block leading-snug text-slate hover:text-primary">Example / Use Case</a></li><li><a href="#notes-tips-amp-caveats" class="block leading-snug text-slate hover:text-primary">Notes, Tips &amp;amp; Caveats</a></li></ul></div></aside> <main class="prose prose-docs w-full flex-1 min-w-0 max-w-3xl lg:max-w-4xl"> <nav class="not-prose mb-4 text-sm text-slate"> <a href="/docs/en" class="hover:underline">Docs</a>  <span class="mx-1">›</span> <a href="/docs/en/Student" class="hover:underline"> Student </a>   </nav> <h1 class="mb-1">Student</h1>  <div class="lg:hidden"> <div class="rounded-2xl border bg-white p-3 text-xs shadow-sm lg:sticky lg:top-24"><div class="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-slate">
+</div><ul class="space-y-1.5"><li><a href="#overview" class="block leading-snug text-slate hover:text-primary">Overview</a></li><li><a href="#fields-json-structure" class="block leading-snug text-slate hover:text-primary">Fields / JSON Structure</a></li><li><a href="#how-to-create-use" class="block leading-snug text-slate hover:text-primary">How to Create / Use</a></li><li><a href="#student-list-view" class="block leading-snug text-slate hover:text-primary">Student List View</a></li><li><a href="#validation-amp-constraints" class="block leading-snug text-slate hover:text-primary">Validation &amp;amp; Constraints</a></li><li><a href="#server-side-logic-python" class="block leading-snug text-slate hover:text-primary">Server-Side Logic (Python)</a></li><li><a href="#relationships-linked-doctypes" class="block leading-snug text-slate hover:text-primary">Relationships / Linked Doctypes</a></li><li><a href="#permissions" class="block leading-snug text-slate hover:text-primary">Permissions</a></li><li><a href="#student-permissions" class="block leading-snug text-slate hover:text-primary">Student — Permissions</a></li><li><a href="#notes-tips-amp-caveats" class="block leading-snug text-slate hover:text-primary">Notes, Tips &amp;amp; Caveats</a></li></ul></div></aside> <main class="prose prose-docs w-full flex-1 min-w-0 max-w-3xl lg:max-w-4xl"> <nav class="not-prose mb-4 text-sm text-slate"> <a href="/docs/en" class="hover:underline">Docs</a>  <span class="mx-1">›</span> <a href="/docs/en/Student" class="hover:underline"> Student </a>   </nav> <h1 class="mb-1">Student</h1>  <div class="lg:hidden"> <div class="rounded-2xl border bg-white p-3 text-xs shadow-sm lg:sticky lg:top-24"><div class="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-slate">
 On this page
-</div><ul class="space-y-1.5"><li><a href="#overview" class="block leading-snug text-slate hover:text-primary">Overview</a></li><li><a href="#fields-json-structure" class="block leading-snug text-slate hover:text-primary">Fields / JSON Structure</a></li><li><a href="#how-to-create-use" class="block leading-snug text-slate hover:text-primary">How to Create / Use</a></li><li><a href="#student-list-view" class="block leading-snug text-slate hover:text-primary">Student List View</a></li><li><a href="#validation-amp-constraints" class="block leading-snug text-slate hover:text-primary">Validation &amp;amp; Constraints</a></li><li><a href="#server-side-logic-python" class="block leading-snug text-slate hover:text-primary">Server-Side Logic (Python)</a></li><li><a href="#relationships-linked-doctypes" class="block leading-snug text-slate hover:text-primary">Relationships / Linked Doctypes</a></li><li><a href="#example-use-case" class="block leading-snug text-slate hover:text-primary">Example / Use Case</a></li><li><a href="#notes-tips-amp-caveats" class="block leading-snug text-slate hover:text-primary">Notes, Tips &amp;amp; Caveats</a></li></ul></div> </div> <div class="mt-6"><hundefined id="overview">Overview</hundefined><p>The <strong>Student</strong> doctype is one of the core entities in the ERP. Many other doctypes link to or depend on Student (e.g. enrollments, attendance, student log, guardians, etc.).<br><strong>Main / Title field</strong>: <code>student_full_name</code> (constructed from first, middle, last name)</p>
+</div><ul class="space-y-1.5"><li><a href="#overview" class="block leading-snug text-slate hover:text-primary">Overview</a></li><li><a href="#fields-json-structure" class="block leading-snug text-slate hover:text-primary">Fields / JSON Structure</a></li><li><a href="#how-to-create-use" class="block leading-snug text-slate hover:text-primary">How to Create / Use</a></li><li><a href="#student-list-view" class="block leading-snug text-slate hover:text-primary">Student List View</a></li><li><a href="#validation-amp-constraints" class="block leading-snug text-slate hover:text-primary">Validation &amp;amp; Constraints</a></li><li><a href="#server-side-logic-python" class="block leading-snug text-slate hover:text-primary">Server-Side Logic (Python)</a></li><li><a href="#relationships-linked-doctypes" class="block leading-snug text-slate hover:text-primary">Relationships / Linked Doctypes</a></li><li><a href="#permissions" class="block leading-snug text-slate hover:text-primary">Permissions</a></li><li><a href="#student-permissions" class="block leading-snug text-slate hover:text-primary">Student — Permissions</a></li><li><a href="#notes-tips-amp-caveats" class="block leading-snug text-slate hover:text-primary">Notes, Tips &amp;amp; Caveats</a></li></ul></div> </div> <div class="mt-6"><hundefined id="overview">Overview</hundefined><p>The <strong>Student</strong> doctype is one of the core entities in the ERP. Many other doctypes link to or depend on Student (e.g. enrollments, attendance, student log, guardians, etc.).<br><strong>Main / Title field</strong>: <code>student_full_name</code> (constructed from first, middle, last name)</p>
 <div class="docs-callout not-prose docs-callout-info" data-callout-type="info" style="--callout-bg:rgba(43, 123, 187, 0.08);--callout-border:rgba(43, 123, 187, 0.24);--callout-border-strong:rgba(43, 123, 187, 0.72)"><div class="docs-callout-title">Why Student matters</div><div class="docs-callout-body prose prose-brand max-w-none"><p>This doctype is foundational. It not only captures demographic data (name, dates, contact) but also triggers creation and sync of User, Contact, Patient, and linked name propagation across other doctypes.</p></div></div>
 
 
@@ -158,9 +158,13 @@ On this page
 <li>Keeps things in sync on every update: student photo file/name, the linked Contact, whether the student is active/inactive, and sibling relationships.</li>
 <li>Overall: you add/update a student once, and the system takes care of the related accounts, records, and links for you.</li>
 </ul>
+<div class="docs-callout not-prose docs-callout-tip" data-callout-type="tip" style="--callout-bg:rgba(41, 159, 101, 0.08);--callout-border:rgba(41, 159, 101, 0.24);--callout-border-strong:rgba(41, 159, 101, 0.72)"><div class="docs-callout-title">Best Practice for Sibling Edits</div><div class="docs-callout-body prose prose-brand max-w-none"><p>When editing siblings, make sure you manage both sides carefully (though system tries to auto-mirror). If a student is deleted or re-IDed later, sibling relationships might require manual maintenance.</p></div></div>
+
+
+
 <hr>
 <hundefined id="relationships-linked-doctypes">Relationships / Linked Doctypes</hundefined><ul>
-<li><a href="./student-patient/"><strong>Student Patient</strong></a> (1:1) — every Student gets a corresponding Patient record  </li>
+<li><a href="/docs/en/[object Object]/"></a> (1:1) — every Student gets a corresponding Patient record  </li>
 <li><strong>User</strong> — if email is present, a User is created for the Student  </li>
 <li><strong>Contact</strong> — created/linked and Dynamic Linked  </li>
 <li><strong>Student Sibling</strong> — child doctype representing sibling relationships  </li>
@@ -195,40 +199,74 @@ On this page
 <td>Historical log / audit trail of student changes (e.g. name changes, status changes) — useful for tracking.</td>
 </tr>
 </tbody></table>
-<hundefined id="example-use-case">Example / Use Case</hundefined><p>&gt; <strong>Scenario</strong>: Registering a student and later renaming, handling siblings &amp; image</p>
-<ol>
-<li><p><strong>New Student creation</strong>  </p>
-<ul>
-<li>Fill in name, DOB, joining date, email, siblings, image  </li>
-<li>Save → triggers validation → after_insert hooks → User, Patient, Contact created</li>
-</ul>
-</li>
-<li><p><strong>Updating name</strong>  </p>
-<ul>
-<li>Change <code>student_middle_name</code> or first/last name  </li>
-<li>On save, system recomputes <code>student_full_name</code>  </li>
-<li><code>update_student_name_in_linked_doctype()</code> ensures consistency across linked records</li>
-</ul>
-</li>
-<li><p><strong>Uploading a profile image</strong>  </p>
-<ul>
-<li><code>rename_student_image()</code> enforces naming standard  </li>
-<li>Image is moved and File doc updated  </li>
-<li><code>sync_student_contact_image()</code> ensures Contact mirrors the image</li>
-</ul>
-</li>
-<li><p><strong>Adding or removing a sibling</strong>  </p>
-<ul>
-<li>Change <code>siblings</code> table  </li>
-<li><code>_validate_siblings_list()</code> prunes invalid entries  </li>
-<li><code>sync_reciprocal_siblings()</code> ensures bidirectional consistency</li>
-</ul>
-</li>
-</ol>
-<div class="docs-callout not-prose docs-callout-tip" data-callout-type="tip" style="--callout-bg:rgba(41, 159, 101, 0.08);--callout-border:rgba(41, 159, 101, 0.24);--callout-border-strong:rgba(41, 159, 101, 0.72)"><div class="docs-callout-title">Best Practice for Sibling Edits</div><div class="docs-callout-body prose prose-brand max-w-none"><p>When editing siblings, make sure you manage both sides carefully (though system tries to auto-mirror). If a student is deleted or re-IDed later, sibling relationships might require manual maintenance.</p></div></div>
-
-
-
+<hundefined id="permissions">Permissions</hundefined><hundefined id="student-permissions">Student — Permissions</hundefined><p><strong>Legend:</strong> 🟢 Allowed · ◻️ Not allowed</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th align="center">Read</th>
+<th align="center">Write</th>
+<th align="center">Create</th>
+<th align="center">Delete</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>System Manager</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+</tr>
+<tr>
+<td>Academic Admin</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+</tr>
+<tr>
+<td>Academic Assistant</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+</tr>
+<tr>
+<td>Admission Officer</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+<td align="center">🟢</td>
+</tr>
+<tr>
+<td>Academic Staff</td>
+<td align="center">🟢</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+</tr>
+<tr>
+<td>Instructor</td>
+<td align="center">🟢</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+</tr>
+<tr>
+<td>Counselor</td>
+<td align="center">🟢</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+</tr>
+<tr>
+<td>Accreditation Visitor</td>
+<td align="center">🟢</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+<td align="center">◻️</td>
+</tr>
+</tbody></table>
 <hr>
 <hundefined id="notes-tips-amp-caveats">Notes, Tips &amp; Caveats</hundefined><div class="docs-callout not-prose docs-callout-note" data-callout-type="note" style="--callout-bg:rgba(148, 163, 184, 0.12);--callout-border:rgba(148, 163, 184, 0.28);--callout-border-strong:rgba(148, 163, 184, 0.8)"><div class="docs-callout-title">Performance &amp; Edge Cases</div><div class="docs-callout-body prose prose-brand max-w-none"><ul>
 <li>Renaming student image moves files on disk — ensure file permissions and existence are valid.  </li>
