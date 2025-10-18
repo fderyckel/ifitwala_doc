@@ -158,7 +158,7 @@ def _shot_manifest_for(docname: str, slug: str) -> list[dict]:
         filters={"parenttype": "Documentation", "parent": docname},
         fields=[
             "idx", "anchor_id", "title", "image", "display_size",
-            "caption_md", "alt_text"
+            "caption_md", "alt_text", "is_og_image"
         ],
         order_by="IFNULL(image_order, 9999), idx",
         ignore_permissions=True,
@@ -209,9 +209,26 @@ def _shot_manifest_for(docname: str, slug: str) -> list[dict]:
             "srcset": srcset,
             "auto": auto_url,
             "urls": urls,
+            "is_og_image": 1 if (r.get("is_og_image") or 0) else 0,
         })
 
     return manifest
+
+
+def _select_og_image(shots: list[dict]) -> str | None:
+    if not shots:
+        return None
+    def _candidate(shot):
+        return (
+            shot.get("auto")
+            or (shot.get("urls") or {}).get("original")
+            or (shot.get("urls") or {}).get("fallback")
+        )
+
+    preferred = next((s for s in shots if s.get("is_og_image")), None)
+    if preferred:
+        return _candidate(preferred)
+    return _candidate(shots[0])
 
 
 @frappe.whitelist(allow_guest=True)
@@ -222,7 +239,8 @@ def fetch_all(language: str | None = None):
     subcat_col = _subcategory_column()
     fields = [
         "name","slug","language","title","summary","version",
-        "published_on","category","doc_order","body_md","modified"
+        "author","published_on","category","doc_order","body_md","modified",
+        "seo_title","seo_description","canonical_url","noindex"
     ]
     if subcat_col:
         fields.insert(7, subcat_col)
@@ -248,7 +266,8 @@ def fetch_one(language: str, slug: str):
     subcat_col = _subcategory_column()
     fields = [
         "name","slug","language","title","summary","version",
-        "published_on","category","doc_order","body_md","modified"
+        "author","published_on","category","doc_order","body_md","modified",
+        "seo_title","seo_description","canonical_url","noindex"
     ]
     if subcat_col:
         fields.insert(7, f"{subcat_col} as subcategory")
@@ -268,6 +287,7 @@ def fetch_one(language: str, slug: str):
 
     # ⬇️ include per-page screenshot manifest
     d["screenshots"] = _shot_manifest_for(d["name"], d["slug"])
+    d["og_image"] = _select_og_image(d["screenshots"])
 
 
     return d

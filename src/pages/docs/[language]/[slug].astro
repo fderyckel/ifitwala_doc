@@ -57,12 +57,47 @@ try {
 const docLanguage = describeLanguage(doc?.language || languageForApi)
 const langRaw = docLanguage.raw || languageForApi
 const langSlug = docLanguage.slug || languageSlugParam
-const title = doc ? `${doc.title} | Ifitwala Ed Docs` : 'Not Found | Ifitwala Ed Docs'
-const description = doc?.summary || ''
-const canonical = doc ? `/docs/${langSlug}/${doc.slug}` : undefined
+
+function toBool(value: any): boolean {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'number') return value !== 0
+  if (typeof value === 'string') return value.trim() === '1' || value.trim().toLowerCase() === 'true'
+  return false
+}
+
+const baseTitle = doc ? (typeof doc?.seo_title === 'string' && doc.seo_title.trim() ? doc.seo_title.trim() : doc.title) : ''
+const shellTitle = doc ? `${baseTitle} | Ifitwala Ed Docs` : 'Not Found | Ifitwala Ed Docs'
+const metaDescription = doc ? (typeof doc?.seo_description === 'string' && doc.seo_description.trim() ? doc.seo_description.trim() : doc.summary || '') : ''
+
+const canonical = doc ? (typeof doc?.canonical_url === 'string' && doc.canonical_url.trim() ? doc.canonical_url.trim() : `/docs/${langSlug}/${doc.slug}`) : undefined
+
+const ogCandidate = (() => {
+  if (typeof doc?.og_image === 'string' && doc.og_image.trim()) {
+    return doc.og_image.trim()
+  }
+  const shots = Array.isArray(doc?.screenshots) ? doc.screenshots : []
+  const preferred = shots.find((shot) => toBool(shot?.is_og_image)) || shots[0]
+  if (!preferred) return null
+  const auto = typeof preferred?.auto === 'string' && preferred.auto.trim() ? preferred.auto.trim() : null
+  const original = typeof preferred?.urls?.original === 'string' ? preferred.urls.original : null
+  const fallback = typeof preferred?.urls?.fallback === 'string' ? preferred.urls.fallback : null
+  return auto || original || fallback || null
+})()
+
+const ogImage = ogCandidate || null
+const noindex = doc ? toBool(doc.noindex) : false
 ---
 
-<DocsShell lang={langRaw || 'en'} title={title} description={description} canonical={canonical}>
+<DocsShell
+  lang={langRaw || 'en'}
+  title={shellTitle}
+  description={metaDescription}
+  canonical={canonical}
+  ogImage={ogImage}
+  ogTitle={baseTitle}
+  ogDescription={metaDescription}
+  noindex={noindex}
+>
   {!doc ? (
     <main class="mx-auto max-w-3xl px-6 py-10">
       <h1 class="text-2xl font-semibold text-primary mb-2">Page not found</h1>

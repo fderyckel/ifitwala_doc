@@ -9,6 +9,10 @@ const {
   canonical,
   bodyClass = '',
   useShell = true,
+  ogImage,
+  ogTitle,
+  ogDescription,
+  noindex = false,
 } = Astro.props
 
 let settings = {}
@@ -43,6 +47,10 @@ if (useShell) {
     settings={settings}
     headerNav={headerNav}
     footerNav={footerNav}
+    ogImage={ogImage}
+    ogTitle={ogTitle}
+    ogDescription={ogDescription}
+    noindex={noindex}
   >
     <slot />
   </SiteShell>

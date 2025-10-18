@@ -438,6 +438,9 @@ if (publishedLabel) {
 if (updatedLabel) {
   metaItems.push({ label: 'Last Updated', value: updatedLabel })
 }
+if (doc?.author) {
+  metaItems.push({ label: 'Author', value: doc.author })
+}
 ---
 
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:flex-row">

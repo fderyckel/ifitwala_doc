@@ -13,6 +13,10 @@ const {
   footerNav = [],
   settings = {},
   bodyClass = '',
+  ogImage,
+  ogTitle,
+  ogDescription,
+  noindex = false,
 }: {
   lang?: string
   title?: string
@@ -22,6 +26,10 @@ const {
   footerNav?: NavItem[]
   settings?: SiteSettings
   bodyClass?: string
+  ogImage?: string
+  ogTitle?: string
+  ogDescription?: string
+  noindex?: boolean
 } = Astro.props
 
 const siteName = settings?.site_name || 'Ifitwala Ed'
@@ -38,6 +46,29 @@ const canonicalHref =
 const footerHtml = settings?.footer_md ? marked.parse(settings.footer_md) : ''
 const headerItems = Array.isArray(headerNav) ? headerNav : []
 const footerItems = Array.isArray(footerNav) ? footerNav : []
+
+function absoluteUrl(input?: string | null) {
+  if (!input || typeof input !== 'string') {
+    return undefined
+  }
+  try {
+    return new URL(input).toString()
+  } catch {
+    const trimmed = input.trim()
+    if (!trimmed) return undefined
+    const base = Astro.site ? Astro.site : new URL('https://ifitwala.com/')
+    try {
+      return new URL(trimmed.replace(/^\//, ''), base).toString()
+    } catch {
+      return undefined
+    }
+  }
+}
+
+const resolvedOgTitle = ogTitle || resolvedTitle
+const resolvedOgDescription = ogDescription || resolvedDescription
+const resolvedOgImage = absoluteUrl(ogImage)
+const robots = noindex ? 'noindex, nofollow' : undefined
 ---
 
 <html lang={lang}>
@@ -46,6 +77,15 @@ const footerItems = Array.isArray(footerNav) ? footerNav : []
     <title>{resolvedTitle}</title>
     {resolvedDescription && <meta name="description" content={resolvedDescription} />}
     {canonicalHref && <link rel="canonical" href={canonicalHref} />}
+    {robots && <meta name="robots" content={robots} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={resolvedOgTitle} />
+    {resolvedOgDescription && <meta property="og:description" content={resolvedOgDescription} />}
+    {resolvedOgImage && <meta property="og:image" content={resolvedOgImage} />}
+    {resolvedOgImage && <meta name="twitter:card" content="summary_large_image" />}
+    {resolvedOgImage && <meta name="twitter:image" content={resolvedOgImage} />}
+    {resolvedOgTitle && <meta name="twitter:title" content={resolvedOgTitle} />}
+    {resolvedOgDescription && <meta name="twitter:description" content={resolvedOgDescription} />}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
 
@@ -94,8 +134,8 @@ const footerItems = Array.isArray(footerNav) ? footerNav : []
         <slot />
       </main>
 
-      <footer class="mt-16 border-t border-border/70 bg-white/90">
-        <div class="mx-auto w-full px-6 py-10 md:max-w-6xl">
+      <footer class="mt-16 border-t border-border/60 bg-white/85 backdrop-blur">
+        <div class="mx-auto w-full px-6 py-6 md:max-w-6xl">
           <div class="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
             <div class="text-lg font-semibold text-canopy">{siteName}</div>
             {footerItems.length > 0 && (
@@ -121,7 +161,7 @@ const footerItems = Array.isArray(footerNav) ? footerNav : []
             )}
           </div>
         </div>
-        <div class="border-t border-border/70 py-4 text-center text-xs text-slate">
+        <div class="border-t border-border/60 py-3 text-center text-xs text-slate">
           © {new Date().getFullYear()} {siteName}. All rights reserved.
         </div>
       </footer>

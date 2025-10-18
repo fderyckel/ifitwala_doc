@@ -7,6 +7,12 @@ type Doc = {
   summary?: string;
   version?: string;
   published_on?: string;
+  author?: string;
+  seo_title?: string;
+  seo_description?: string;
+  canonical_url?: string;
+  og_image?: string;
+  noindex?: number | boolean;
   tags?: string[];
   body_md?: string;
   body_html?: string;

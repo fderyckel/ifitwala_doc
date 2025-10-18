@@ -1,164 +1,194 @@
 {
- "actions": [],
- "allow_rename": 1,
- "creation": "2025-10-09 16:56:01.040146",
- "doctype": "DocType",
- "engine": "InnoDB",
- "field_order": [
-  "section_break_cdhp",
-  "title",
-  "language",
-  "version",
-  "author",
-  "column_break_samu",
-  "slug",
-  "published_on",
-  "category",
-  "subcategory",
-  "column_break_z8yu",
-  "status",
-  "last_edited",
-  "doc_order",
-  "section_break_s3mc",
-  "body_md",
-  "summary",
-  "body_html",
-  "section_break_1xdj",
-  "screenshots"
- ],
- "fields": [
-  {
-   "fieldname": "section_break_cdhp",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "title",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Title",
-   "reqd": 1
-  },
-  {
-   "fieldname": "slug",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Slug",
-   "reqd": 1,
-   "unique": 1
-  },
-  {
-   "fieldname": "language",
-   "fieldtype": "Data",
-   "label": "Language"
-  },
-  {
-   "fieldname": "summary",
-   "fieldtype": "Small Text",
-   "label": "Summary"
-  },
-  {
-   "fieldname": "version",
-   "fieldtype": "Data",
-   "label": "Version"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Status",
-   "options": "Draft\nPublished\nArchived"
-  },
-  {
-   "fieldname": "published_on",
-   "fieldtype": "Date",
-   "label": "Published On"
-  },
-  {
-   "fieldname": "body_md",
-   "fieldtype": "Long Text",
-   "label": "Body MD"
-  },
-  {
-   "fieldname": "body_html",
-   "fieldtype": "HTML",
-   "label": "Body HTML"
-  },
-  {
-   "fieldname": "author",
-   "fieldtype": "Data",
-   "label": "Author"
-  },
-  {
-   "fieldname": "last_edited",
-   "fieldtype": "Date",
-   "label": "Last Edited"
-  },
-  {
-   "fieldname": "category",
-   "fieldtype": "Link",
-   "label": "Category",
-   "options": "Doc Category"
-  },
-  {
-   "fieldname": "subcategory",
-   "fieldtype": "Link",
-   "label": "Subcategory",
-   "options": "Doc Subcategory"
-  },
-  {
-   "fieldname": "doc_order",
-   "fieldtype": "Int",
-   "label": "Doc Order"
-  },
-  {
-   "fieldname": "column_break_z8yu",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_s3mc",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_samu",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_1xdj",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "screenshots",
-   "fieldtype": "Table",
-   "label": "Doc Screenshots",
-   "options": "Doc Screenshot"
-  }
- ],
- "grid_page_length": 50,
- "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2025-10-17 09:40:34.753791",
- "modified_by": "Administrator",
- "module": "Ifitwala Doc",
- "name": "Documentation",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
- "row_format": "Dynamic",
- "rows_threshold_for_grid_search": 20,
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+  "actions": [],
+  "allow_rename": 1,
+  "creation": "2025-10-09 16:56:01.040146",
+  "doctype": "DocType",
+  "engine": "InnoDB",
+  "field_order": [
+    "section_break_cdhp",
+    "title",
+    "language",
+    "version",
+    "author",
+    "column_break_samu",
+    "slug",
+    "published_on",
+    "category",
+    "subcategory",
+    "column_break_z8yu",
+    "status",
+    "last_edited",
+    "doc_order",
+    "section_break_s3mc",
+    "seo_title",
+    "seo_description",
+    "canonical_url",
+    "noindex",
+    "body_md",
+    "summary",
+    "body_html",
+    "section_break_1xdj",
+    "screenshots"
+  ],
+  "fields": [
+    {
+      "fieldname": "section_break_cdhp",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Title",
+      "reqd": 1
+    },
+    {
+      "fieldname": "slug",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Slug",
+      "reqd": 1,
+      "unique": 1
+    },
+    {
+      "fieldname": "language",
+      "fieldtype": "Data",
+      "label": "Language"
+    },
+    {
+      "fieldname": "summary",
+      "fieldtype": "Small Text",
+      "label": "Summary"
+    },
+    {
+      "fieldname": "version",
+      "fieldtype": "Data",
+      "label": "Version"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "in_standard_filter": 1,
+      "label": "Status",
+      "options": "Draft\nPublished\nArchived"
+    },
+    {
+      "fieldname": "published_on",
+      "fieldtype": "Date",
+      "label": "Published On"
+    },
+    {
+      "fieldname": "body_md",
+      "fieldtype": "Long Text",
+      "label": "Body MD"
+    },
+    {
+      "fieldname": "body_html",
+      "fieldtype": "HTML",
+      "label": "Body HTML"
+    },
+    {
+      "fieldname": "author",
+      "fieldtype": "Data",
+      "label": "Author"
+    },
+    {
+      "fieldname": "last_edited",
+      "fieldtype": "Date",
+      "label": "Last Edited"
+    },
+    {
+      "fieldname": "category",
+      "fieldtype": "Link",
+      "label": "Category",
+      "options": "Doc Category"
+    },
+    {
+      "fieldname": "subcategory",
+      "fieldtype": "Link",
+      "label": "Subcategory",
+      "options": "Doc Subcategory"
+    },
+    {
+      "fieldname": "doc_order",
+      "fieldtype": "Int",
+      "label": "Doc Order"
+    },
+    {
+      "fieldname": "seo_title",
+      "fieldtype": "Data",
+      "label": "SEO Title",
+      "description": "Optional title for search snippets (60 char max)",
+      "length": 150
+    },
+    {
+      "fieldname": "seo_description",
+      "fieldtype": "Small Text",
+      "label": "SEO Description",
+      "description": "Optional summary for search/social cards (160 char max)"
+    },
+    {
+      "fieldname": "canonical_url",
+      "fieldtype": "Data",
+      "label": "Canonical URL",
+      "options": "URL",
+      "description": "Override canonical link if duplicate content"
+    },
+    {
+      "fieldname": "noindex",
+      "fieldtype": "Check",
+      "label": "Hide from search (noindex)",
+      "default": "0"
+    },
+    {
+      "fieldname": "column_break_z8yu",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "section_break_s3mc",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "column_break_samu",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "section_break_1xdj",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "screenshots",
+      "fieldtype": "Table",
+      "label": "Doc Screenshots",
+      "options": "Doc Screenshot"
+    }
+  ],
+  "grid_page_length": 50,
+  "index_web_pages_for_search": 1,
+  "links": [],
+  "modified": "2025-10-17 19:40:34.753791",
+  "modified_by": "Administrator",
+  "module": "Ifitwala Doc",
+  "name": "Documentation",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "row_format": "Dynamic",
+  "rows_threshold_for_grid_search": 20,
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": []
 }
