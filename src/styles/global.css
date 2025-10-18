@@ -10,18 +10,32 @@ html, body { height: 100%; }
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--neutral-50);
+    color: var(--neutral-800);
+    position: relative;
+    min-height: 100%;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background:
-      radial-gradient(120% 120% at 80% 0%, rgba(47, 125, 98, 0.12) 0%, rgba(47, 125, 98, 0) 60%),
-      radial-gradient(140% 140% at -10% 30%, rgba(235, 169, 78, 0.14) 0%, rgba(235, 169, 78, 0) 70%),
+      radial-gradient(120% 120% at 80% 0%, rgba(47, 125, 98, 0.14) 0%, rgba(47, 125, 98, 0) 65%),
+      radial-gradient(160% 140% at -10% 20%, rgba(235, 169, 78, 0.18) 0%, rgba(235, 169, 78, 0) 70%),
       linear-gradient(
         180deg,
-        rgba(241, 237, 228, 0.96) 0%,
-        rgba(247, 243, 234, 0.98) 28%,
-        rgba(255, 255, 252, 1) 52%,
-        rgba(236, 246, 241, 0.98) 76%,
+        rgba(241, 237, 228, 0.92) 0%,
+        rgba(249, 245, 235, 0.95) 32%,
+        rgba(236, 246, 241, 0.9) 68%,
         rgba(255, 255, 255, 1) 100%
       );
-    color: var(--neutral-800);
+    background-repeat: no-repeat;
+    background-size: 140% 140%, 180% 180%, 100% 300%;
+    background-position: top right, top left, top center;
+    opacity: 0.98;
   }
 
   a {
