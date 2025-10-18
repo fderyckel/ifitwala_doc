@@ -221,59 +221,18 @@ function rewriteDocHref(rawHref) {
   }
 
   let working = href
-  let hash = ''
-  let query = ''
-
-  const hashIndex = working.indexOf('#')
-  if (hashIndex !== -1) {
-    hash = working.slice(hashIndex)
-    working = working.slice(0, hashIndex)
+  if (!working.startsWith('.') && !working.startsWith('/')) {
+    working = `./${working}`
   }
 
-  const queryIndex = working.indexOf('?')
-  if (queryIndex !== -1) {
-    query = working.slice(queryIndex)
-    working = working.slice(0, queryIndex)
-  }
-
-  if (!working) {
-    return `${ensureTrailingSlash(canonicalDocPath)}${query}${hash}`
-  }
-
-  if (working.startsWith('../')) {
+  const base = new URL(ensureTrailingSlash(canonicalDocPath), 'https://ifitwala.local')
+  try {
+    const resolved = new URL(working, base)
+    const pathname = resolved.pathname.replace(/\/{2,}/g, '/')
+    return `${ensureTrailingSlash(pathname)}${resolved.search}${resolved.hash}`
+  } catch {
     return href
   }
-
-  working = working.replace(/^\.\//, '')
-  working = working.replace(/^\.?\//, '')
-
-  if (!working || working === '.') {
-    return `${ensureTrailingSlash(canonicalDocPath)}${query}${hash}`
-  }
-
-  const extensionMatch = working.match(/\.(mdx?|html?)$/i)
-  if (extensionMatch) {
-    const ext = extensionMatch[0].toLowerCase()
-    if (ext === '.md' || ext === '.mdx' || ext === '.html' || ext === '.htm') {
-      working = working.slice(0, -ext.length)
-    }
-  }
-
-  const trimmed = working.replace(/\/+$/,'')
-  if (!trimmed) {
-    return `${ensureTrailingSlash(canonicalDocPath)}${query}${hash}`
-  }
-
-  const lastSegment = trimmed.split('/').pop() || ''
-  if (
-    !working.endsWith('/') &&
-    /\.[a-z0-9]{2,5}$/i.test(lastSegment)
-  ) {
-    return href
-  }
-
-  const targetPath = `${docsLangRoot}/${trimmed}`.replace(/\/{2,}/g, '/')
-  return `${ensureTrailingSlash(targetPath)}${query}${hash}`
 }
 
 function createSlugger() {
