@@ -49,6 +49,20 @@ const ICON_PATHS = {
   calendar:'M6 8h12M7 4v4m10-4v4M6 20h12a2 2 0 002-2V8H4v10a2 2 0 002 2',
 }
 
+function normalizeIconSource(raw: unknown) {
+  if (typeof raw !== 'string') return null
+  const value = raw.trim()
+  if (!value) return null
+  const isImage =
+    /^(https?:|data:|\/)/i.test(value) ||
+    value.toLowerCase().endsWith('.svg') ||
+    value.toLowerCase().endsWith('.png') ||
+    value.toLowerCase().endsWith('.jpg') ||
+    value.toLowerCase().endsWith('.jpeg') ||
+    value.toLowerCase().endsWith('.webp')
+  return { value, isImage }
+}
+
 const title = `Documentation — ${languageRaw}`
 ---
 
@@ -65,24 +79,51 @@ const title = `Documentation — ${languageRaw}`
             class="group block bg-white border border-border/60 rounded-2xl p-6 hover:shadow-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/60"
           >
             <div class="h-1 w-10 rounded bg-leaf mb-4 opacity-90 group-hover:opacity-100"></div>
-            <div class="flex items-start gap-3">
-              {c.icon && (ICON_PATHS[(c.icon || '').toLowerCase()] ? (
-                <svg
-                  viewBox="0 0 24 24"
-                  class="w-6 h-6 opacity-80"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d={ICON_PATHS[(c.icon || '').toLowerCase()]} />
-                </svg>
-              ) : <span class="text-xl">{c.icon}</span>)}
+            <div class="flex items-start justify-between gap-4">
               <div>
                 <div class="text-lg font-semibold text-ink group-hover:text-canopy">{c.label}</div>
                 {c.description && <p class="text-sm text-slate mt-1">{c.description}</p>}
               </div>
+              {(() => {
+                const rawIcon = typeof c.icon === 'string' ? c.icon : ''
+                const svgPath = ICON_PATHS[rawIcon.trim().toLowerCase()]
+                const fallback = svgPath ? null : normalizeIconSource(rawIcon)
+                if (svgPath) {
+                  return (
+                    <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-moss/30 text-canopy">
+                      <svg
+                        viewBox="0 0 24 24"
+                        class="h-7 w-7"
+                        aria-hidden="true"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d={svgPath} />
+                      </svg>
+                    </span>
+                  )
+                }
+                if (fallback) {
+                  return fallback.isImage ? (
+                    <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-moss/20">
+                      <img
+                        src={fallback.value}
+                        alt={`${c.label} icon`}
+                        class="h-10 w-10 object-contain"
+                        loading="lazy"
+                      />
+                    </span>
+                  ) : (
+                    <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-moss/30 text-canopy text-2xl">
+                      {fallback.value}
+                    </span>
+                  )
+                }
+                return null
+              })()}
             </div>
           </a>
         ))}

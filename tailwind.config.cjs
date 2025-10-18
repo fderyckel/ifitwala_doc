@@ -15,6 +15,9 @@ module.exports = {
   safelist: ['prose','prose-docs','max-w-3xl','mx-auto','px-6','py-10','not-prose'],
   theme: {
     extend: {
+      fontFamily: {
+        serif: ['"Merriweather"', '"Source Serif Pro"', 'Georgia', 'serif'],
+      },
       colors: {
         // semantic aliases
         ink:      color('ink'),
@@ -58,9 +61,43 @@ module.exports = {
 
             a: { textDecoration: 'none' },
             'a:hover': { textDecoration: 'underline' },
-            h1: { color: theme('colors.ink') },
-            h2: { color: theme('colors.ink') },
-            h3: { color: theme('colors.ink') },
+            h1: {
+              color: theme('colors.canopy'),
+              fontFamily: `'Merriweather', 'Source Serif Pro', 'Georgia', serif`,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              fontSize: 'clamp(2.25rem, 3.5vw, 2.875rem)',
+              marginTop: '2.5rem',
+              marginBottom: '1.25rem',
+              lineHeight: '1.2',
+            },
+            h2: {
+              color: theme('colors.ink'),
+              fontFamily: `'Merriweather', 'Source Serif Pro', 'Georgia', serif`,
+              fontWeight: 700,
+              fontSize: 'clamp(1.75rem, 2.5vw, 2.125rem)',
+              marginTop: '2.25rem',
+              marginBottom: '1rem',
+              lineHeight: '1.25',
+            },
+            h3: {
+              color: theme('colors.ink'),
+              fontFamily: `'Merriweather', 'Source Serif Pro', 'Georgia', serif`,
+              fontWeight: 600,
+              fontSize: 'clamp(1.35rem, 2vw, 1.6rem)',
+              marginTop: '1.75rem',
+              marginBottom: '0.75rem',
+              lineHeight: '1.3',
+            },
+            h4: {
+              color: theme('colors.slate'),
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              marginTop: '1.5rem',
+              marginBottom: '0.5rem',
+              fontSize: '0.875rem',
+            },
 
             code: { fontWeight: '600' },
             pre: { borderRadius: theme('borderRadius.lg') },
