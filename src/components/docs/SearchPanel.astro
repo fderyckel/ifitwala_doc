@@ -59,15 +59,25 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
 </section>
 
 <script>
-  const scriptEl = document.currentScript
-  const root = scriptEl ? scriptEl.previousElementSibling : null
-  if (!root || !root.getAttribute) return
+  if (typeof window === 'undefined') {
+    window.requestAnimationFrame(() => {})
+    return
+  }
+
+  const root = document.querySelector('[data-widget-id="{widgetId}"]') || document.currentScript?.previousElementSibling
+  if (!root || !root.getAttribute) {
+    console.warn('SearchPanel root missing')
+    return
+  }
 
   const widgetId = root.getAttribute('data-widget-id') || ''
   const language = root.getAttribute('data-language') || 'en'
   const form = document.getElementById(`${widgetId}-form`)
   const resultsEl = document.getElementById(`${widgetId}-results`)
-  if (!form || !resultsEl) return
+  if (!form || !resultsEl) {
+    console.warn('SearchPanel form/results missing')
+    return
+  }
 
   const fetchResults = async () => {
     const data = new FormData(form)
