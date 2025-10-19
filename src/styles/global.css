@@ -41,6 +41,11 @@ html, body { height: 100%; }
 
   a {
     color: var(--canopy);
+    text-decoration: underline;
+    text-decoration-color: rgba(var(--leaf-rgb), 0.45);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
   }
 
   strong {
