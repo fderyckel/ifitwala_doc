@@ -2,6 +2,7 @@
 import DocsShell from '@/layouts/DocsShell.astro'
 import { getCategories, getAvailableLanguages } from '@/lib/docsClient'
 import { describeLanguage } from '@/lib/language'
+import SearchPanel from '@/components/docs/SearchPanel.astro'
 
 export const prerender = true
 
@@ -70,6 +71,8 @@ const title = `Documentation — ${languageRaw}`
   <main class="mx-auto max-w-6xl px-6 py-12">
     <h1 class="text-3xl font-bold tracking-tight">Documentation — {languageRaw}</h1>
     <p class="text-slate mt-2">Pick a category below.</p>
+
+    <SearchPanel language={languageRaw} categories={categories.map(c => ({ slug: c.slug, label: c.label }))} />
 
     {categories?.length ? (
       <section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">

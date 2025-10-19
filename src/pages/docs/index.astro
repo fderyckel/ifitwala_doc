@@ -1,6 +1,7 @@
 ---
 import DocsShell from '@/layouts/DocsShell.astro'
 import { getCategories, getAvailableLanguages } from '@/lib/docsClient'
+import SearchPanel from '@/components/docs/SearchPanel.astro'
 
 const detectedLanguages = await getAvailableLanguages()
 const language = (detectedLanguages[0] || 'en').toLowerCase()
@@ -43,6 +44,8 @@ const description = 'Explore Ifitwala Ed docs by category'
       <h1 class="text-3xl font-bold tracking-tight">Ifitwala Ed Documentation</h1>
       <p class="text-slate mt-2">Start by choosing a category.</p>
     </header>
+
+    <SearchPanel language={language} categories={categories.map(c => ({ slug: c.slug, label: c.label }))} />
 
     {categories && categories.length > 0 ? (
       <section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

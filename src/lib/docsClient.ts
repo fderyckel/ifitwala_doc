@@ -133,6 +133,52 @@ export async function getDocsInCategory(language: string, category_slug: string)
   return unwrap(raw) || [];
 }
 
+export type SearchFilters = {
+  language?: string;
+  category?: string;
+  subcategory?: string;
+  tags?: string[];
+  q?: string;
+  published_after?: string;
+  published_before?: string;
+  author?: string;
+};
+
+export type SearchResult = Doc & { snippets?: string[] };
+
+export type SearchResponse = {
+  items: SearchResult[];
+  facets?: Record<string, any>;
+};
+
+export async function searchDocs(filters: SearchFilters = {}): Promise<SearchResponse> {
+  const params = new URLSearchParams();
+  if (filters.language) params.set('language', filters.language);
+  if (filters.category) params.set('category', filters.category);
+  if (filters.subcategory) params.set('subcategory', filters.subcategory);
+  if (filters.q) params.set('q', filters.q);
+  if (filters.author) params.set('author', filters.author);
+  if (filters.published_after) params.set('published_after', filters.published_after);
+  if (filters.published_before) params.set('published_before', filters.published_before);
+  if (Array.isArray(filters.tags)) {
+    for (const tag of filters.tags) {
+      if (typeof tag === 'string' && tag.trim()) {
+        params.append('tags', tag.trim());
+      }
+    }
+  }
+
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+  const raw = await fetchJSON(normalizeUrl(`/api/method/ifitwala_doc.api.docs.search${suffix}`));
+  const payload = unwrap<SearchResponse>(raw);
+  if (!payload || typeof payload !== 'object') {
+    return { items: [], facets: {} };
+  }
+  payload.items = Array.isArray(payload.items) ? payload.items : [];
+  payload.facets = payload.facets && typeof payload.facets === 'object' ? payload.facets : {};
+  return payload;
+}
+
 export async function getAvailableLanguages(): Promise<string[]> {
   try {
     const payload = await getAllDocs();

@@ -225,11 +225,12 @@ function rewriteDocHref(rawHref) {
     working = `./${working}`
   }
 
-  const base = new URL(ensureTrailingSlash(canonicalDocPath), 'https://ifitwala.local')
+  const base = new URL(ensureTrailingSlash(docsLangRoot), 'https://ifitwala.local')
   try {
     const resolved = new URL(working, base)
-    const pathname = resolved.pathname.replace(/\/{2,}/g, '/')
-    return `${ensureTrailingSlash(pathname)}${resolved.search}${resolved.hash}`
+    const cleanPath = resolved.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '')
+    const finalPath = cleanPath ? ensureTrailingSlash(cleanPath) : ensureTrailingSlash(docsLangRoot)
+    return `${finalPath}${resolved.search}${resolved.hash}`
   } catch {
     return href
   }

@@ -1,0 +1,114 @@
+---
+interface Category {
+  slug: string
+  label: string
+}
+
+const {
+  language = 'en',
+  categories = [],
+} = Astro.props as { language?: string; categories?: Category[] }
+
+const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
+---
+
+<section
+  class="rounded-[32px] border border-border/60 bg-white/80 px-5 py-6 shadow-soft"
+  data-widget-id={widgetId}
+  data-language={language}
+>
+  <form id={`${widgetId}-form`} class="grid gap-3 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)_auto] md:items-end">
+    <div class="md:col-span-1">
+      <label class="block text-xs font-semibold uppercase tracking-[0.3em] text-slate" for={`${widgetId}-q`}>
+        Search docs
+      </label>
+      <input
+        id={`${widgetId}-q`}
+        name="q"
+        type="search"
+        placeholder="Search keywords"
+        class="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leaf/50"
+      />
+    </div>
+    <div class="md:col-span-1">
+      <label class="block text-xs font-semibold uppercase tracking-[0.3em] text-slate" for={`${widgetId}-category`}>
+        Category
+      </label>
+      <select
+        id={`${widgetId}-category`}
+        name="category"
+        class="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-leaf/50"
+      >
+        <option value="">All categories</option>
+        {categories.map((cat) => (
+          <option value={cat.slug}>{cat.label}</option>
+        ))}
+      </select>
+    </div>
+    <div class="md:col-span-1">
+      <button
+        type="submit"
+        class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-canopy via-leaf to-canopy px-6 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:shadow-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/50"
+      >
+        Search
+      </button>
+    </div>
+  </form>
+
+  <div id={`${widgetId}-results`} class="mt-5 space-y-4 text-sm"></div>
+</section>
+
+<script>
+  const root = document.currentScript?.previousElementSibling
+  if (!root) return
+  const widgetId = root.getAttribute('data-widget-id')
+  const language = root.getAttribute('data-language') || 'en'
+  const form = document.getElementById(`${widgetId}-form`)
+  const resultsEl = document.getElementById(`${widgetId}-results`)
+
+  if (form && resultsEl) {
+    const fetchResults = async () => {
+      const data = new FormData(form)
+      const params = new URLSearchParams()
+      params.set('language', language)
+      const q = (data.get('q') || '').toString().trim()
+      const category = (data.get('category') || '').toString().trim()
+      if (q) params.set('q', q)
+      if (category) params.set('category', category)
+      resultsEl.innerHTML = '<div class="text-xs text-slate">Searching…</div>'
+      try {
+        const res = await fetch(`/api/method/ifitwala_doc.api.docs.search?${params.toString()}`)
+        if (!res.ok) throw new Error('Search failed')
+        const payload = await res.json()
+        const items = (payload?.message?.items || payload?.items || [])
+        if (!items.length) {
+          resultsEl.innerHTML = '<div class="text-xs text-slate">No matching docs yet.</div>'
+          return
+        }
+        const markup = items
+          .slice(0, 20)
+          .map((item) => {
+            const url = `/docs/${encodeURIComponent(item.language || language)}/${encodeURIComponent(item.slug || '')}/`
+            const summary = item.summary || ''
+            const snippet = item.snippets && item.snippets.length ? item.snippets[0] : summary
+            return `
+              <article class="rounded-2xl border border-border/60 bg-white/70 p-4 shadow-soft">
+                <a href="${url}" class="text-base font-semibold text-canopy hover:underline">${item.title || '(Untitled)'}</a>
+                ${snippet ? `<p class="mt-2 text-sm text-slate">${snippet}</p>` : ''}
+              </article>
+            `
+          })
+          .join('')
+        resultsEl.innerHTML = markup
+      } catch (error) {
+        console.error(error)
+        resultsEl.innerHTML = '<div class="text-xs text-danger-500">Search failed. Please try again.</div>'
+      }
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      fetchResults()
+    })
+  }
+</script>

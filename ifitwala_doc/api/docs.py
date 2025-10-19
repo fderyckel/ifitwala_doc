@@ -231,6 +231,27 @@ def _select_og_image(shots: list[dict]) -> str | None:
     return _candidate(shots[0])
 
 
+def _build_snippets(doc: dict, query: str) -> list[str]:
+    snippets: list[str] = []
+    q_lower = query.lower()
+    sources = [doc.get('summary') or '', doc.get('body_md') or '']
+    for source in sources:
+        if not source:
+            continue
+        lower = source.lower()
+        idx = lower.find(q_lower)
+        if idx == -1:
+            continue
+        start = max(idx - 60, 0)
+        end = min(idx + 160, len(source))
+        snippet = source[start:end].strip()
+        if snippet and snippet not in snippets:
+            snippets.append(snippet)
+        if len(snippets) >= 2:
+            break
+    return snippets
+
+
 @frappe.whitelist(allow_guest=True)
 def fetch_all(language: str | None = None):
     flt = {"status": "Published"}
@@ -320,6 +341,97 @@ def search_index(language: str | None = None):
     if _set_cache_headers(payload.encode(), max((i.modified for i in items), default=None)):
         return
     return {"items": items}
+
+
+@frappe.whitelist(allow_guest=True)
+def search():
+    """Full-text search for documentation with optional filters."""
+    params = frappe.form_dict or {}
+
+    def _clean(value: str | None) -> str:
+        return (value or '').strip()
+
+    language = _clean(params.get('language'))
+    category = _clean(params.get('category'))
+    subcategory = _clean(params.get('subcategory'))
+    author = _clean(params.get('author'))
+    q = _clean(params.get('q'))
+    published_after = _clean(params.get('published_after'))
+    published_before = _clean(params.get('published_before'))
+
+    if hasattr(params, 'getlist'):
+        raw_tags = params.getlist('tags')
+    else:
+        raw_tags = params.get('tags')
+    if isinstance(raw_tags, (list, tuple)):
+        tags = [str(t).strip() for t in raw_tags if str(t).strip()]
+    else:
+        try:
+            parsed = frappe.parse_json(raw_tags) if raw_tags else []
+            tags = [str(t).strip() for t in (parsed or []) if str(t).strip()]
+        except Exception:
+            tags = []
+
+    filters = [["Documentation", "status", "=", "Published"]]
+    if language:
+        filters.append(["Documentation", "language", "=", language])
+    if category:
+        filters.append(["Documentation", "category", "=", category])
+    if author:
+        filters.append(["Documentation", "author", "=", author])
+    if published_after:
+        filters.append(["Documentation", "published_on", ">=", published_after])
+    if published_before:
+        filters.append(["Documentation", "published_on", "<=", published_before])
+
+    or_filters = []
+    if q:
+        like = f"%{q}%"
+        or_filters.extend([
+            ["Documentation", "title", "like", like],
+            ["Documentation", "summary", "like", like],
+            ["Documentation", "body_md", "like", like],
+        ])
+
+    subcat_col = _subcategory_column()
+    fields = [
+        "name", "slug", "language", "title", "summary", "version",
+        "author", "published_on", "category", "doc_order", "body_md", "modified",
+        "seo_title", "seo_description", "canonical_url", "noindex"
+    ]
+    if subcat_col:
+        fields.append(f"{subcat_col} as subcategory")
+
+    docs = frappe.get_all(
+        "Documentation",
+        filters=filters,
+        or_filters=or_filters if or_filters else None,
+        fields=fields,
+        order_by="published_on desc, modified desc",
+        limit_page_length=200,
+        ignore_permissions=True,
+    )
+
+    tags_map = _load_tags_for([d["name"] for d in docs])
+    results = []
+    wanted_tags = {t.lower() for t in tags if t}
+
+    for d in docs:
+        _normalize_subcategory(d, subcat_col)
+        doc_tags = tags_map.get(d.get("name"), [])
+        if wanted_tags and not wanted_tags.issubset({t.lower() for t in doc_tags}):
+            continue
+        if subcategory and (d.get("subcategory") or '').strip().lower() != subcategory.lower():
+            continue
+
+        d["tags"] = doc_tags
+        if q:
+            d["snippets"] = _build_snippets(d, q)
+        d.pop("body_md", None)
+        d.pop("name", None)
+        results.append(d)
+
+    return {"items": results, "facets": {}}
 
 @frappe.whitelist(allow_guest=True)
 def get_categories(language="en"):
