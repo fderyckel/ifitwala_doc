@@ -60,11 +60,12 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
 
 <script>
   if (typeof window === 'undefined') {
-    window.requestAnimationFrame(() => {})
+    window.addEventListener('load', () => {})
     return
   }
 
-  const root = document.querySelector('[data-widget-id="{widgetId}"]') || document.currentScript?.previousElementSibling
+  const scriptEl = document.currentScript
+  const root = scriptEl ? scriptEl.previousElementSibling : null
   if (!root || !root.getAttribute) {
     console.warn('SearchPanel root missing')
     return
