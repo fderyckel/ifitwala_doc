@@ -306,6 +306,8 @@ function renderMarkdown(
   const activeSlugger = slugger || createSlugger()
 
   const renderer = new marked.Renderer()
+  const defaultRenderer = new marked.Renderer()
+
   renderer.heading = (text, level, raw) => {
     const source = typeof raw === 'string' ? raw : text
     const id = activeSlugger(source)
@@ -318,28 +320,11 @@ function renderMarkdown(
     const safeLabel = label
     return `<h${level} id="${escapeHtml(id)}" class="doc-heading doc-heading-${level}">${safeLabel}</h${level}>`
   }
+  const originalLink = defaultRenderer.link.bind(defaultRenderer)
   renderer.link = (href, title, text) => {
-    const original =
-      typeof href === 'string'
-        ? href
-        : href == null
-          ? ''
-          : String(href)
-    const resolved = rewriteDocHref(original) || ''
-    const safeHref = escapeHtml(resolved || original || '')
-    const label =
-      typeof text === 'string'
-        ? text
-        : Array.isArray(text)
-          ? text.join('')
-          : text == null
-            ? ''
-            : String(text)
-    const titleAttr =
-      typeof title === 'string' && title.trim()
-        ? ` title="${escapeHtml(title)}"`
-        : ''
-    return `<a href="${safeHref}"${titleAttr}>${label}</a>`
+    const original = typeof href === 'string' ? href : href == null ? '' : String(href)
+    const resolved = rewriteDocHref(original) || original || ''
+    return originalLink(resolved, title, text)
   }
 
   if (!allowCallouts) {
