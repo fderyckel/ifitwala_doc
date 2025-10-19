@@ -221,20 +221,33 @@ function rewriteDocHref(rawHref) {
   }
 
   let working = href
-  if (!working.startsWith('.') && !working.startsWith('/')) {
-    working = `./${working}`
+  let hash = ''
+  let query = ''
+
+  const hashIndex = working.indexOf('#')
+  if (hashIndex !== -1) {
+    hash = working.slice(hashIndex)
+    working = working.slice(0, hashIndex)
   }
 
-  const basePath = ensureTrailingSlash(canonicalDocPath || docsLangRoot)
-  const base = new URL(basePath, 'https://ifitwala.local')
-  try {
-    const resolved = new URL(working, base)
-    const cleanPath = resolved.pathname.replace(/\/{2,}/g, '/')
-    const finalPath = cleanPath.endsWith('/') ? cleanPath : `${cleanPath}/`
-    return `${finalPath}${resolved.search}${resolved.hash}`
-  } catch {
+  const queryIndex = working.indexOf('?')
+  if (queryIndex !== -1) {
+    query = working.slice(queryIndex)
+    working = working.slice(0, queryIndex)
+  }
+
+  if (working.startsWith('../')) {
     return href
   }
+
+  working = working.replace(/^\.\//, '')
+  working = working.replace(/^\/+/, '')
+  if (!working) {
+    return `${ensureTrailingSlash(docsLangRoot)}${query}${hash}`
+  }
+
+  const target = `${docsLangRoot}/${working}`.replace(/\/{2,}/g, '/').replace(/\/+$/, '')
+  return `${ensureTrailingSlash(target)}${query}${hash}`
 }
 
 function createSlugger() {
