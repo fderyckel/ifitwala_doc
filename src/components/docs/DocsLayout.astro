@@ -209,47 +209,6 @@ function ensureTrailingSlash(path = '') {
   return path.endsWith('/') ? path : `${path}/`
 }
 
-const LINK_PROTOCOL_RX = /^[a-zA-Z][a-zA-Z0-9+.-]*:/
-
-function rewriteDocHref(rawHref) {
-  const href = typeof rawHref === 'string' ? rawHref.trim() : ''
-  if (!href) {
-    return typeof rawHref === 'string' ? rawHref : ''
-  }
-  if (href.startsWith('#') || href.startsWith('//') || LINK_PROTOCOL_RX.test(href) || href.startsWith('/')) {
-    return href
-  }
-
-  let working = href
-  let hash = ''
-  let query = ''
-
-  const hashIndex = working.indexOf('#')
-  if (hashIndex !== -1) {
-    hash = working.slice(hashIndex)
-    working = working.slice(0, hashIndex)
-  }
-
-  const queryIndex = working.indexOf('?')
-  if (queryIndex !== -1) {
-    query = working.slice(queryIndex)
-    working = working.slice(0, queryIndex)
-  }
-
-  if (working.startsWith('../')) {
-    return href
-  }
-
-  working = working.replace(/^\.\//, '')
-  working = working.replace(/^\/+/, '')
-  if (!working) {
-    return `${ensureTrailingSlash(docsLangRoot)}${query}${hash}`
-  }
-
-  const target = `${docsLangRoot}/${working}`.replace(/\/{2,}/g, '/').replace(/\/+$/, '')
-  return `${ensureTrailingSlash(target)}${query}${hash}`
-}
-
 function createSlugger() {
   const seen = new Map()
   return input => {
@@ -298,15 +257,37 @@ function extractHeadings(md) {
   return out
 }
 
+function rewriteRelativeMarkdownLinks(md) {
+  if (!md) return ''
+  const base = new URL(ensureTrailingSlash(canonicalDocPath || docsLangRoot), 'https://ifitwala.local')
+  return md.replace(/\[([^\]]+)\]\((\.\/[^)]+)\)/g, (match, label, rel) => {
+    const cleaned = (rel || '').trim()
+    if (!cleaned.startsWith('./') || cleaned.startsWith('../')) {
+      return match
+    }
+    try {
+      const resolved = new URL(cleaned, base)
+      let path = resolved.pathname.replace(/\/{2,}/g, '/')
+      if (!/\.[a-z0-9]{2,}$/i.test(path) && !path.endsWith('/')) {
+        path += '/'
+      }
+      const href = `${path}${resolved.search}${resolved.hash}`
+      return `[${label}](${href})`
+    } catch (error) {
+      return match
+    }
+  })
+}
+
 function renderMarkdown(
   input,
   { allowCallouts = true, alreadyTransformed = false, slugger } = {}
 ) {
-  let md = alreadyTransformed ? (input || '') : applyDocTransforms(input || '')
+  const prepared = rewriteRelativeMarkdownLinks(input || '')
+  let md = alreadyTransformed ? prepared : applyDocTransforms(prepared)
   const activeSlugger = slugger || createSlugger()
 
   const renderer = new marked.Renderer()
-  const baseLink = renderer.link.bind(renderer)
 
   renderer.heading = (text, level, raw) => {
     const source = typeof raw === 'string' ? raw : text
@@ -319,11 +300,6 @@ function renderMarkdown(
           : String(text ?? '')
     const safeLabel = label
     return `<h${level} id="${escapeHtml(id)}" class="doc-heading doc-heading-${level}">${safeLabel}</h${level}>`
-  }
-  renderer.link = (href, title, text) => {
-    const original = typeof href === 'string' ? href : href == null ? '' : String(href)
-    const resolved = rewriteDocHref(original) || original || ''
-    return baseLink(resolved, title, text)
   }
 
   if (!allowCallouts) {
