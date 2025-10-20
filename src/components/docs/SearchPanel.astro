@@ -79,7 +79,7 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
     }
 
     const fetchResults = async () => {
-      const data = new FormData(form as HTMLFormElement)
+      const data = new FormData(form)
       const params = new URLSearchParams()
       params.set('language', language)
       const q = (data.get('q') || '').toString().trim()
@@ -120,7 +120,7 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
     form.addEventListener('submit', (event) => {
       event.preventDefault()
       const params = new URLSearchParams()
-      const data = new FormData(form as HTMLFormElement)
+      const data = new FormData(form)
       const q = (data.get('q') || '').toString().trim()
       const category = (data.get('category') || '').toString().trim()
       if (q) params.set('q', q)
@@ -135,11 +135,11 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
     const existingCategory = existing.get('category') || ''
     if (existingQ || existingCategory) {
       if (existingQ) {
-        const input = document.getElementById(`${widgetId}-q`) as HTMLInputElement | null
+        const input = document.getElementById(`${widgetId}-q`) 
         if (input) input.value = existingQ
       }
       if (existingCategory) {
-        const select = document.getElementById(`${widgetId}-category`) as HTMLSelectElement | null
+        const select = document.getElementById(`${widgetId}-category`) 
         if (select) select.value = existingCategory
       }
       fetchResults()

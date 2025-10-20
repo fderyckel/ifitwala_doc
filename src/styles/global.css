@@ -129,4 +129,36 @@ html, body { height: 100%; }
   .prose a:hover, .docs-prose a:hover {
     text-decoration-color: rgba(var(--leaf-rgb), 0.75);
   }
+
+  .docs-prose > *:not(:first-child) {
+    margin-top: 1.25rem;
+  }
+
+  .docs-prose .doc-heading + * {
+    margin-top: 1rem !important;
+  }
+
+  .docs-prose .docs-callout {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .docs-prose ul,
+  .docs-prose ol {
+    padding-left: 1.6rem;
+  }
+
+  .docs-prose ul {
+    list-style: disc;
+  }
+
+  .docs-prose ol {
+    list-style: decimal;
+  }
+
+  .docs-prose p {
+    line-height: 1.7;
+  }
 }
