@@ -59,28 +59,24 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
 </section>
 
 <script>
-  if (typeof window === 'undefined') {
-    window.addEventListener('load', () => {})
-    return
-  }
+  if (typeof window !== 'undefined') {
+    const scriptEl = document.currentScript
+    const root = scriptEl ? scriptEl.previousElementSibling : null
+    if (!root || !root.getAttribute) {
+      console.warn('SearchPanel root missing')
+      return
+    }
 
-  const scriptEl = document.currentScript
-  const root = scriptEl ? scriptEl.previousElementSibling : null
-  if (!root || !root.getAttribute) {
-    console.warn('SearchPanel root missing')
-    return
-  }
+    const widgetId = root.getAttribute('data-widget-id') || ''
+    const language = root.getAttribute('data-language') || 'en'
+    const form = document.getElementById(`${widgetId}-form`)
+    const resultsEl = document.getElementById(`${widgetId}-results`)
+    if (!form || !resultsEl) {
+      console.warn('SearchPanel form/results missing')
+      return
+    }
 
-  const widgetId = root.getAttribute('data-widget-id') || ''
-  const language = root.getAttribute('data-language') || 'en'
-  const form = document.getElementById(`${widgetId}-form`)
-  const resultsEl = document.getElementById(`${widgetId}-results`)
-  if (!form || !resultsEl) {
-    console.warn('SearchPanel form/results missing')
-    return
-  }
-
-  const fetchResults = async () => {
+    const fetchResults = async () => {
     const data = new FormData(form)
     const params = new URLSearchParams()
     params.set('language', language)
@@ -117,33 +113,35 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
       console.error(error)
       resultsEl.innerHTML = '<div class="text-xs text-danger-500">Search failed. Please try again.</div>'
     }
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      const params = new URLSearchParams()
+      const data = new FormData(form)
+      const q = (data.get('q') || '').toString().trim()
+      const category = (data.get('category') || '').toString().trim()
+      if (q) params.set('q', q)
+      if (category) params.set('category', category)
+      const searchUrl = `${window.location.pathname}?${params.toString()}`
+      window.history.replaceState({}, '', searchUrl)
+      fetchResults()
+    })
+
+    const existing = new URLSearchParams(window.location.search)
+    const existingQ = existing.get('q') || ''
+    const existingCategory = existing.get('category') || ''
+    if (existingQ || existingCategory) {
+      if (existingQ) {
+        const input = document.getElementById(`${widgetId}-q`)
+        if (input) input.value = existingQ
+      }
+      if (existingCategory) {
+        const select = document.getElementById(`${widgetId}-category`)
+        if (select) select.value = existingCategory
+      }
+      fetchResults()
+    }
   }
-
-  form.addEventListener('submit', (event) => {
-    event.preventDefault()
-    const params = new URLSearchParams()
-    const data = new FormData(form)
-    const q = (data.get('q') || '').toString().trim()
-    const category = (data.get('category') || '').toString().trim()
-    if (q) params.set('q', q)
-    if (category) params.set('category', category)
-    const searchUrl = `${window.location.pathname}?${params.toString()}`
-    window.history.replaceState({}, '', searchUrl)
-    fetchResults()
-  })
-
-  const existing = new URLSearchParams(window.location.search)
-  const existingQ = existing.get('q') || ''
-  const existingCategory = existing.get('category') || ''
-  if (existingQ || existingCategory) {
-    if (existingQ) {
-      const input = document.getElementById(`${widgetId}-q`)
-      if (input) input.value = existingQ
-    }
-    if (existingCategory) {
-      const select = document.getElementById(`${widgetId}-category`)
-      if (select) select.value = existingCategory
-    }
-    fetchResults()
   }
 </script>
