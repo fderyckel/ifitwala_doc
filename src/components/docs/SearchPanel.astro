@@ -58,8 +58,10 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
   <div id={`${widgetId}-results`} class="mt-5 space-y-4 text-sm"></div>
 </section>
 
-<script>
-  if (typeof window !== 'undefined') {
+<script type="module">
+  if (typeof window === 'undefined') {
+    window.addEventListener('load', () => {})
+  } else {
     const scriptEl = document.currentScript
     const root = scriptEl ? scriptEl.previousElementSibling : null
     if (!root || !root.getAttribute) {
@@ -77,7 +79,7 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
     }
 
     const fetchResults = async () => {
-      const data = new FormData(form)
+      const data = new FormData(form as HTMLFormElement)
       const params = new URLSearchParams()
       params.set('language', language)
       const q = (data.get('q') || '').toString().trim()
@@ -118,7 +120,7 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
     form.addEventListener('submit', (event) => {
       event.preventDefault()
       const params = new URLSearchParams()
-      const data = new FormData(form)
+      const data = new FormData(form as HTMLFormElement)
       const q = (data.get('q') || '').toString().trim()
       const category = (data.get('category') || '').toString().trim()
       if (q) params.set('q', q)
@@ -133,15 +135,14 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
     const existingCategory = existing.get('category') || ''
     if (existingQ || existingCategory) {
       if (existingQ) {
-        const input = document.getElementById(`${widgetId}-q`)
+        const input = document.getElementById(`${widgetId}-q`) as HTMLInputElement | null
         if (input) input.value = existingQ
       }
       if (existingCategory) {
-        const select = document.getElementById(`${widgetId}-category`)
+        const select = document.getElementById(`${widgetId}-category`) as HTMLSelectElement | null
         if (select) select.value = existingCategory
       }
       fetchResults()
     }
-  }
   }
 </script>
