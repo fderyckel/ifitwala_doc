@@ -59,9 +59,10 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
 </section>
 
 <script type="module">
-  if (typeof window === 'undefined') {
-    window.addEventListener('load', () => {})
-  } else {
+  ;(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
     const scriptEl = document.currentScript
     const root = scriptEl ? scriptEl.previousElementSibling : null
     if (!root || !root.getAttribute) {
@@ -71,12 +72,13 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
 
     const widgetId = root.getAttribute('data-widget-id') || ''
     const language = root.getAttribute('data-language') || 'en'
-    const form = document.getElementById(`${widgetId}-form`)
+    const formElement = document.getElementById(`${widgetId}-form`)
     const resultsEl = document.getElementById(`${widgetId}-results`)
-    if (!form || !resultsEl) {
+    if (!formElement || !(formElement instanceof HTMLFormElement) || !resultsEl) {
       console.warn('SearchPanel form/results missing')
       return
     }
+    const form = formElement
 
     const fetchResults = async () => {
       const data = new FormData(form)
@@ -144,5 +146,5 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
       }
       fetchResults()
     }
-  }
+  })()
 </script>

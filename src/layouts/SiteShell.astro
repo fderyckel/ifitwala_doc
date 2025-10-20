@@ -1,3 +1,7 @@
+import IconGithub from '~icons/lucide/github'
+import IconLinkedin from '~icons/lucide/linkedin'
+import IconTwitter from '~icons/lucide/twitter'
+import IconYoutube from '~icons/lucide/youtube'
 ---
 import '@/styles/global.css'
 import { marked } from 'marked'
@@ -46,6 +50,54 @@ const canonicalHref =
 const footerHtml = settings?.footer_md ? marked.parse(settings.footer_md) : ''
 const headerItems = Array.isArray(headerNav) ? headerNav : []
 const footerItems = Array.isArray(footerNav) ? footerNav : []
+const renderedSocialLinks = Array.isArray(settings?.social_links)
+  ? settings.social_links
+      .map((link: any) => ({
+        platform: (link?.platform || '').trim(),
+        url: (link?.url || '').trim(),
+        icon: (link?.icon || '').trim(),
+      }))
+      .filter((link: any) => link.url)
+  : []
+
+const sameAs = Array.isArray(settings?.social_same_as)
+  ? settings.social_same_as.filter((url: any) => typeof url === 'string' && url.trim())
+  : []
+
+const iconMap: Record<string, any> = {
+  github: IconGithub,
+  linkedin: IconLinkedin,
+  twitter: IconTwitter,
+  x: IconTwitter,
+  youtube: IconYoutube,
+}
+
+const normalizeKey = (value: string) => {
+  if (!value) return ''
+  const normalized = value.trim().toLowerCase()
+  const parts = normalized.split(':')
+  return parts[parts.length - 1] || normalized
+}
+
+const detectIconKey = (link: any) => {
+  const iconKey = normalizeKey(link?.icon || '')
+  if (iconKey && iconMap[iconKey]) return iconKey
+  const platformKey = normalizeKey(link?.platform || '')
+  if (platformKey && iconMap[platformKey]) return platformKey
+  const url = (link?.url || '').trim().toLowerCase()
+  if (!url) return ''
+  if (url.includes('github')) return 'github'
+  if (url.includes('linkedin')) return 'linkedin'
+  if (url.includes('twitter') || url.includes('x.com')) return 'twitter'
+  if (url.includes('youtube')) return 'youtube'
+  return ''
+}
+
+const headerLink = renderedSocialLinks.find((link) => detectIconKey(link) === 'github')
+const headerIconKey = headerLink ? detectIconKey(headerLink) : ''
+const HeaderIconComponent = headerIconKey ? iconMap[headerIconKey] : null
+const footerSocial = renderedSocialLinks.filter((link) => link !== headerLink)
+
 
 function absoluteUrl(input?: string | null) {
   if (!input || typeof input !== 'string') {
@@ -86,6 +138,17 @@ const robots = noindex ? 'noindex, nofollow' : undefined
     {resolvedOgImage && <meta name="twitter:image" content={resolvedOgImage} />}
     {resolvedOgTitle && <meta name="twitter:title" content={resolvedOgTitle} />}
     {resolvedOgDescription && <meta name="twitter:description" content={resolvedOgDescription} />}
+    {sameAs.length ? (
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": siteName,
+          "url": siteOrigin,
+          "sameAs": sameAs,
+        })}
+      </script>
+    ) : null}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
 
@@ -119,6 +182,23 @@ const robots = noindex ? 'noindex, nofollow' : undefined
             </nav>
           )}
 
+          {headerLink ? (
+            <div class="flex items-center gap-2 md:ml-4">
+              <a
+                href={headerLink.url}
+                title={headerLink.platform || headerLink.url}
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-white/80 text-canopy transition hover:bg-moss/30 hover:text-canopy"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {HeaderIconComponent ? (
+                  <HeaderIconComponent class="h-5 w-5" />
+                ) : (
+                  <span class="text-xs font-semibold uppercase tracking-[0.2em]">{(headerLink.platform || headerLink.url).slice(0,2).toUpperCase()}</span>
+                )}
+              </a>
+            </div>
+          ) : null}
           {settings?.primary_cta_label && settings?.primary_cta_url ? (
             <a
               href={settings.primary_cta_url}
@@ -154,12 +234,38 @@ const robots = noindex ? 'noindex, nofollow' : undefined
             )}
           </div>
 
-          <div class="mt-6 grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-start md:gap-10">
-            {settings?.tagline && <p class="text-sm text-slate">{settings.tagline}</p>}
-            {footerHtml && (
-              <div class="prose prose-sm prose-neutral md:justify-self-end" set:html={footerHtml}></div>
-            )}
-          </div>
+          <div class="mt-6 grid gap-6 md:grid-cols-[minmax(0,2.5fr)_minmax(0,3fr)] md:items-start md:gap-10">
+            <div class="space-y-4">
+              {settings?.tagline && <p class="text-sm text-slate">{settings.tagline}</p>}
+              {footerSocial.length ? (
+                <nav class="flex flex-wrap items-center gap-3 text-sm text-slate">
+                  {footerSocial.map((link) => (
+                    <a
+                      href={link.url}
+                      title={link.platform || link.url}
+                      class="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-white/85 text-canopy transition hover:bg-moss/30 hover:text-canopy"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {(() => {
+                        const iconKey = detectIconKey(link)
+                        const IconComp = iconKey ? iconMap[iconKey] : null
+                        const icon = link.icon || ''
+                        if (IconComp) {
+                          return <IconComp class="h-5 w-5" />
+                        }
+                        if (icon.startsWith('http') || icon.startsWith('/')) {
+                          return <img src={icon} alt={link.platform || 'social'} class="h-5 w-5" loading="lazy" />
+                        }
+                        if (icon) {
+                          return <span class="text-base font-semibold">{icon}</span>
+                        }
+                        return <span class="text-xs font-semibold uppercase tracking-[0.2em]">{(link.platform || link.url).slice(0,2).toUpperCase()}</span>
+                      })()}
+                    </a>
+                  ))}
+                </nav>
+              ) : null}
         </div>
         <div class="border-t border-border/60 py-3 text-center text-xs text-slate">
           © {new Date().getFullYear()} {siteName}. All rights reserved.

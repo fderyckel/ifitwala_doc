@@ -46,6 +46,8 @@ export type SiteSettings = {
   primary_cta_label?: string
   primary_cta_url?: string
   footer_md?: string
+  social_links?: { platform?: string; url?: string; icon?: string; display_order?: number }[]
+  social_same_as?: string[]
   updated_at?: string | null
 }
 

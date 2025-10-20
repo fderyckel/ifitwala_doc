@@ -408,6 +408,12 @@ def list_pages(include_unpublished: int = 0) -> List[PageSummary]:
 @frappe.whitelist(allow_guest=True)
 def get_site_settings() -> Dict[str, Any]:
     ws = frappe.get_single("Ifitwala Website Settings")
+    social_links = frappe.get_all(
+        "Website Social Link",
+        filters={"parent": ws.name, "parenttype": "Ifitwala Website Settings"},
+        fields=["platform", "url", "icon", "display_order"],
+        order_by="IFNULL(display_order, 9999), platform asc",
+    )
     return {
         "site_name": ws.site_name,
         "brand_logo": ws.brand_logo,
@@ -416,6 +422,8 @@ def get_site_settings() -> Dict[str, Any]:
         "primary_cta_label": ws.primary_cta_label,
         "primary_cta_url": ws.primary_cta_url,
         "footer_md": ws.footer_md,
+        "social_links": social_links,
+        "social_same_as": [link["url"] for link in social_links if link.get("url")],
         "updated_at": _format(ws.modified),
     }
 
