@@ -77,42 +77,42 @@ const widgetId = `docs-search-${Math.random().toString(36).slice(2)}`
     }
 
     const fetchResults = async () => {
-    const data = new FormData(form)
-    const params = new URLSearchParams()
-    params.set('language', language)
-    const q = (data.get('q') || '').toString().trim()
-    const category = (data.get('category') || '').toString().trim()
-    if (q) params.set('q', q)
-    if (category) params.set('category', category)
-    resultsEl.innerHTML = '<div class="text-xs text-slate">Searching…</div>'
-    try {
-      const res = await fetch(`/api/method/ifitwala_doc.api.docs.search?${params.toString()}`)
-      if (!res.ok) throw new Error('Search failed')
-      const payload = await res.json()
-      const items = (payload?.message?.items || payload?.items || [])
-      if (!items.length) {
-        resultsEl.innerHTML = '<div class="text-xs text-slate">No matching docs yet.</div>'
-        return
+      const data = new FormData(form)
+      const params = new URLSearchParams()
+      params.set('language', language)
+      const q = (data.get('q') || '').toString().trim()
+      const category = (data.get('category') || '').toString().trim()
+      if (q) params.set('q', q)
+      if (category) params.set('category', category)
+      resultsEl.innerHTML = '<div class="text-xs text-slate">Searching…</div>'
+      try {
+        const res = await fetch(`/api/method/ifitwala_doc.api.docs.search?${params.toString()}`)
+        if (!res.ok) throw new Error('Search failed')
+        const payload = await res.json()
+        const items = (payload?.message?.items || payload?.items || [])
+        if (!items.length) {
+          resultsEl.innerHTML = '<div class="text-xs text-slate">No matching docs yet.</div>'
+          return
+        }
+        const markup = items
+          .slice(0, 20)
+          .map((item) => {
+            const url = `/docs/${encodeURIComponent(item.language || language)}/${encodeURIComponent(item.slug || '')}/`
+            const summary = item.summary || ''
+            const snippet = item.snippets && item.snippets.length ? item.snippets[0] : summary
+            return `
+              <article class="rounded-2xl border border-border/60 bg-white/70 p-4 shadow-soft">
+                <a href="${url}" class="text-base font-semibold text-canopy hover:underline">${item.title || '(Untitled)'}</a>
+                ${snippet ? `<p class="mt-2 text-sm text-slate">${snippet}</p>` : ''}
+              </article>
+            `
+          })
+          .join('')
+        resultsEl.innerHTML = markup
+      } catch (error) {
+        console.error(error)
+        resultsEl.innerHTML = '<div class="text-xs text-danger-500">Search failed. Please try again.</div>'
       }
-      const markup = items
-        .slice(0, 20)
-        .map((item) => {
-          const url = `/docs/${encodeURIComponent(item.language || language)}/${encodeURIComponent(item.slug || '')}/`
-          const summary = item.summary || ''
-          const snippet = item.snippets && item.snippets.length ? item.snippets[0] : summary
-          return `
-            <article class="rounded-2xl border border-border/60 bg-white/70 p-4 shadow-soft">
-              <a href="${url}" class="text-base font-semibold text-canopy hover:underline">${item.title || '(Untitled)'}</a>
-              ${snippet ? `<p class="mt-2 text-sm text-slate">${snippet}</p>` : ''}
-            </article>
-          `
-        })
-        .join('')
-      resultsEl.innerHTML = markup
-    } catch (error) {
-      console.error(error)
-      resultsEl.innerHTML = '<div class="text-xs text-danger-500">Search failed. Please try again.</div>'
-    }
     }
 
     form.addEventListener('submit', (event) => {
