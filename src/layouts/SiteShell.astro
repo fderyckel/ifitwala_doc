@@ -1,9 +1,9 @@
 ---
+---
 import { Github, Linkedin, Twitter, Youtube } from '@lucide/astro';
 import '@/styles/global.css';
 import { marked } from 'marked';
 import type { NavItem, SiteSettings } from '@/lib/siteClient';
-
 
 const {
   lang = 'en',
@@ -19,38 +19,38 @@ const {
   ogDescription,
   noindex = false,
 }: {
-  lang?: string
-  title?: string
-  description?: string
-  canonical?: string
-  headerNav?: NavItem[]
-  footerNav?: NavItem[]
-  settings?: SiteSettings
-  bodyClass?: string
-  ogImage?: string
-  ogTitle?: string
-  ogDescription?: string
-  noindex?: boolean
-} = Astro.props
+  lang?: string;
+  title?: string;
+  description?: string;
+  canonical?: string;
+  headerNav?: NavItem[];
+  footerNav?: NavItem[];
+  settings?: SiteSettings;
+  bodyClass?: string;
+  ogImage?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  noindex?: boolean;
+} = Astro.props;
 
 const siteName =
   typeof settings?.site_name === 'string' && settings.site_name.trim()
     ? settings.site_name.trim()
-    : 'Ifitwala Ed'
+    : 'Ifitwala Ed';
 const title =
-  typeof titleProp === 'string' && titleProp.trim() ? titleProp : siteName
-const resolvedDescription = description || settings?.tagline || ''
+  typeof titleProp === 'string' && titleProp.trim() ? titleProp : siteName;
+const resolvedDescription = description || settings?.tagline || '';
 
-const siteOrigin = Astro.site ? Astro.site.toString() : 'https://ifitwala.com/'
+const siteOrigin = Astro.site ? Astro.site.toString() : 'https://ifitwala.com/';
 const canonicalHref =
   canonical && canonical.startsWith('http')
     ? canonical
     : canonical
     ? new URL(canonical.replace(/^\//, ''), siteOrigin).toString()
-    : undefined
-const footerHtml = settings?.footer_md ? marked.parse(settings.footer_md) : ''
-const headerItems = Array.isArray(headerNav) ? headerNav : []
-const footerItems = Array.isArray(footerNav) ? footerNav : []
+    : undefined;
+const footerHtml = settings?.footer_md ? marked.parse(settings.footer_md) : '';
+const headerItems = Array.isArray(headerNav) ? headerNav : [];
+const footerItems = Array.isArray(footerNav) ? footerNav : [];
 const renderedSocialLinks = Array.isArray(settings?.social_links)
   ? settings.social_links
       .map((link: any) => ({
@@ -59,71 +59,76 @@ const renderedSocialLinks = Array.isArray(settings?.social_links)
         icon: (link?.icon || '').trim(),
       }))
       .filter((link: any) => link.url)
-  : []
+  : [];
 
 const sameAs = Array.isArray(settings?.social_same_as)
-  ? settings.social_same_as.filter((url: any) => typeof url === 'string' && url.trim())
-  : []
+  ? settings.social_same_as.filter(
+      (url: any) => typeof url === 'string' && url.trim()
+    )
+  : [];
 
+// Update iconMap to use the Lucide components you just imported
 const iconMap: Record<string, any> = {
-  github: IconGithub,
-  linkedin: IconLinkedin,
-  twitter: IconTwitter,
-  x: IconTwitter,
-  youtube: IconYoutube,
-}
+  github: Github,
+  linkedin: Linkedin,
+  twitter: Twitter,
+  x: Twitter,
+  youtube: Youtube,
+};
 
 const normalizeKey = (value: string) => {
-  if (!value) return ''
-  const normalized = value.trim().toLowerCase()
-  const parts = normalized.split(':')
-  return parts[parts.length - 1] || normalized
-}
+  if (!value) return '';
+  const normalized = value.trim().toLowerCase();
+  const parts = normalized.split(':');
+  return parts[parts.length - 1] || normalized;
+};
 
 const detectIconKey = (link: any) => {
-  const iconKey = normalizeKey(link?.icon || '')
-  if (iconKey && iconMap[iconKey]) return iconKey
-  const platformKey = normalizeKey(link?.platform || '')
-  if (platformKey && iconMap[platformKey]) return platformKey
-  const url = (link?.url || '').trim().toLowerCase()
-  if (!url) return ''
-  if (url.includes('github')) return 'github'
-  if (url.includes('linkedin')) return 'linkedin'
-  if (url.includes('twitter') || url.includes('x.com')) return 'twitter'
-  if (url.includes('youtube')) return 'youtube'
-  return ''
-}
+  const iconKey = normalizeKey(link?.icon || '');
+  if (iconKey && iconMap[iconKey]) return iconKey;
+  const platformKey = normalizeKey(link?.platform || '');
+  if (platformKey && iconMap[platformKey]) return platformKey;
+  const url = (link?.url || '').trim().toLowerCase();
+  if (!url) return '';
+  if (url.includes('github')) return 'github';
+  if (url.includes('linkedin')) return 'linkedin';
+  if (url.includes('twitter') || url.includes('x.com')) return 'twitter';
+  if (url.includes('youtube')) return 'youtube';
+  return '';
+};
 
-const headerLink = renderedSocialLinks.find((link) => detectIconKey(link) === 'github')
-const headerIconKey = headerLink ? detectIconKey(headerLink) : ''
-const HeaderIconComponent = headerIconKey ? iconMap[headerIconKey] : null
-const footerSocial = renderedSocialLinks.filter((link) => link !== headerLink)
-
+const headerLink = renderedSocialLinks.find(
+  (link) => detectIconKey(link) === 'github'
+);
+const headerIconKey = headerLink ? detectIconKey(headerLink) : '';
+const HeaderIconComponent = headerIconKey ? iconMap[headerIconKey] : null;
+const footerSocial = renderedSocialLinks.filter((link) => link !== headerLink);
 
 function absoluteUrl(input?: string | null) {
   if (!input || typeof input !== 'string') {
-    return undefined
+    return undefined;
   }
   try {
-    return new URL(input).toString()
+    return new URL(input).toString();
   } catch {
-    const trimmed = input.trim()
-    if (!trimmed) return undefined
-    const base = Astro.site ? Astro.site : new URL('https://ifitwala.com/')
+    const trimmed = input.trim();
+    if (!trimmed) return undefined;
+    const base = Astro.site ? Astro.site : new URL('https://ifitwala.com/');
     try {
-      return new URL(trimmed.replace(/^\//, ''), base).toString()
+      return new URL(trimmed.replace(/^\//, ''), base).toString();
     } catch {
-      return undefined
+      return undefined;
     }
   }
 }
 
 const resolvedOgTitle =
-  typeof ogTitle === 'string' && ogTitle.trim() ? ogTitle : title
-const resolvedOgDescription = ogDescription || resolvedDescription
-const resolvedOgImage = absoluteUrl(ogImage)
-const robots = noindex ? 'noindex, nofollow' : undefined
+  typeof ogTitle === 'string' && ogTitle.trim() ? ogTitle : title;
+const resolvedOgDescription = ogDescription || resolvedDescription;
+const resolvedOgImage = absoluteUrl(ogImage);
+const robots = noindex ? 'noindex, nofollow' : undefined;
 ---
+
 
 <html lang={lang}>
   <head>
