@@ -36,12 +36,13 @@ const {
   noindex?: boolean
 } = Astro.props
 
-const siteNameComputed =
-  typeof settings?.site_name === 'string' && settings.site_name.trim()
-    ? settings.site_name
-    : 'Ifitwala Ed'
-const titleComputed =
-  typeof title === 'string' && title.trim() ? title : siteNameComputed
+const siteNameRaw =
+  typeof settings?.site_name === 'string' ? settings.site_name.trim() : ''
+const meta = {
+  siteName: siteNameRaw || 'Ifitwala Ed',
+}
+meta.title =
+  typeof title === 'string' && title.trim() ? title : meta.siteName
 const resolvedDescription = description || settings?.tagline || ''
 
 const siteOrigin = Astro.site ? Astro.site.toString() : 'https://ifitwala.com/'
@@ -121,7 +122,7 @@ function absoluteUrl(input?: string | null) {
   }
 }
 
-const resolvedOgTitle = ogTitle || titleComputed
+const resolvedOgTitle = ogTitle || meta.title
 const resolvedOgDescription = ogDescription || resolvedDescription
 const resolvedOgImage = absoluteUrl(ogImage)
 const robots = noindex ? 'noindex, nofollow' : undefined
@@ -130,7 +131,7 @@ const robots = noindex ? 'noindex, nofollow' : undefined
 <html lang={lang}>
   <head>
     <meta charset="utf-8" />
-    <title>{titleComputed}</title>
+    <title>{meta.title}</title>
     {resolvedDescription && <meta name="description" content={resolvedDescription} />}
     {canonicalHref && <link rel="canonical" href={canonicalHref} />}
     {robots && <meta name="robots" content={robots} />}
@@ -147,7 +148,7 @@ const robots = noindex ? 'noindex, nofollow' : undefined
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          "name": siteNameComputed,
+          "name": meta.siteName,
           "url": siteOrigin,
           "sameAs": sameAs,
         })}
@@ -164,11 +165,11 @@ const robots = noindex ? 'noindex, nofollow' : undefined
             {settings?.brand_logo ? (
               <img
                 src={settings.brand_logo}
-                alt={settings.brand_logo_alt || siteNameComputed}
+                alt={settings.brand_logo_alt || meta.siteName}
                 class="h-11 w-auto rounded-xl border border-border bg-white p-1.5 shadow-sm"
               />
             ) : null}
-            <span>{siteNameComputed}</span>
+            <span>{meta.siteName}</span>
           </a>
 
           {headerItems.length > 0 && (
@@ -221,7 +222,7 @@ const robots = noindex ? 'noindex, nofollow' : undefined
       <footer class="mt-16 border-t border-border/60 bg-white/85 backdrop-blur">
         <div class="mx-auto w-full px-6 py-6 md:max-w-6xl">
           <div class="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-            <div class="text-lg font-semibold text-canopy">{siteNameComputed}</div>
+            <div class="text-lg font-semibold text-canopy">{meta.siteName}</div>
             {footerItems.length > 0 && (
               <nav class="flex flex-wrap items-center gap-4 text-sm font-medium text-slate md:justify-end">
                 {footerItems.map((item) => (
@@ -272,7 +273,7 @@ const robots = noindex ? 'noindex, nofollow' : undefined
               ) : null}
         </div>
         <div class="border-t border-border/60 py-3 text-center text-xs text-slate">
-          © {new Date().getFullYear()} {siteNameComputed}. All rights reserved.
+          © {new Date().getFullYear()} {meta.siteName}. All rights reserved.
         </div>
       </footer>
     </div>
