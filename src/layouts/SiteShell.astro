@@ -18,7 +18,7 @@ const {
   ogTitle,
   ogDescription,
   noindex = false,
-}: {
+} = Astro.props as {
   lang?: string;
   title?: string;
   description?: string;
@@ -31,7 +31,8 @@ const {
   ogTitle?: string;
   ogDescription?: string;
   noindex?: boolean;
-} = Astro.props;
+};
+
 
 const siteName =
   typeof settings?.site_name === 'string' && settings.site_name.trim()
