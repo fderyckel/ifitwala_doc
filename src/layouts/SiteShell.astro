@@ -1,12 +1,9 @@
 ---
-import IconGithub from '~icons/lucide/github'
-import IconLinkedin from '~icons/lucide/linkedin'
-import IconTwitter from '~icons/lucide/twitter'
-import IconYoutube from '~icons/lucide/youtube'
-import '@/styles/global.css'
-import { marked } from 'marked'
+import { Github, Linkedin, Twitter, Youtube } from '@lucide/astro';
+import '@/styles/global.css';
+import { marked } from 'marked';
+import type { NavItem, SiteSettings } from '@/lib/siteClient';
 
-import type { NavItem, SiteSettings } from '@/lib/siteClient'
 
 const {
   lang = 'en',
