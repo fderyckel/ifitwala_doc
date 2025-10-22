@@ -37,8 +37,6 @@ const {
 } = Astro.props
 
 const siteName = settings?.site_name || 'Ifitwala Ed'
-const resolvedTitle =
-  typeof title === 'string' && title.trim() ? title : siteName
 const resolvedDescription = description || settings?.tagline || ''
 
 const siteOrigin = Astro.site ? Astro.site.toString() : 'https://ifitwala.com/'
@@ -118,7 +116,9 @@ function absoluteUrl(input?: string | null) {
   }
 }
 
-const resolvedOgTitle = ogTitle || resolvedTitle
+const resolvedOgTitle =
+  ogTitle ||
+  (typeof title === 'string' && title.trim() ? title : siteName)
 const resolvedOgDescription = ogDescription || resolvedDescription
 const resolvedOgImage = absoluteUrl(ogImage)
 const robots = noindex ? 'noindex, nofollow' : undefined
@@ -127,7 +127,7 @@ const robots = noindex ? 'noindex, nofollow' : undefined
 <html lang={lang}>
   <head>
     <meta charset="utf-8" />
-    <title>{resolvedTitle}</title>
+    <title>{typeof title === 'string' && title.trim() ? title : siteName}</title>
     {resolvedDescription && <meta name="description" content={resolvedDescription} />}
     {canonicalHref && <link rel="canonical" href={canonicalHref} />}
     {robots && <meta name="robots" content={robots} />}
