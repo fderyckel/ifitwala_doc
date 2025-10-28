@@ -23,6 +23,18 @@ const sorted = [...items].sort((a, b) => {
 
 const fallbackIconName = 'star'
 const iconCache = new Map<string, any>()
+const iconModules = import.meta.glob('~icons/lucide/*', { import: 'default' })
+const availableIconLoaders = new Map<string, () => Promise<any>>()
+
+for (const [key, loader] of Object.entries(iconModules)) {
+  if (typeof loader === 'function') {
+    const normalizedKey = key
+      .replace(/^~icons\/lucide\//, '')
+      .replace(/\.[^/.]+$/, '')
+      .toLowerCase()
+    availableIconLoaders.set(normalizedKey, loader)
+  }
+}
 
 function normalizeIconName(icon?: string) {
   if (typeof icon !== 'string') return ''
@@ -31,24 +43,39 @@ function normalizeIconName(icon?: string) {
   return trimmed.replace(/[\s_]+/g, '-').replace(/-+/g, '-')
 }
 
-async function resolveLucideIcon(icon?: string) {
-  const slug = normalizeIconName(icon) || fallbackIconName
+async function loadIconComponent(slug: string) {
   if (iconCache.has(slug)) {
     return iconCache.get(slug)
   }
-  try {
-    const { default: Icon } = await import(`~icons/lucide/${slug}`)
+
+  const loader = availableIconLoaders.get(slug)
+  if (typeof loader === 'function') {
+    const loaded = await loader()
+    const Icon = loaded?.default ?? loaded
     iconCache.set(slug, Icon)
-    return Icon
-  } catch (_error) {
-    if (slug !== fallbackIconName) {
-      const fallbackIcon = await resolveLucideIcon(fallbackIconName)
-      iconCache.set(slug, fallbackIcon)
-      return fallbackIcon
+    if (Icon) {
+      return Icon
     }
-    iconCache.set(slug, null)
-    return null
   }
+
+  iconCache.set(slug, null)
+  return null
+}
+
+async function resolveLucideIcon(icon?: string) {
+  const slug = normalizeIconName(icon) || fallbackIconName
+  const resolved = await loadIconComponent(slug)
+  if (resolved) {
+    return resolved
+  }
+
+  if (slug !== fallbackIconName) {
+    const fallbackComponent = await loadIconComponent(fallbackIconName)
+    iconCache.set(slug, fallbackComponent)
+    return fallbackComponent
+  }
+
+  return null
 }
 
 const itemsWithIcons = await Promise.all(
