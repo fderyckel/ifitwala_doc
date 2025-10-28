@@ -17,9 +17,11 @@ export async function getStaticPaths() {
           !page.slug.startsWith('/docs/')
       )
       .map((page) => {
-        const segments = page.slug.split('/').filter(Boolean)
+        const normalized = typeof page.slug === 'string' ? page.slug.trim() : ''
+        const cleaned = normalized.replace(/^\/+/, '')
+        const param = cleaned.length ? cleaned : undefined
         return {
-          params: { page: segments },
+          params: { page: param },
           props: { slug: page.slug },
         }
       })
