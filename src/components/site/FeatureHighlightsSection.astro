@@ -20,6 +20,44 @@ const sorted = [...items].sort((a, b) => {
   const bOrder = typeof b?.order === 'number' ? b.order : 0
   return aOrder - bOrder
 })
+
+const fallbackIconName = 'star'
+const iconCache = new Map<string, any>()
+
+function normalizeIconName(icon?: string) {
+  if (typeof icon !== 'string') return ''
+  const trimmed = icon.trim().toLowerCase()
+  if (!trimmed) return ''
+  return trimmed.replace(/[\s_]+/g, '-').replace(/-+/g, '-')
+}
+
+async function resolveLucideIcon(icon?: string) {
+  const slug = normalizeIconName(icon) || fallbackIconName
+  if (iconCache.has(slug)) {
+    return iconCache.get(slug)
+  }
+  try {
+    const { default: Icon } = await import(`~icons/lucide/${slug}`)
+    iconCache.set(slug, Icon)
+    return Icon
+  } catch (_error) {
+    if (slug !== fallbackIconName) {
+      const fallbackIcon = await resolveLucideIcon(fallbackIconName)
+      iconCache.set(slug, fallbackIcon)
+      return fallbackIcon
+    }
+    iconCache.set(slug, null)
+    return null
+  }
+}
+
+const itemsWithIcons = await Promise.all(
+  sorted.map(async (item) => {
+    const hasIcon = typeof item?.icon === 'string' && item.icon.trim().length > 0
+    const IconComponent = hasIcon ? await resolveLucideIcon(item.icon) : null
+    return { ...item, IconComponent }
+  })
+)
 ---
 
 <section
@@ -28,7 +66,7 @@ const sorted = [...items].sort((a, b) => {
 >
   <header class="mx-auto max-w-3xl text-center">
     {eyebrow && (
-      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-canopy">
+      <p class="mx-auto inline-flex items-center justify-center rounded-full border border-leaf/40 bg-leaf/15 px-5 py-2 text-sm font-semibold uppercase tracking-[0.35em] text-canopy shadow-sm">
         {eyebrow}
       </p>
     )}
@@ -39,17 +77,17 @@ const sorted = [...items].sort((a, b) => {
     )}
   </header>
 
-  {sorted.length > 0 && (
+  {itemsWithIcons.length > 0 && (
     <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {sorted.map((item, idx) => (
+      {itemsWithIcons.map((item, idx) => (
         <article
           key={idx}
           class="group flex h-full flex-col justify-between rounded-3xl border border-border/50 bg-gradient-to-br from-white to-moss/25 p-6 text-left shadow-card transition hover:-translate-y-1 hover:shadow-xl"
         >
           <div class="flex items-start gap-5">
-            {item?.icon && (
-              <div class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-moss/40 text-canopy shadow-inner">
-                <span class="text-xl font-semibold">{item.icon}</span>
+            {item?.IconComponent && (
+              <div class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-leaf/20 text-canopy shadow-inner">
+                <item.IconComponent class="h-6 w-6" aria-hidden="true" />
               </div>
             )}
             <div>
