@@ -8,26 +8,17 @@ You can install this app using the [bench](https://github.com/frappe/bench) CLI:
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
+bench get-app https://github.com/fderyckel/ifitwala_doc --branch develop
 bench install-app ifitwala_doc
 ```
 
 ### Contributing
 
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
-
-```bash
-cd apps/ifitwala_doc
-pre-commit install
-```
-
-Pre-commit is configured to use the following tools for checking and formatting your code:
-
-- ruff
-- eslint
-- prettier
-- pyupgrade
+Just post issues or even better pull requests!
 
 ### License
 
 mit
+
+### Convert the docs and Web Page to Astro
+You need to run each time the ./deploy_docs.sh script from the your frappe-bench/apps/ifitwala_docs folder
