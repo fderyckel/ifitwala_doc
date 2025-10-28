@@ -1,0 +1,137 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_order",
+  "layout",
+  "style",
+  "anchor",
+  "eyebrow",
+  "heading",
+  "subheading",
+  "body",
+  "image",
+  "image_alt",
+  "image_caption",
+  "cta_label",
+  "cta_href",
+  "cta_variant"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fieldname": "section_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Section Order",
+   "reqd": 1
+  },
+  {
+   "columns": 2,
+   "default": "text",
+   "description": "text: full-width content, split-left/right: media + copy.",
+   "fieldname": "layout",
+   "fieldtype": "Select",
+   "label": "Layout",
+   "options": "text\nsplit-left\nsplit-right\nmedia-top"
+  },
+  {
+   "columns": 2,
+   "default": "default",
+   "description": "Controls the surface styling for this section.",
+   "fieldname": "style",
+   "fieldtype": "Select",
+   "label": "Style",
+   "options": "default\nmuted\nhighlight"
+  },
+  {
+   "columns": 2,
+   "description": "Optional anchor/id used for in-page navigation.",
+   "fieldname": "anchor",
+   "fieldtype": "Data",
+   "label": "Anchor"
+  },
+  {
+   "columns": 2,
+   "fieldname": "eyebrow",
+   "fieldtype": "Data",
+   "label": "Eyebrow"
+  },
+  {
+   "columns": 3,
+   "fieldname": "heading",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Heading",
+   "reqd": 1
+  },
+  {
+   "columns": 3,
+   "fieldname": "subheading",
+   "fieldtype": "Small Text",
+   "label": "Subheading"
+  },
+  {
+   "fieldname": "body",
+   "fieldtype": "Text Editor",
+   "label": "Body Copy"
+  },
+  {
+   "columns": 2,
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image"
+  },
+  {
+   "columns": 2,
+   "fieldname": "image_alt",
+   "fieldtype": "Data",
+   "label": "Image Alt Text"
+  },
+  {
+   "columns": 2,
+   "fieldname": "image_caption",
+   "fieldtype": "Data",
+   "label": "Image Caption"
+  },
+  {
+   "columns": 2,
+   "fieldname": "cta_label",
+   "fieldtype": "Data",
+   "label": "CTA Label"
+  },
+  {
+   "columns": 3,
+   "fieldname": "cta_href",
+   "fieldtype": "Data",
+   "label": "CTA Link"
+  },
+  {
+   "columns": 2,
+   "default": "link",
+   "fieldname": "cta_variant",
+   "fieldtype": "Select",
+   "label": "CTA Variant",
+   "options": "link\nprimary\nsecondary"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Ifitwala Doc",
+ "name": "Longform Block Section",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -101,12 +101,61 @@ def _trust_logos_props(doc: Document) -> Dict[str, Any]:
     }
 
 
+def _longform_props(doc: Document) -> Dict[str, Any]:
+    sections = sorted(
+        doc.sections or [],
+        key=lambda r: (
+            getattr(r, "section_order", None)
+            if getattr(r, "section_order", None) is not None
+            else getattr(r, "idx", 0)
+        ),
+    )
+    payload: List[Dict[str, Any]] = []
+    for row in sections:
+        order = getattr(row, "section_order", None)
+        if order is None:
+            order = getattr(row, "idx", None) or 0
+
+        section_payload: Dict[str, Any] = {
+            "order": order,
+            "layout": (getattr(row, "layout", None) or "text"),
+            "style": (getattr(row, "style", None) or getattr(doc, "background", None) or "default"),
+            "anchor": getattr(row, "anchor", None),
+            "eyebrow": getattr(row, "eyebrow", None),
+            "heading": getattr(row, "heading", None),
+            "subheading": getattr(row, "subheading", None),
+            "body": getattr(row, "body", None),
+            "image": getattr(row, "image", None),
+            "imageAlt": getattr(row, "image_alt", None),
+            "imageCaption": getattr(row, "image_caption", None),
+        }
+
+        cta_label = getattr(row, "cta_label", None)
+        cta_href = getattr(row, "cta_href", None)
+        if cta_label and cta_href:
+            section_payload["cta"] = {
+                "label": cta_label,
+                "href": cta_href,
+                "variant": getattr(row, "cta_variant", None) or "link",
+            }
+
+        payload.append(section_payload)
+
+    return {
+        "title": getattr(doc, "title", None),
+        "lede": getattr(doc, "lede", None),
+        "background": getattr(doc, "background", None) or "default",
+        "sections": payload,
+    }
+
+
 BlockSerializer = Callable[[Document], Dict[str, Any]]
 
 BLOCK_REGISTRY: Tuple[Tuple[str, Tuple[str, ...], BlockSerializer], ...] = (
     ("Hero", ("Hero Block",), _hero_props),
     ("Feature Highlights", ("Feature Highlight", "Feature Highlights"), _feature_highlights_props),
     ("Trust Logos", ("Trust Logos", "Trust Logo", "Trust Logo Group"), _trust_logos_props),
+    ("Longform Content", ("Longform Block",), _longform_props),
 )
 
 BLOCK_TYPES: Dict[str, Dict[str, Any]] = {}

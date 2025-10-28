@@ -1,0 +1,243 @@
+---
+interface CTA {
+  label?: string
+  href?: string
+  variant?: string
+}
+
+interface Section {
+  order?: number
+  layout?: string
+  style?: string
+  anchor?: string
+  eyebrow?: string
+  heading?: string
+  subheading?: string
+  body?: string
+  image?: string
+  imageAlt?: string
+  imageCaption?: string
+  cta?: CTA
+}
+
+interface Props {
+  id?: string
+  title?: string
+  lede?: string
+  background?: string
+  sections?: Section[]
+}
+
+const {
+  id,
+  title = '',
+  lede = '',
+  background = 'default',
+  sections = [],
+}: Props = Astro.props
+
+const backgroundClasses: Record<string, string> = {
+  default: 'bg-gradient-to-b from-white via-white to-sky/20',
+  muted: 'bg-gradient-to-b from-sand/30 via-white to-sand/30',
+  brand: 'bg-gradient-to-b from-leaf/15 via-white to-sky/15',
+}
+
+const surfaceClasses: Record<string, string> = {
+  default: 'bg-white/95 border border-border/60 shadow-soft backdrop-blur-sm',
+  muted: 'bg-sky/35 border border-sky/40 shadow-soft backdrop-blur-sm',
+  highlight: 'bg-gradient-to-br from-leaf/12 via-white to-sand/35 border border-leaf/40 shadow-strong backdrop-blur',
+}
+
+const ctaVariants: Record<string, string> = {
+  link: 'inline-flex items-center gap-2 text-sm font-semibold text-canopy transition hover:text-leaf',
+  primary:
+    'inline-flex items-center gap-2 rounded-full bg-canopy px-5 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]',
+  secondary:
+    'inline-flex items-center gap-2 rounded-full border border-canopy/30 px-5 py-2 text-sm font-semibold text-canopy transition hover:border-leaf/60 hover:text-leaf',
+}
+
+const sortedSections = [...sections].sort((a, b) => {
+  const aOrder = typeof a?.order === 'number' ? a.order : 0
+  const bOrder = typeof b?.order === 'number' ? b.order : 0
+  return aOrder - bOrder
+})
+
+const proseClasses =
+  'prose prose-docs max-w-none text-base leading-relaxed text-slate'
+
+function getSurfaceClass(style?: string) {
+  if (!style) return surfaceClasses.default
+  return surfaceClasses[style] || surfaceClasses.default
+}
+
+function getCTAVariant(variant?: string) {
+  if (!variant) return ctaVariants.link
+  return ctaVariants[variant] || ctaVariants.link
+}
+
+function bodyHTML(value?: string | null) {
+  if (!value || typeof value !== 'string') return ''
+  return value
+}
+---
+
+<section
+  id={id}
+  class={`relative isolate rounded-[40px] px-6 py-16 md:px-12 md:py-20 ${backgroundClasses[background] || backgroundClasses.default}`}
+>
+  <div class="mx-auto flex w-full max-w-5xl flex-col gap-16">
+    {(title || lede) && (
+      <header class="mx-auto max-w-3xl text-center">
+        {title && (
+          <h2 class="text-3xl font-semibold tracking-tight text-canopy md:text-[2.5rem]">
+            {title}
+          </h2>
+        )}
+        {lede && (
+          <p class="mt-4 text-lg leading-relaxed text-slate">
+            {lede}
+          </p>
+        )}
+      </header>
+    )}
+
+    {sortedSections.map((section, index) => {
+      const surface = getSurfaceClass(section?.style)
+      const layout = section?.layout || 'text'
+      const hasImage = Boolean(section?.image)
+      const effectiveLayout = hasImage ? layout : 'text'
+      const anchorId = section?.anchor
+      const containerClass =
+        effectiveLayout === 'media-top'
+          ? 'flex flex-col gap-8'
+          : hasImage
+          ? 'grid gap-8 lg:grid-cols-2 lg:items-center'
+          : 'flex flex-col gap-8'
+
+      const copyClassParts = ['flex flex-col gap-4']
+      if (hasImage || effectiveLayout === 'media-top') {
+        copyClassParts.push('order-2')
+      }
+      if (effectiveLayout === 'split-left') {
+        copyClassParts.push('lg:pl-6')
+      } else if (effectiveLayout === 'split-right') {
+        copyClassParts.push('lg:pr-6')
+      } else if (effectiveLayout === 'media-top') {
+        copyClassParts.push('lg:w-full', 'mx-auto', 'max-w-3xl', 'text-center', 'lg:text-left')
+      }
+      const copyClass = copyClassParts.join(' ')
+
+      return (
+        <article
+          id={anchorId}
+          key={index}
+          class={`overflow-hidden rounded-[28px] px-6 py-10 md:px-12 md:py-12 ${surface}`}
+        >
+          <div class={containerClass}>
+            {effectiveLayout === 'split-left' && hasImage && (
+              <figure class="order-1 flex flex-col items-center justify-center gap-3 lg:items-start lg:pr-6">
+                <img
+                  src={section?.image}
+                  alt={section?.imageAlt || section?.heading || ''}
+                  class="w-full rounded-3xl object-cover shadow-soft"
+                  loading="lazy"
+                />
+                {section?.imageCaption && (
+                  <figcaption class="text-sm text-slate/80">
+                    {section.imageCaption}
+                  </figcaption>
+                )}
+              </figure>
+            )}
+
+            <div
+              class={copyClass}
+            >
+              {section?.eyebrow && (
+                <span class="inline-flex items-center justify-start rounded-full border border-leaf/40 bg-leaf/15 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-canopy">
+                  {section.eyebrow}
+                </span>
+              )}
+
+              {section?.heading && (
+                <h3 class="text-2xl font-semibold leading-tight text-ink md:text-[1.85rem]">
+                  {section.heading}
+                </h3>
+              )}
+
+              {section?.subheading && (
+                <p class="text-base font-medium text-canopy/90">
+                  {section.subheading}
+                </p>
+              )}
+
+              {section?.body && (
+                <div class={`${proseClasses} [&>:first-child]:mt-0`} set:html={bodyHTML(section.body)} />
+              )}
+
+              {section?.cta && section?.cta?.label && section?.cta?.href && (
+                <div class="pt-2">
+                  <a
+                    href={section.cta.href}
+                    class={getCTAVariant(section.cta.variant)}
+                  >
+                    {section.cta.label}
+                    <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {effectiveLayout === 'split-right' && hasImage && (
+              <figure class="order-3 flex flex-col items-center justify-center gap-3 lg:items-end lg:pl-6">
+                <img
+                  src={section?.image}
+                  alt={section?.imageAlt || section?.heading || ''}
+                  class="w-full rounded-3xl object-cover shadow-soft"
+                  loading="lazy"
+                />
+                {section?.imageCaption && (
+                  <figcaption class="text-sm text-slate/80">
+                    {section.imageCaption}
+                  </figcaption>
+                )}
+              </figure>
+            )}
+
+            {effectiveLayout === 'media-top' && hasImage && (
+              <figure class="order-1 flex flex-col items-center justify-center gap-3">
+                <img
+                  src={section?.image}
+                  alt={section?.imageAlt || section?.heading || ''}
+                  class="w-full rounded-3xl object-cover shadow-soft"
+                  loading="lazy"
+                />
+                {section?.imageCaption && (
+                  <figcaption class="text-sm text-slate/80">
+                    {section.imageCaption}
+                  </figcaption>
+                )}
+              </figure>
+            )}
+
+            {effectiveLayout === 'text' && hasImage && (
+              <figure class="order-1 flex flex-col items-center justify-center gap-3 lg:items-end lg:pl-6">
+                <img
+                  src={section?.image}
+                  alt={section?.imageAlt || section?.heading || ''}
+                  class="w-full rounded-3xl object-cover shadow-soft"
+                  loading="lazy"
+                />
+                {section?.imageCaption && (
+                  <figcaption class="text-sm text-slate/80">
+                    {section.imageCaption}
+                  </figcaption>
+                )}
+              </figure>
+            )}
+          </div>
+        </article>
+      )
+    })}
+  </div>
+</section>

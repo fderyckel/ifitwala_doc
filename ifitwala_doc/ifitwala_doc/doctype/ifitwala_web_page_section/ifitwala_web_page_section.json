@@ -18,7 +18,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Block Type",
-   "options": "Hero\nFeature Highlights\nTrust Logos\nTestimonial Group\nCTA",
+   "options": "Hero\nFeature Highlights\nTrust Logos\nLongform Content\nTestimonial Group\nCTA",
    "reqd": 1
   },
   {
