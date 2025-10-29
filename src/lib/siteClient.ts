@@ -19,12 +19,29 @@ export type PageSummary = {
   created?: string | null
 }
 
+export type PageSEO = {
+  title?: string
+  description?: string
+  canonical_url?: string
+  meta_description?: string
+  seo_title?: string
+  seo_description?: string
+  seo_keywords?: string
+  seo_noindex?: number
+  seo_nofollow?: number
+  og_image?: string
+  og_title?: string
+  og_description?: string
+  og_image_alt?: string
+  og_type?: string
+}
+
 export type PagePayload = {
   name?: string
   slug?: string
   title?: string
   layout?: string
-  seo?: Record<string, any>
+  seo?: PageSEO
   sections?: Section[]
   is_published?: number
   modified?: string | null

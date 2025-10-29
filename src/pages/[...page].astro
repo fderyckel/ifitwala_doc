@@ -49,14 +49,77 @@ const sections = Array.isArray(page?.sections)
   ? [...page.sections].sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0))
   : []
 
+const pageSeo = page?.seo ?? {}
+const longformSections = sections.filter((section) => section?.type === 'Longform Content')
+const longformSeo =
+  longformSections.length === 1 && typeof longformSections[0]?.props === 'object'
+    ? longformSections[0]?.props?.seo ?? {}
+    : {}
+
+const take = (value: unknown): string => {
+  if (typeof value !== 'string') return ''
+  const trimmed = value.trim()
+  return trimmed
+}
+
 const siteName = settings?.site_name || 'Ifitwala Ed'
+
 const seoTitle =
-  (page?.seo && page.seo.title) ||
-  page?.title ||
+  take(pageSeo?.seo_title) ||
+  take(pageSeo?.title) ||
+  take(page?.title) ||
+  take(longformSeo?.title) ||
   `${slugSegments.map((s) => s.replace(/-/g, ' ')).join(' · ') || 'Page'} | ${siteName}`
-const seoDescription =
-  (page?.seo && page.seo.description) || settings?.tagline || siteName
-const canonical = (page?.seo && page.seo.canonical_url) || page?.slug || slug
+
+const mergedDescription =
+  take(pageSeo?.seo_description) ||
+  take(pageSeo?.description) ||
+  take(pageSeo?.meta_description) ||
+  take(longformSeo?.description) ||
+  settings?.tagline ||
+  siteName
+
+const metaKeywords =
+  take(pageSeo?.seo_keywords) ||
+  take(longformSeo?.keywords) ||
+  ''
+
+const canonical =
+  take(pageSeo?.canonical_url) ||
+  take(longformSeo?.canonical) ||
+  page?.slug ||
+  slug
+
+const ogTitle =
+  take(pageSeo?.og_title) ||
+  take(longformSeo?.ogTitle) ||
+  seoTitle
+
+const ogDescription =
+  take(pageSeo?.og_description) ||
+  take(longformSeo?.ogDescription) ||
+  mergedDescription
+
+const ogImage =
+  take(pageSeo?.og_image) ||
+  take(longformSeo?.ogImage) ||
+  undefined
+
+const ogImageAlt =
+  take(pageSeo?.og_image_alt) ||
+  take(longformSeo?.ogImageAlt) ||
+  undefined
+
+const ogType =
+  take(pageSeo?.og_type) ||
+  take(longformSeo?.ogType) ||
+  undefined
+
+const noindex = Boolean(pageSeo?.seo_noindex)
+const nofollow = Boolean(pageSeo?.seo_nofollow)
+
+const seoDescription = mergedDescription
+const canonicalUrl = canonical
 
 const layoutVariant = (page?.layout || 'Standard').toLowerCase()
 const stackClasses =
@@ -85,10 +148,18 @@ if (!hasContent) {
   lang="en"
   title={seoTitle}
   description={seoDescription}
-  canonical={canonical}
+  canonical={canonicalUrl}
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={metaKeywords}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  ogImage={ogImage}
+  ogImageAlt={ogImageAlt}
+  ogType={ogType}
+  noindex={noindex}
+  nofollow={nofollow}
 >
   <div class={`mx-auto w-full max-w-6xl px-6 py-16 md:py-24 ${stackClasses}`}>
     {hasContent ? (

@@ -14,6 +14,16 @@
   "is_published",
   "og_image",
   "meta_description",
+  "seo_title",
+  "seo_description",
+  "seo_keywords",
+  "section_break_seo",
+  "seo_noindex",
+  "seo_nofollow",
+  "og_title",
+  "og_description",
+  "og_image_alt",
+  "og_type",
   "section_break_2qy1",
   "sections"
  ],
@@ -57,6 +67,61 @@
    "label": "OG Image"
   },
   {
+   "fieldname": "seo_title",
+   "fieldtype": "Data",
+   "label": "SEO Title"
+  },
+  {
+   "fieldname": "seo_description",
+   "fieldtype": "Small Text",
+   "label": "SEO Description"
+  },
+  {
+   "description": "Comma-separated list for targeted keywords (optional).",
+   "fieldname": "seo_keywords",
+   "fieldtype": "Small Text",
+   "label": "SEO Keywords"
+  },
+  {
+   "fieldname": "section_break_seo",
+   "fieldtype": "Section Break",
+   "label": "Advanced SEO"
+  },
+  {
+   "default": "0",
+   "fieldname": "seo_noindex",
+   "fieldtype": "Check",
+   "label": "Noindex"
+  },
+  {
+   "default": "0",
+   "fieldname": "seo_nofollow",
+   "fieldtype": "Check",
+   "label": "Nofollow"
+  },
+  {
+   "fieldname": "og_title",
+   "fieldtype": "Data",
+   "label": "OG Title"
+  },
+  {
+   "fieldname": "og_description",
+   "fieldtype": "Small Text",
+   "label": "OG Description"
+  },
+  {
+   "fieldname": "og_image_alt",
+   "fieldtype": "Data",
+   "label": "OG Image Alt Text"
+  },
+  {
+   "default": "website",
+   "fieldname": "og_type",
+   "fieldtype": "Select",
+   "label": "OG Type",
+   "options": "website\narticle\nproduct\nprofile"
+  },
+  {
    "fieldname": "canonical_url",
    "fieldtype": "Data",
    "label": "Canonical URL"
@@ -79,7 +144,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-16 19:57:29.930920",
+ "modified": "2025-10-16 21:57:29.930920",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Ifitwala Web Page",

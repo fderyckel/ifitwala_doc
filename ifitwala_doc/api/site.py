@@ -145,6 +145,17 @@ def _longform_props(doc: Document) -> Dict[str, Any]:
         "title": getattr(doc, "title", None),
         "lede": getattr(doc, "lede", None),
         "background": getattr(doc, "background", None) or "default",
+        "seo": {
+            "title": getattr(doc, "seo_title", None),
+            "description": getattr(doc, "seo_description", None),
+            "keywords": getattr(doc, "seo_keywords", None),
+            "canonical": getattr(doc, "seo_canonical_override", None),
+            "ogTitle": getattr(doc, "og_title", None),
+            "ogDescription": getattr(doc, "og_description", None),
+            "ogImage": getattr(doc, "og_image", None),
+            "ogImageAlt": getattr(doc, "og_image_alt", None),
+            "ogType": getattr(doc, "og_type", None),
+        },
         "sections": payload,
     }
 
@@ -188,10 +199,20 @@ def _serialize_block(block_dt: str, name: str) -> Optional[Tuple[str, Dict[str, 
 
 def _seo_payload(page: Document) -> Dict[str, Any]:
     return {
-        "title": page.title,
-        "description": page.meta_description,
-        "og_image": page.og_image,
+        "title": page.seo_title or page.title,
+        "description": page.seo_description or page.meta_description,
         "canonical_url": page.canonical_url,
+        "meta_description": page.meta_description,
+        "seo_title": page.seo_title,
+        "seo_description": page.seo_description,
+        "seo_keywords": page.seo_keywords,
+        "seo_noindex": int(getattr(page, "seo_noindex", 0) or 0),
+        "seo_nofollow": int(getattr(page, "seo_nofollow", 0) or 0),
+        "og_image": page.og_image,
+        "og_title": page.og_title,
+        "og_description": page.og_description,
+        "og_image_alt": page.og_image_alt,
+        "og_type": page.og_type or "website",
     }
 
 

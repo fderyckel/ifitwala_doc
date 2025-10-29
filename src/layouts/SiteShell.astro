@@ -17,6 +17,10 @@ const {
   ogTitle,
   ogDescription,
   noindex = false,
+  nofollow = false,
+  keywords = '',
+  ogType = 'website',
+  ogImageAlt,
 } = Astro.props as {
   lang?: string;
   title?: string;
@@ -30,6 +34,10 @@ const {
   ogTitle?: string;
   ogDescription?: string;
   noindex?: boolean;
+  nofollow?: boolean;
+  keywords?: string;
+  ogType?: string;
+  ogImageAlt?: string;
 };
 
 
@@ -126,7 +134,20 @@ const resolvedOgTitle =
   typeof ogTitle === 'string' && ogTitle.trim() ? ogTitle : title;
 const resolvedOgDescription = ogDescription || resolvedDescription;
 const resolvedOgImage = absoluteUrl(ogImage);
-const robots = noindex ? 'noindex, nofollow' : undefined;
+const resolvedOgImageAlt =
+  typeof ogImageAlt === 'string' && ogImageAlt.trim()
+    ? ogImageAlt.trim()
+    : undefined;
+const resolvedOgType =
+  typeof ogType === 'string' && ogType.trim() ? ogType.trim() : 'website';
+
+let robots: string | undefined;
+if (noindex || nofollow) {
+  const directives: string[] = [];
+  directives.push(noindex ? 'noindex' : 'index');
+  directives.push(nofollow ? 'nofollow' : 'follow');
+  robots = directives.join(', ');
+}
 ---
 
 
@@ -135,12 +156,14 @@ const robots = noindex ? 'noindex, nofollow' : undefined;
     <meta charset="utf-8" />
     <title>{title}</title>
     {resolvedDescription && <meta name="description" content={resolvedDescription} />}
+    {keywords && <meta name="keywords" content={keywords} />}
     {canonicalHref && <link rel="canonical" href={canonicalHref} />}
     {robots && <meta name="robots" content={robots} />}
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={resolvedOgType} />
     <meta property="og:title" content={resolvedOgTitle} />
     {resolvedOgDescription && <meta property="og:description" content={resolvedOgDescription} />}
     {resolvedOgImage && <meta property="og:image" content={resolvedOgImage} />}
+    {resolvedOgImageAlt && <meta property="og:image:alt" content={resolvedOgImageAlt} />}
     {resolvedOgImage && <meta name="twitter:card" content="summary_large_image" />}
     {resolvedOgImage && <meta name="twitter:image" content={resolvedOgImage} />}
     {resolvedOgTitle && <meta name="twitter:title" content={resolvedOgTitle} />}

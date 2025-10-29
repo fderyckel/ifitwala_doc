@@ -9,6 +9,16 @@
   "title",
   "lede",
   "background",
+  "seo_title",
+  "seo_description",
+  "seo_keywords",
+  "section_break_seo",
+  "og_title",
+  "og_description",
+  "og_image",
+  "og_image_alt",
+  "og_type",
+  "seo_canonical_override",
   "sections"
  ],
  "fields": [
@@ -40,12 +50,66 @@
    "label": "Narrative Sections",
    "options": "Longform Block Section",
    "reqd": 1
+  },
+  {
+   "fieldname": "seo_title",
+   "fieldtype": "Data",
+   "label": "SEO Title"
+  },
+  {
+   "fieldname": "seo_description",
+   "fieldtype": "Small Text",
+   "label": "SEO Description"
+  },
+  {
+   "description": "Optional keywords to target for this narrative.",
+   "fieldname": "seo_keywords",
+   "fieldtype": "Small Text",
+   "label": "SEO Keywords"
+  },
+  {
+   "fieldname": "section_break_seo",
+   "fieldtype": "Section Break",
+   "label": "Social Sharing"
+  },
+  {
+   "fieldname": "og_title",
+   "fieldtype": "Data",
+   "label": "OG Title"
+  },
+  {
+   "fieldname": "og_description",
+   "fieldtype": "Small Text",
+   "label": "OG Description"
+  },
+  {
+   "fieldname": "og_image",
+   "fieldtype": "Attach Image",
+   "label": "OG Image"
+  },
+  {
+   "fieldname": "og_image_alt",
+   "fieldtype": "Data",
+   "label": "OG Image Alt Text"
+  },
+  {
+   "default": "article",
+   "fieldname": "og_type",
+   "fieldtype": "Select",
+   "label": "OG Type",
+   "options": "article\nwebsite\nprofile\nproduct"
+  },
+  {
+   "description": "Optional canonical URL override for this story.",
+   "fieldname": "seo_canonical_override",
+   "fieldtype": "Data",
+   "label": "Canonical Override"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-01 00:00:00.000000",
+ "modified": "2024-01-01 02:00:00.000000",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Longform Block",
