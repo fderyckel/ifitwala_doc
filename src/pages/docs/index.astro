@@ -71,7 +71,7 @@ const description = 'Explore Ifitwala Ed docs by category'
                 const fallback = svgPath ? null : normalizeIconSource(rawIcon)
                 if (svgPath) {
                   return (
-                    <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-moss/30 text-canopy">
+                    <span class="flex h-12 w-12 flex-none items-center justify-center text-canopy">
                       <svg
                         viewBox="0 0 24 24"
                         class="h-7 w-7"
@@ -98,7 +98,7 @@ const description = 'Explore Ifitwala Ed docs by category'
                       />
                     </span>
                   ) : (
-                    <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-moss/30 text-canopy text-2xl">
+                    <span class="flex h-12 w-12 flex-none items-center justify-center text-canopy text-2xl">
                       {fallback.value}
                     </span>
                   )

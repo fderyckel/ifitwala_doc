@@ -93,7 +93,7 @@ const title = `Documentation — ${languageRaw}`
                 const fallback = svgPath ? null : normalizeIconSource(rawIcon)
                 if (svgPath) {
                   return (
-                    <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-moss/30 text-canopy">
+                    <span class="flex h-12 w-12 flex-none items-center justify-center text-canopy">
                       <svg
                         viewBox="0 0 24 24"
                         class="h-7 w-7"
@@ -111,16 +111,16 @@ const title = `Documentation — ${languageRaw}`
                 }
                 if (fallback) {
                   return fallback.isImage ? (
-                    <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-moss/20">
+                    <span class="flex h-12 w-12 flex-none items-center justify-center">
                       <img
                         src={fallback.value}
                         alt={`${c.label} icon`}
-                        class="h-10 w-10 object-contain"
+                        class="h-12 w-12 object-contain"
                         loading="lazy"
                       />
                     </span>
                   ) : (
-                    <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-moss/30 text-canopy text-2xl">
+                    <span class="flex h-12 w-12 flex-none items-center justify-center text-canopy text-2xl">
                       {fallback.value}
                     </span>
                   )
