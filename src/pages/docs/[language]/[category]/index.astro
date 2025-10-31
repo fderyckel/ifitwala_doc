@@ -76,6 +76,20 @@ const ICON_PATHS = {
   calendar: 'M6 8h12M7 4v4m10-4v4M6 20h12a2 2 0 002-2V8H4v10a2 2 0 002 2',
 }
 
+function normalizeIconSource(raw: unknown) {
+  if (typeof raw !== 'string') return null
+  const value = raw.trim()
+  if (!value) return null
+  const isImage =
+    /^(https?:|data:|\/)/i.test(value) ||
+    value.toLowerCase().endsWith('.svg') ||
+    value.toLowerCase().endsWith('.png') ||
+    value.toLowerCase().endsWith('.jpg') ||
+    value.toLowerCase().endsWith('.jpeg') ||
+    value.toLowerCase().endsWith('.webp')
+  return { value, isImage }
+}
+
 const title = `${cat?.label || category} — Docs (${languageRaw}) | Ifitwala Ed`
 const description = cat?.description || 'Category'
 ---
@@ -90,23 +104,42 @@ const description = cat?.description || 'Category'
 
     <header class="mb-6">
       <h1 class="text-2xl font-bold flex items-center gap-2">
-        {cat?.icon && (
-          ICON_PATHS[(cat.icon || '').toLowerCase()]
-            ? (
-              <svg
-                viewBox="0 0 24 24"
-                class="w-6 h-6 opacity-80"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d={ICON_PATHS[(cat.icon || '').toLowerCase()]} />
-              </svg>
+        {(() => {
+          const rawIcon = typeof cat?.icon === 'string' ? cat.icon : ''
+          if (!rawIcon) return null
+          const svgPath = ICON_PATHS[rawIcon.trim().toLowerCase()]
+          if (svgPath) {
+            return (
+              <span class="inline-flex h-8 w-8 items-center justify-center text-canopy">
+                <svg
+                  viewBox="0 0 24 24"
+                  class="w-6 h-6 opacity-80"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d={svgPath} />
+                </svg>
+              </span>
             )
-            : <span class="text-xl">{cat.icon}</span>
-        )}
+          }
+          const fallback = normalizeIconSource(rawIcon)
+          if (fallback?.isImage) {
+            return (
+              <span class="inline-flex h-8 w-8 items-center justify-center">
+                <img
+                  src={fallback.value}
+                  alt={`${cat?.label || category} icon`}
+                  class="h-8 w-8 object-contain"
+                  loading="lazy"
+                />
+              </span>
+            )
+          }
+          return <span class="text-xl">{fallback?.value || rawIcon}</span>
+        })()}
         <span>{cat?.label || category}</span>
       </h1>
       {cat?.description && <p class="text-slate mt-1">{cat.description}</p>}
