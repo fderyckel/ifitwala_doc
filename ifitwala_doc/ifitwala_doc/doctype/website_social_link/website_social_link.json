@@ -6,15 +6,23 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "platforms",
-  "url"
+  "platform",
+  "icon",
+  "url",
+  "display_order"
  ],
  "fields": [
   {
-   "fieldname": "platforms",
+   "fieldname": "platform",
    "fieldtype": "Select",
-   "label": "Platforms",
+   "label": "Platform",
    "options": "GitHub\nLinkedIn\nX (Twitter)\nYouTube\nFacebook\nInstagram"
+  },
+  {
+   "description": "Optional Lucide icon name or custom identifier (e.g., lucide:linkedin).",
+   "fieldname": "icon",
+   "fieldtype": "Data",
+   "label": "Icon"
   },
   {
    "fieldname": "url",
@@ -22,13 +30,18 @@
    "in_list_view": 1,
    "label": "URL",
    "reqd": 1
+  },
+  {
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "label": "Display Order"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-10-15 18:37:55.862802",
+ "modified": "2025-10-15 20:37:55.862802",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Website Social Link",
