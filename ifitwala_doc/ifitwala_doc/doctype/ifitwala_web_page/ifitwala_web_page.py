@@ -5,7 +5,14 @@ import frappe
 from frappe.model.document import Document
 from frappe import _
 
-ALLOWED_BLOCK_TYPES = {"Hero", "Feature Highlights", "Trust Logos", "Testimonial Group", "CTA"}
+ALLOWED_BLOCK_TYPES = {
+    "Hero",
+    "Feature Highlights",
+    "Trust Logos",
+    "Longform Content",
+    "Testimonial Group",
+    "CTA",
+}
 
 class IfitwalaWebPage(Document):
     def validate(self):
@@ -35,4 +42,3 @@ class IfitwalaWebPage(Document):
             seen.add(row.section_order)
             if row.block_type and row.block_type not in ALLOWED_BLOCK_TYPES:
                 frappe.throw(_("Block Type '{0}' is not allowed.").format(row.block_type))
-
