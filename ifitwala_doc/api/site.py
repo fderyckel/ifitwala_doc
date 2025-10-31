@@ -235,6 +235,14 @@ def _normalize_slug(value: Optional[str]) -> str:
     trimmed = raw.strip("/")
     if not trimmed:
         return "/"
+    lowered = trimmed.lower()
+    if lowered in ("index", "home"):
+        return "/"
+    if lowered.endswith("/index"):
+        trimmed = trimmed[: -len("/index")]
+    trimmed = trimmed.strip("/")
+    if not trimmed:
+        return "/"
     return f"/{trimmed}"
 
 

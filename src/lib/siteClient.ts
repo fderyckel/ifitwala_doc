@@ -169,7 +169,23 @@ function normalizeSlug(value: unknown): string {
   if (!trimmed || trimmed === '/') {
     return '/'
   }
-  return `/${trimmed.replace(/^\/|\/$/g, '')}`
+  const stripped = trimmed.replace(/^\/+|\/+$/g, '')
+  if (!stripped) {
+    return '/'
+  }
+  const lowered = stripped.toLowerCase()
+  if (lowered === 'index' || lowered === 'home') {
+    return '/'
+  }
+  let normalized = stripped
+  if (lowered.endsWith('/index')) {
+    normalized = stripped.slice(0, -6)
+  }
+  normalized = normalized.replace(/^\/+|\/+$/g, '')
+  if (!normalized) {
+    return '/'
+  }
+  return `/${normalized}`
 }
 
 export function slugToSegments(slug: string): string[] {
