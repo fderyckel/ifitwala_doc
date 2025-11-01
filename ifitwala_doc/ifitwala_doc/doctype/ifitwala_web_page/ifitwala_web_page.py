@@ -35,6 +35,14 @@ class IfitwalaWebPage(WebsiteGenerator):
         if self.slug not in (None, "", "/") and not self.canonical_url:
             self.canonical_url = f"/{self.slug}"
 
+        # Ensure `route` mirrors the slug (with a leading slash)
+        normalized_route = (self.slug or "").strip()
+        if normalized_route and not normalized_route.startswith("/"):
+            normalized_route = f"/{normalized_route}"
+        if not normalized_route:
+            normalized_route = "/"
+        self.route = normalized_route
+
     def validate(self):
         self._validate_slug_unique()
         self._validate_has_sections()
