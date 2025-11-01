@@ -24,8 +24,15 @@ class IfitwalaWebPage(WebsiteGenerator):
     )
 
     def before_validate(self):
-        self.slug = self._normalize_slug_value(self.slug)
-        if self.slug != "/" and self.canonical_url in (None, "", "/"):
+        cleaned = (self.slug or "").strip()
+        if cleaned and cleaned != "/":
+            # remove leading slash but keep intentional segments
+            cleaned = cleaned.lstrip("/")
+            self.slug = cleaned or "/"
+        else:
+            self.slug = "/" if cleaned == "/" else cleaned
+
+        if self.slug not in (None, "", "/") and not self.canonical_url:
             self.canonical_url = f"/{self.slug}"
 
     def validate(self):
@@ -61,23 +68,3 @@ class IfitwalaWebPage(WebsiteGenerator):
         context.slug = self.slug
         context.layout = (self.layout or "Standard").lower()
         return context
-
-    @staticmethod
-    def _normalize_slug_value(value: str | None) -> str:
-        if not value:
-            return "/"
-        raw = str(value).strip()
-        if not raw or raw == "/":
-            return "/"
-        trimmed = raw.strip("/")
-        if not trimmed:
-            return "/"
-        lowered = trimmed.lower()
-        if lowered in ("index", "home"):
-            return "/"
-        if lowered.endswith("/index"):
-            trimmed = trimmed[: -len("/index")]
-        trimmed = trimmed.strip("/")
-        if not trimmed:
-            return "/"
-        return trimmed

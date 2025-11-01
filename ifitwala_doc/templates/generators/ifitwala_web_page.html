@@ -80,7 +80,8 @@
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         const assetsBase = '/assets/ifitwala_doc';
-        const slug = '{{ (doc.slug or "").strip() }}' || '{{ context.slug or "" }}';
+        const rawSlug = '{{ (doc.slug or "").strip() }}' || '{{ context.slug or "" }}';
+        const slug = rawSlug.startsWith('/') ? rawSlug : (rawSlug ? `/${rawSlug}` : '');
 
         function cleanSlug(value) {
           if (!value) return '/';
