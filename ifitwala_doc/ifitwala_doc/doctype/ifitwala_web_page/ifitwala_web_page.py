@@ -23,6 +23,11 @@ class IfitwalaWebPage(WebsiteGenerator):
         template="generators/ifitwala_web_page.html",
     )
 
+    def before_validate(self):
+        self.slug = self._normalize_slug_value(self.slug)
+        if self.slug != "/" and self.canonical_url in (None, "", "/"):
+            self.canonical_url = f"/{self.slug}"
+
     def validate(self):
         self._validate_slug_unique()
         self._validate_has_sections()
@@ -56,3 +61,23 @@ class IfitwalaWebPage(WebsiteGenerator):
         context.slug = self.slug
         context.layout = (self.layout or "Standard").lower()
         return context
+
+    @staticmethod
+    def _normalize_slug_value(value: str | None) -> str:
+        if not value:
+            return "/"
+        raw = str(value).strip()
+        if not raw or raw == "/":
+            return "/"
+        trimmed = raw.strip("/")
+        if not trimmed:
+            return "/"
+        lowered = trimmed.lower()
+        if lowered in ("index", "home"):
+            return "/"
+        if lowered.endswith("/index"):
+            trimmed = trimmed[: -len("/index")]
+        trimmed = trimmed.strip("/")
+        if not trimmed:
+            return "/"
+        return trimmed

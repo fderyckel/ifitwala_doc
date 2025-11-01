@@ -136,21 +136,24 @@
    "fieldname": "column_break_nkfj",
    "fieldtype": "Column Break"
   },
-  {
-   "fieldname": "section_break_2qy1",
-   "fieldtype": "Section Break"
-  }
- ],
+ {
+  "fieldname": "section_break_2qy1",
+  "fieldtype": "Section Break"
+ }
+],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-16 21:57:29.930920",
- "modified_by": "Administrator",
- "module": "Ifitwala Doc",
- "name": "Ifitwala Web Page",
- "naming_rule": "By fieldname",
- "owner": "Administrator",
- "permissions": [
+"modified": "2025-10-16 22:57:29.930920",
+"modified_by": "Administrator",
+"module": "Ifitwala Doc",
+"name": "Ifitwala Web Page",
+"naming_rule": "By fieldname",
+"owner": "Administrator",
+ "has_web_view": 1,
+ "website_route_field": "slug",
+ "website_condition_field": "is_published",
+"permissions": [
   {
    "create": 1,
    "delete": 1,
