@@ -67,28 +67,86 @@
     </style>
     <script>
       (function () {
-        const target = '/assets/ifitwala_doc/index.html';
-        async function hydrate() {
+        const assetsBase = '/assets/ifitwala_doc';
+
+        function unique(list) {
+          return list.filter((value, index, arr) => arr.indexOf(value) === index);
+        }
+
+        function normalisePath(pathname) {
+          if (!pathname) {
+            return '/';
+          }
           try {
-            const response = await fetch(target, {
-              cache: 'no-cache',
-              credentials: 'same-origin',
-            });
-            if (!response.ok) {
-              throw new Error(`Failed to load ${target}`);
-            }
-            const html = await response.text();
-            document.open();
-            document.write(html);
-            document.close();
-          } catch (error) {
-            console.error('[ifitwala_doc] Failed to load static marketing site:', error);
-            const msg = document.getElementById('fallback-message');
-            if (msg) {
-              msg.hidden = false;
+            pathname = decodeURIComponent(pathname);
+          } catch (_) {
+            // keep original if decoding fails
+          }
+          let cleaned = pathname.replace(/\/+/g, '/');
+          if (!cleaned.startsWith('/')) {
+            cleaned = `/${cleaned}`;
+          }
+          cleaned = cleaned.replace(/\/+$/, '');
+          if (cleaned === '' || cleaned === '/') {
+            return '/';
+          }
+          const lower = cleaned.toLowerCase();
+          if (lower === '/index' || lower === '/home') {
+            return '/';
+          }
+          if (lower.endsWith('/index')) {
+            const trimmed = cleaned.slice(0, -6);
+            return trimmed ? trimmed : '/';
+          }
+          return cleaned;
+        }
+
+        function candidateTargets(pathname) {
+          const normalized = normalisePath(pathname);
+          const candidates = [];
+          if (normalized === '/') {
+            candidates.push(`${assetsBase}/index.html`);
+            candidates.push(`${assetsBase}/index/index.html`);
+          } else {
+            const trimmed = normalized.replace(/^\/+/, '');
+            candidates.push(`${assetsBase}/${trimmed}/index.html`);
+            candidates.push(`${assetsBase}/${trimmed}.html`);
+            candidates.push(`${assetsBase}/${trimmed}/index/index.html`);
+          }
+          return unique(candidates);
+        }
+
+        async function hydrate() {
+          const candidates = candidateTargets(window.location.pathname);
+          for (const target of candidates) {
+            try {
+              const response = await fetch(target, {
+                cache: 'no-cache',
+                credentials: 'same-origin',
+              });
+              if (!response.ok) {
+                throw new Error(`Failed to load ${target} -> ${response.status}`);
+              }
+              const html = await response.text();
+              if (!html) {
+                throw new Error(`Empty HTML from ${target}`);
+              }
+              document.open();
+              document.write(html);
+              document.close();
+              return;
+            } catch (error) {
+              console.warn('[ifitwala_doc] Static fallback miss:', target, error);
             }
           }
+
+          console.error('[ifitwala_doc] Failed to load static marketing site for path:', window.location.pathname);
+          const msg = document.getElementById('fallback-message');
+          if (msg) {
+            msg.hidden = false;
+          }
         }
+
         hydrate();
       })();
     </script>

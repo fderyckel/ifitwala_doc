@@ -63,7 +63,10 @@ website_redirects = [
 # Alternatively (if Frappe version supports):
 website_route_rules = [
     {"from_route": "/home",                           "to_route": "/"},
-    {"from_route": "/docs/preview/<language>/<slug>", "to_route": "docs/preview"}
+    {"from_route": "/docs/preview/<language>/<slug>", "to_route": "docs/preview"},
+    {"from_route": "/features",                       "to_route": "index"},
+    {"from_route": "/features/<path:subpath>",        "to_route": "index"},
+    {"from_route": "/features/<path:subpath>/",       "to_route": "index"},
 ]
 
 # Svg Icons
