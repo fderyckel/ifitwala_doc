@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:slug",
+ "autoname": "hash",
  "creation": "2025-10-16 19:24:30.824627",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -25,7 +25,8 @@
   "og_image_alt",
   "og_type",
   "section_break_2qy1",
-  "sections"
+  "sections",
+  "route"
  ],
  "fields": [
   {
@@ -136,24 +137,28 @@
    "fieldname": "column_break_nkfj",
    "fieldtype": "Column Break"
   },
- {
-  "fieldname": "section_break_2qy1",
-  "fieldtype": "Section Break"
- }
-],
+  {
+   "fieldname": "section_break_2qy1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "label": "Route"
+  }
+ ],
  "grid_page_length": 50,
+ "has_web_view": 1,
  "index_web_pages_for_search": 1,
+ "is_published_field": "is_published",
  "links": [],
-"modified": "2025-10-26 22:57:29.930920",
-"modified_by": "Administrator",
-"module": "Ifitwala Doc",
-"name": "Ifitwala Web Page",
-"naming_rule": "By fieldname",
-"owner": "Administrator",
-"has_web_view": 1,
-"website_route_field": "slug",
-"website_condition_field": "is_published",
-"permissions": [
+ "modified": "2025-11-01 18:26:14.977690",
+ "modified_by": "Administrator",
+ "module": "Ifitwala Doc",
+ "name": "Ifitwala Web Page",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
   {
    "create": 1,
    "delete": 1,
@@ -191,6 +196,7 @@
    "write": 1
   }
  ],
+ "route": "slug",
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
