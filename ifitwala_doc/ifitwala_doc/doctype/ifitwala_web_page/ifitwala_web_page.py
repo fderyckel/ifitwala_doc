@@ -1,9 +1,14 @@
 # Copyright (c) 2025, François de Ryckel and contributors
 # For license information, please see license.txt
 
+# ifitwala_doc/ifitwala_doc/doctype/ifitwala_web_page/ifitwala_web_page.py
+
 import frappe
 from frappe.website.website_generator import WebsiteGenerator
 from frappe import _
+
+# DEBUG: log route resolution
+frappe.log_error(f"WebPage slug={_(lambda self: self.slug) if False else '…'}", "IfitwalaWebPage Debug")
 
 ALLOWED_BLOCK_TYPES = {
     "Hero",
