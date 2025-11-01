@@ -86,7 +86,9 @@ home_page = "index"
 # ----------
 
 # automatically create page for each record of this doctype
-website_generators = ["Ifitwala Web Page"]
+# website_generators = ["Web Page"]
+
+website_catch_all = ["ifitwala_doc.api.catch_all.handle"]
 
 # Jinja
 # ----------

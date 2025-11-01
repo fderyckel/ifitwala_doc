@@ -1,14 +1,9 @@
 # Copyright (c) 2025, François de Ryckel and contributors
 # For license information, please see license.txt
 
-# ifitwala_doc/ifitwala_doc/doctype/ifitwala_web_page/ifitwala_web_page.py
-
 import frappe
-from frappe.website.website_generator import WebsiteGenerator
+from frappe.model.document import Document
 from frappe import _
-
-# DEBUG: log route resolution
-frappe.log_error(f"WebPage slug={_(lambda self: self.slug) if False else '…'}", "IfitwalaWebPage Debug")
 
 ALLOWED_BLOCK_TYPES = {
     "Hero",
@@ -20,34 +15,7 @@ ALLOWED_BLOCK_TYPES = {
 }
 
 
-class IfitwalaWebPage(WebsiteGenerator):
-    website_route_field = "slug"
-    website = frappe._dict(
-        condition_field="is_published",
-        page_title_field="title",
-        template="generators/ifitwala_web_page.html",
-    )
-
-    def before_validate(self):
-        cleaned = (self.slug or "").strip()
-        if cleaned and cleaned != "/":
-            # remove leading slash but keep intentional segments
-            cleaned = cleaned.lstrip("/")
-            self.slug = cleaned or "/"
-        else:
-            self.slug = "/" if cleaned == "/" else cleaned
-
-        if self.slug not in (None, "", "/") and not self.canonical_url:
-            self.canonical_url = f"/{self.slug}"
-
-        # Ensure `route` mirrors the slug (with a leading slash)
-        normalized_route = (self.slug or "").strip()
-        if normalized_route and not normalized_route.startswith("/"):
-            normalized_route = f"/{normalized_route}"
-        if not normalized_route:
-            normalized_route = "/"
-        self.route = normalized_route
-
+class IfitwalaWebPage(Document):
     def validate(self):
         self._validate_slug_unique()
         self._validate_has_sections()
