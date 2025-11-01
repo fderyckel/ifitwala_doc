@@ -20,6 +20,7 @@
 	"devDependencies": {
 		"@astrojs/tailwind": "^6.0.2",
 		"@iconify-json/lucide": "^1.2.69",
+		"@lucide/astro": "^0.552.0",
 		"@tailwindcss/typography": "^0.5.10",
 		"@vitejs/plugin-vue": "^6.0.1",
 		"astro": "^5.14.1",
