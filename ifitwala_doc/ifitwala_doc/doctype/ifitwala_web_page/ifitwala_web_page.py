@@ -2,7 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.model.document import Document
+from frappe.website.website_generator import WebsiteGenerator
 from frappe import _
 
 ALLOWED_BLOCK_TYPES = {
@@ -14,7 +14,15 @@ ALLOWED_BLOCK_TYPES = {
     "CTA",
 }
 
-class IfitwalaWebPage(Document):
+
+class IfitwalaWebPage(WebsiteGenerator):
+    website_route_field = "slug"
+    website = frappe._dict(
+        condition_field="is_published",
+        page_title_field="title",
+        template="generators/ifitwala_web_page.html",
+    )
+
     def validate(self):
         self._validate_slug_unique()
         self._validate_has_sections()
@@ -42,3 +50,9 @@ class IfitwalaWebPage(Document):
             seen.add(row.section_order)
             if row.block_type and row.block_type not in ALLOWED_BLOCK_TYPES:
                 frappe.throw(_("Block Type '{0}' is not allowed.").format(row.block_type))
+
+    def get_context(self, context):
+        context = super().get_context(context)
+        context.slug = self.slug
+        context.layout = (self.layout or "Standard").lower()
+        return context

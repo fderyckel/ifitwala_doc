@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ doc.title or "Ifitwala Ed" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    {% if doc.seo_title %}
+      <meta property="og:title" content="{{ doc.seo_title }}" />
+    {% endif %}
+    {% if doc.seo_description %}
+      <meta property="og:description" content="{{ doc.seo_description }}" />
+      <meta name="description" content="{{ doc.seo_description }}" />
+    {% elif doc.meta_description %}
+      <meta name="description" content="{{ doc.meta_description }}" />
+    {% endif %}
+    {% if doc.og_image %}
+      <meta property="og:image" content="{{ doc.og_image }}" />
+    {% endif %}
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: radial-gradient(120% 120% at 80% 0%, rgba(47, 125, 98, 0.12) 0%, rgba(47, 125, 98, 0) 60%),
+                    radial-gradient(140% 140% at -10% 30%, rgba(235, 169, 78, 0.14) 0%, rgba(235, 169, 78, 0) 70%),
+                    linear-gradient(180deg, #f9f6f1 0%, #ffffff 55%, #ffffff 100%);
+        color: #5f5347;
+      }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+      }
+      .loader {
+        display: grid;
+        gap: 1rem;
+        padding: 2.5rem 3rem;
+        border-radius: 32px;
+        border: 1px solid rgba(47, 125, 98, 0.15);
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 18px 48px rgba(14, 38, 29, 0.08);
+        text-align: center;
+      }
+      .loader span {
+        font-size: 0.95rem;
+        opacity: 0.8;
+      }
+      .spinner {
+        width: 3rem;
+        height: 3rem;
+        margin: 0 auto;
+        border-radius: 50%;
+        border: 0.3rem solid rgba(47, 125, 98, 0.15);
+        border-top-color: rgba(47, 125, 98, 0.65);
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      noscript {
+        display: block;
+        max-width: 420px;
+        text-align: center;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-top: 1.5rem;
+        color: #7e6f61;
+      }
+      noscript a {
+        color: #2e7d62;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      noscript a:hover { text-decoration: underline; }
+      .fallback-error {
+        color: #c0564a;
+        font-weight: 600;
+      }
+    </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const assetsBase = '/assets/ifitwala_doc';
+        const slug = '{{ (doc.slug or "").strip() }}' || '{{ context.slug or "" }}';
+
+        function cleanSlug(value) {
+          if (!value) return '/';
+          let trimmed = value.trim();
+          if (!trimmed) return '/';
+          if (!trimmed.startsWith('/')) {
+            trimmed = '/' + trimmed;
+          }
+          trimmed = trimmed.replace(/\/+$/, '');
+          const lower = trimmed.toLowerCase();
+          if (lower === '/index' || lower === '/home') return '/';
+          if (lower.endsWith('/index')) {
+            const compact = trimmed.slice(0, -6);
+            return compact || '/';
+          }
+          return trimmed;
+        }
+
+        const normalizedPath = cleanSlug(slug);
+
+        function candidates(pathname) {
+          if (pathname === '/') {
+            return [assetsBase + '/index.html', assetsBase + '/index/index.html'];
+          }
+          const trimmed = pathname.replace(/^\/+/, '');
+          return [
+            `${assetsBase}/${trimmed}/index.html`,
+            `${assetsBase}/${trimmed}.html`,
+            `${assetsBase}/${trimmed}/index/index.html`,
+          ];
+        }
+
+        async function hydrate() {
+          const targets = candidates(normalizedPath);
+          for (const target of targets) {
+            try {
+              const response = await fetch(target, { cache: 'no-cache', credentials: 'same-origin' });
+              if (!response.ok) {
+                throw new Error(`Failed to load ${target}, status ${response.status}`);
+              }
+              const html = await response.text();
+              document.open();
+              document.write(html);
+              document.close();
+              return;
+            } catch (error) {
+              console.warn('[ifitwala_doc] Failed candidate', target, error);
+            }
+          }
+          const msg = document.getElementById('fallback-message');
+          if (msg) {
+            msg.hidden = false;
+          }
+        }
+
+        hydrate();
+      });
+    </script>
+  </head>
+  <body>
+    <div class="loader">
+      <div class="spinner" aria-hidden="true"></div>
+      <strong>Preparing the Ifitwala page…</strong>
+      <span id="fallback-message" hidden>
+        If this page does not load automatically, please refresh or open
+        <a href="/assets/ifitwala_doc/index.html">/assets/ifitwala_doc/index.html</a>.
+      </span>
+    </div>
+    <noscript>
+      JavaScript is required to view this page. You can open the static version directly at
+      <a href="/assets/ifitwala_doc/index.html">/assets/ifitwala_doc/index.html</a>.
+    </noscript>
+  </body>
+</html>
