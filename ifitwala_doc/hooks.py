@@ -66,6 +66,8 @@ website_route_rules = [
     {"from_route": "/docs/preview/<language>/<slug>", "to_route": "docs/preview"},
 ]
 
+website_catch_all = ["ifitwala_doc.api.catch_all.handle"]
+
 # Svg Icons
 # ------------------
 # include app icons in desk
