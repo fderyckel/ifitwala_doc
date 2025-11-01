@@ -265,7 +265,7 @@ def _slug_candidates(slug: str) -> List[str]:
             seen.append(key)
 
     if "/" not in seen:
-        seen.insert(0, "/")
+        seen.append("/")
     return seen
 
 
