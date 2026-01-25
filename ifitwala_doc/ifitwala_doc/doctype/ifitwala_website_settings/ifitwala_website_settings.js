@@ -5,7 +5,7 @@ frappe.ui.form.on("Ifitwala Website Settings", {
 	refresh(frm) {
 		frm.add_custom_button(__("Deploy Website"), () => {
 			frappe.call({
-				method: "ifitwala_doc.ifitwala_doc.api.build.kick_build",
+				method: "ifitwala_doc.api.build.kick_build",
 				freeze: true,
 				freeze_message: __("Starting build process..."),
 				callback: function (r) {

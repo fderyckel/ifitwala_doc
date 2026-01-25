@@ -207,7 +207,7 @@ def kick_build():
     frappe.only_for(("System Manager", "Website Manager"))
     
     frappe.enqueue(
-        "ifitwala_doc.ifitwala_doc.api.build.run_astro_build",
+        "ifitwala_doc.api.build.run_astro_build",
         queue="long",
         timeout=1500
     )
