@@ -125,6 +125,19 @@ def run_astro_build():
     env = os.environ.copy()
     env.setdefault("NODE_ENV", "production")  # build env can be production
 
+    # Load .env file manually since we aren't in a shell that sources it
+    dotenv_path = os.path.join(proj_root, ".env")
+    if os.path.isfile(dotenv_path):
+        with open(dotenv_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                # Remove quotes if present
+                v = v.strip("'\"")
+                env.setdefault(k.strip(), v)
+
     original_path = env.get("PATH", "")
     import glob
 
