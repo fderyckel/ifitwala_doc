@@ -126,6 +126,8 @@ def run_astro_build():
     env.setdefault("NODE_ENV", "production")  # build env can be production
 
     original_path = env.get("PATH", "")
+    import glob
+
     path_hints = [
         "/usr/local/bin",
         "/usr/local/sbin",
@@ -135,6 +137,19 @@ def run_astro_build():
         os.path.join(proj_root, "node_modules", ".bin"),
         os.path.join(proj_root, ".yarn", "bin"),
     ]
+    
+    # Attempt to find NVM paths
+    nvm_paths = glob.glob(os.path.expanduser("~/.nvm/versions/node/*/bin"))
+    if not nvm_paths:
+        # Fallback: check based on bench_root ownership if running as root/restricted
+        possible_home = os.path.dirname(os.path.dirname(bench_root)) # /home/user or /opt
+        nvm_paths = glob.glob(os.path.join(possible_home, ".nvm/versions/node/*/bin"))
+    
+    if nvm_paths:
+        # Sort by version (latest first approximately)
+        nvm_paths.sort(reverse=True)
+        path_hints.extend(nvm_paths)
+
     path_hints.extend(_normalize_path_entries(frappe.conf.get("docs_build_yarn_paths")))
     path_hints.extend(_normalize_path_entries(env.get("IFITWALA_DOC_YARN_PATHS")))
     if original_path:
