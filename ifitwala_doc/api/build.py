@@ -157,23 +157,40 @@ def run_astro_build():
         _run(command, cwd=proj_root, env=env)
 
     # ─────────────────────── Build step ──────────────────────
-    # 1) Install with devDependencies so 'astro' exists
-    run_yarn("install --frozen-lockfile --check-files --production=false")
+    try:
+        # 1) Install with devDependencies so 'astro' exists
+        run_yarn("install --frozen-lockfile --check-files --production=false")
 
-    # (optional diagnostics)
-    run_yarn("--version")
-    _run("node --version", cwd=proj_root, env=env)
+        # (optional diagnostics)
+        run_yarn("--version")
+        _run("node --version", cwd=proj_root, env=env)
 
-    # 2) Build via package.json script (runs 'astro build')
-    run_yarn("astro:build")
+        # 2) Build via package.json script (runs 'astro build')
+        run_yarn("astro:build")
 
-    # 3) Deploy built assets
-    dist_root = os.path.join(proj_root, "dist")
-    if not os.path.isdir(dist_root):
-        frappe.throw("Astro build did not produce dist/")
+        # 3) Deploy built assets
+        dist_root = os.path.join(proj_root, "dist")
+        if not os.path.isdir(dist_root):
+            frappe.throw("Astro build did not produce dist/")
 
-    # Absolute paths; neutral cwd avoids accidental relatives
-    _run(f"rsync -a --delete {shlex.quote(dist_root)}/ {shlex.quote(out_root)}/", cwd="/", env=env)
+        # Absolute paths; neutral cwd avoids accidental relatives
+        _run(f"rsync -a --delete {shlex.quote(dist_root)}/ {shlex.quote(out_root)}/", cwd="/", env=env)
+
+        frappe.publish_realtime(
+            "astro_build_status",
+            {"status": "completed", "message": "Website deployed successfully!"},
+            user=frappe.session.user
+        )
+
+    except Exception as e:
+        frappe.logger("ifitwala_doc").error(f"Build failed: {e}", exc_info=True)
+        frappe.publish_realtime(
+            "astro_build_status",
+            {"status": "failed", "message": f"Build failed: {str(e)}"},
+            user=frappe.session.user
+        )
+        raise e
+
 
 @frappe.whitelist(allow_guest=True)
 def debug_headers():
@@ -186,10 +203,13 @@ def debug_headers():
 
 @frappe.whitelist()
 def kick_build():
-    """Server-side trigger so Desk JS doesn't handle tokens.
-    Restrict to trusted roles.
-    """
+    """Trigger the Astro build process directly from the Desk."""
     frappe.only_for(("System Manager", "Website Manager"))
-    from ifitwala_doc.ifitwala_doc.published_utils import ping_build
-    ping_build()
-    return {"queued": True}
+    
+    frappe.enqueue(
+        "ifitwala_doc.ifitwala_doc.api.build.run_astro_build",
+        queue="long",
+        timeout=1500
+    )
+    
+    return {"queued": True, "message": "Build started. You will be notified when complete."}
