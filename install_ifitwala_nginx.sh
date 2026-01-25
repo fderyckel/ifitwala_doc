@@ -4,7 +4,7 @@ set -Eeuo pipefail
 # --- CONFIG ---
 BENCH_ROOT="${BENCH_ROOT:-$HOME/frappe-bench}"
 ASSETS_ROOT="${ASSETS_ROOT:-$BENCH_ROOT/sites/assets/ifitwala_doc}"
-OUT_CONF="${OUT_CONF:-/etc/nginx/conf.d/ifitwala_doc_static.conf}"
+OUT_CONF="${OUT_CONF:-/etc/nginx/conf.d/ifitwala_doc_static.inc}"
 
 echo "==> Installing Ifitwala Doc nginx configuration"
 echo "   BENCH_ROOT  : $BENCH_ROOT"
@@ -56,7 +56,13 @@ echo "==> Reloading nginx service"
 sudo systemctl reload nginx
 
 echo
-echo "✅ Nginx static routes for Ifitwala Docs installed!"
-echo "   /docs/_astro/  → ${ASSETS_ROOT}/_astro/"
-echo "   /docs/         → ${ASSETS_ROOT}/docs/"
-echo "   /features/     → ${ASSETS_ROOT}/features/"
+echo "✅ Nginx static routes file created at: $OUT_CONF"
+echo
+echo "⚠️  IMPORTANT STEP REQUIRED ⚠️"
+echo "To enable these routes, you must EDIT your main Nginx configuration"
+echo "(usually /etc/nginx/conf.d/frappe-bench.conf) and add this line"
+echo "inside the 'server {' block for your site:"
+echo
+echo "    include $OUT_CONF;"
+echo
+echo "Then reload nginx: sudo service nginx reload"
