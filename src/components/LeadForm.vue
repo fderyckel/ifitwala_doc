@@ -28,6 +28,7 @@ const submitForm = async () => {
   try {
     const response = await fetch('/api/method/ifitwala_doc.crm.api.capture_lead', {
       method: 'POST',
+      credentials: 'omit', // Bypass CSRF check by not sending cookies (public form)
       headers: {
         'Content-Type': 'application/json',
       },
