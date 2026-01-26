@@ -54,3 +54,20 @@ To update Nginx mapping:
 ./install_ifitwala_nginx.sh
 # Then follow instructions to edit frappe-bench.conf
 ```
+
+## Vue + Astro Hydration Architecture
+**Context**: We use Astro as the site framework but leverage Vue for interactive components (like Forms).
+
+**How it works**:
+- **Configuration**: We use `@astrojs/vue` in `astro.config.mjs` to enable Vue support.
+- **Components**: Vue components live in `src/components/` (e.g., `LeadForm.vue`).
+- **Hydration**: When embedding a Vue component in an Astro page, we use a client directive to tell Astro when to load the JavaScript.
+    ```astro
+    <!-- src/pages/book-a-demo.astro -->
+    <LeadForm client:load /> 
+    ```
+    - `client:load`: Hydrates immediately on page load.
+    - `client:visible`: Hydrates only when scrolled into view.
+- **Styling**: Vue components inherit the global Tailwind CSS configuration, so no separate style setup is needed.
+
+**Benefit**: This specific architecture avoids sending a massive bundle for the whole site. We only send Vue.js for the specific "islands" that need interactivity.
