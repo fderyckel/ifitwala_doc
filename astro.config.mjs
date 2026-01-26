@@ -1,6 +1,6 @@
-// astro.config.mjs
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
+import vue from '@astrojs/vue';
 import Icons from 'unplugin-icons/vite';
 import { fileURLToPath } from 'node:url';
 
@@ -14,7 +14,10 @@ export default defineConfig({
   build: {
     assetsPrefix: '/assets/ifitwala_doc',
   },
-  integrations: [tailwind({ config: './tailwind.config.cjs', applyBaseStyles: false })],
+  integrations: [
+    tailwind({ config: './tailwind.config.cjs', applyBaseStyles: false }),
+    vue(),
+  ],
   vite: {
     // Add the unplugin-icons plugin here
     plugins: [

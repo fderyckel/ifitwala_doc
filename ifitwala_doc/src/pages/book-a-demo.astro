@@ -1,0 +1,61 @@
+---
+import SiteShell from '@/layouts/SiteShell.astro';
+import LeadForm from '@/components/LeadForm.vue';
+import { getNav, getSiteSettings } from '@/lib/siteClient';
+
+const [settings, headerNav, footerNav] = await Promise.all([
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+]);
+
+const pageTitle = "Book a Demo - Ifitwala Ed";
+const pageDesc = "Schedule a personalized demo of Ifitwala Ed. See how our education ERP can streamlline your school operations.";
+---
+
+<SiteShell
+  title={pageTitle}
+  description={pageDesc}
+  headerNav={headerNav}
+  footerNav={footerNav}
+  settings={settings}
+>
+  <div class="relative overflow-hidden bg-sand/30">
+    <div class="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+      <div class="grid gap-12 lg:grid-cols-2 lg:items-center">
+        <!-- Text Content -->
+        <div class="space-y-8">
+          <h1 class="font-serif text-4xl font-bold leading-tight text-ink md:text-5xl lg:text-6xl">
+            Transform Your <span class="text-canopy">School Management</span>
+          </h1>
+          <p class="text-lg text-slate md:text-xl leading-relaxed">
+            Stop wrestling with fragmented spreadsheets and outdated software. 
+            Ifitwala Ed brings Admissions, Academics, Finance, and HR into one beautiful, 
+            easy-to-use platform.
+          </p>
+          
+          <ul class="space-y-4 pt-4">
+            {[
+              "Unified Student Records",
+              "Automated Gradebooks & Reports", 
+              "Seamless Parent Communication",
+              "Integrated Financial Management"
+            ].map(item => (
+              <li class="flex items-center gap-3">
+                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-leaf/20 text-leaf">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <span class="font-medium text-ink">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Form -->
+        <div class="lg:pl-10">
+            <LeadForm client:load source="Book Demo Page" />
+        </div>
+      </div>
+    </div>
+  </div>
+</SiteShell>

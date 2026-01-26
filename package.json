@@ -23,6 +23,7 @@
 		"@lucide/astro": "^0.552.0",
 		"@tailwindcss/typography": "^0.5.10",
 		"@vitejs/plugin-vue": "^6.0.1",
+		"@astrojs/vue": "^5.0.0",
 		"astro": "^5.14.1",
 		"autoprefixer": "^10.4.20",
 		"marked": "^16.4.0",
