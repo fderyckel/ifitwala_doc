@@ -45,6 +45,12 @@ location ^~ /features/ {
     index index.html;
     try_files \$uri \$uri/ =404;
 }
+
+# ---- New root-level marketing pages (book-a-demo, pricing, etc.) ----
+location ~ ^/(book-a-demo|pricing|about) {
+    root ${ASSETS_ROOT};
+    try_files \$uri \$uri/index.html \$uri/ =404;
+}
 NGINX
 
 # --- TEST & RELOAD ---
