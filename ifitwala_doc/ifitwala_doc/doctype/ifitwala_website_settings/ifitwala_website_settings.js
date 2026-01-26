@@ -26,12 +26,14 @@ frappe.ui.form.on("Ifitwala Website Settings", {
 					message: __(data.message),
 					indicator: "green"
 				});
+				frm.reload_doc();
 			} else if (data.status === "failed") {
 				frappe.msgprint({
 					title: __("Build Failed"),
 					message: __(data.message),
 					indicator: "red"
 				});
+				frm.reload_doc();
 			}
 		});
 	},

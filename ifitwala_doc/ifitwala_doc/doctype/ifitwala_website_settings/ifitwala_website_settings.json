@@ -11,7 +11,11 @@
   "primary_cta_label",
   "primary_cta_url",
   "footer_md",
-  "brand_logo_alt"
+  "brand_logo_alt",
+  "section_break_deployment",
+  "last_build_status",
+  "last_build_time",
+  "last_build_log"
  ],
  "fields": [
   {
@@ -48,13 +52,37 @@
    "fieldname": "brand_logo_alt",
    "fieldtype": "Data",
    "label": "Logo Alt Text"
+  },
+  {
+   "fieldname": "section_break_deployment",
+   "fieldtype": "Section Break",
+   "label": "Deployment Status"
+  },
+  {
+   "fieldname": "last_build_status",
+   "fieldtype": "Select",
+   "label": "Last Build Status",
+   "options": "\nPending\nSuccess\nFailed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_build_time",
+   "fieldtype": "Datetime",
+   "label": "Last Build Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_build_log",
+   "fieldtype": "Small Text",
+   "label": "Last Build Log",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-15 18:35:05.080519",
+ "modified": "2026-01-15 18:35:07",
  "modified_by": "Administrator",
  "module": "Ifitwala Doc",
  "name": "Ifitwala Website Settings",

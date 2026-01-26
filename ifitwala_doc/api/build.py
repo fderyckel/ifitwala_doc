@@ -184,6 +184,12 @@ def run_astro_build():
         command = yarn_prefix if not args else f"{yarn_prefix} {args}"
         _run(command, cwd=proj_root, env=env)
 
+    # ─────────────────────── Status Update (Start) ────────────────
+    settings = frappe.get_single("Ifitwala Website Settings")
+    settings.last_build_status = "Pending"
+    settings.save(ignore_permissions=True)
+    frappe.db.commit()
+
     # ─────────────────────── Build step ──────────────────────
     try:
         # 1) Install with devDependencies so 'astro' exists
@@ -204,6 +210,13 @@ def run_astro_build():
         # Absolute paths; neutral cwd avoids accidental relatives
         _run(f"rsync -a --delete {shlex.quote(dist_root)}/ {shlex.quote(out_root)}/", cwd="/", env=env)
 
+        # ─────────────────── Status Update (Success) ────────────────
+        settings.last_build_status = "Success"
+        settings.last_build_time = frappe.utils.now()
+        settings.last_build_log = "Build completed successfully."
+        settings.save(ignore_permissions=True)
+        frappe.db.commit()
+
         frappe.publish_realtime(
             "astro_build_status",
             {"status": "completed", "message": "Website deployed successfully!"},
@@ -212,6 +225,14 @@ def run_astro_build():
 
     except Exception as e:
         frappe.logger("ifitwala_doc").error(f"Build failed: {e}", exc_info=True)
+        
+        # ─────────────────── Status Update (Failure) ────────────────
+        settings.last_build_status = "Failed"
+        settings.last_build_time = frappe.utils.now()
+        settings.last_build_log = str(e)
+        settings.save(ignore_permissions=True)
+        frappe.db.commit()
+
         frappe.publish_realtime(
             "astro_build_status",
             {"status": "failed", "message": f"Build failed: {str(e)}"},
