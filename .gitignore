@@ -14,7 +14,10 @@ __pycache__/
 node_modules/
 .astro/
 
-# Build output
+# Standard Build output (Root level)
 dist/
-public/doc/
-public/_astro/
+
+# App Specific Build output (inside ifitwala_doc/public)
+ifitwala_doc/public/dist/
+ifitwala_doc/public/_astro/
+ifitwala_doc/public/docs/
