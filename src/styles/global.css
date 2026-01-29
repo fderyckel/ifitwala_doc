@@ -1,9 +1,9 @@
 @import './tokens.css';
+@import "tailwindcss"; /* */
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Reference legacy configuration for typography plugin and shared logic */
+@config "../../tailwind.config.cjs"; /* */
 
 /* small defaults */
 html, body { height: 100%; }
@@ -45,9 +45,8 @@ html, body { height: 100%; }
 }
 
 /* Helpers that typography plugin doesn't handle */
-@layer utilities {
-  /* Keep anchors from hiding under top nav (use on headings if needed) */
-  .scroll-mt-header { scroll-margin-top: 6rem; }
+@utility scroll-mt-header {
+  scroll-margin-top: 6rem;
 }
 
 /* Optional breadcrumb tint used in DocsLayout */

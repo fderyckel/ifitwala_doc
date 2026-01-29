@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite'; // Import the v4 Vite plugin
 import vue from '@astrojs/vue';
 import Icons from 'unplugin-icons/vite';
 import { fileURLToPath } from 'node:url';
@@ -15,12 +15,12 @@ export default defineConfig({
     assetsPrefix: '/assets/ifitwala_doc',
   },
   integrations: [
-    // Update: Remove the 'config' path. Tailwind v4/PostCSS will find it automatically.
-    tailwind({ applyBaseStyles: false }), 
+    // Removed @astrojs/tailwind integration to resolve PostCSS errors
     vue(),
   ],
   vite: {
     plugins: [
+      tailwindcss(), // Tailwind v4 now runs as a Vite plugin
       Icons({
         compiler: 'astro',
         autoInstall: true

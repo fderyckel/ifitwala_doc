@@ -1,3 +1,21 @@
 @import "tailwindcss";
 
-/* remove the .prose @apply for now */
+/* Reference the shared legacy configuration to maintain consistency 
+  with the Documentation pipeline and custom typography settings.
+*/
+@config "../../../tailwind.config.cjs";
+
+/* Global resets or marketing-specific base styles can be added here.
+  In v4, these automatically hook into the @import "tailwindcss" engine.
+*/
+@layer base {
+  /* Add any marketing-specific base overrides if needed */
+}
+
+/* Marketing-specific components go here. 
+  Note: .prose classes are handled by the @tailwindcss/typography 
+  plugin referenced in your shared config.
+*/
+@layer components {
+  /* Marketing-specific component classes */
+}
