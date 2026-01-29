@@ -72,6 +72,5 @@ This repository (`ifitwala_doc`) implements a **Hybrid Monorepo** pattern combin
 ## Deployment Commands
 
 To manually deploy or debug (runs both pipelines):
-```bash
 # 1. Ensure .env has PUBLIC_DOCS_API
 # 2. Run the deployment script    deploy_docs.sh
