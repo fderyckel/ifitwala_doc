@@ -1,4 +1,5 @@
 // tailwind.config.cjs
+
 const path = require('path');
 const colors = require('tailwindcss/colors'); // Added for v4 compatibility
 
