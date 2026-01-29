@@ -3,6 +3,8 @@
  * Synchronise theme tokens from Frappe (Ifitwala Theme Settings) into src/styles/tokens.css.
  */
 
+// scripts/pull_theme_tokens.mjs
+
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
