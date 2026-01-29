@@ -1,6 +1,6 @@
 // tailwind.config.cjs
 const path = require('path');
-const colors = require('tailwindcss/colors'); // Required to restore default v3 colors
+const colors = require('tailwindcss/colors'); // Added for v4 compatibility
 
 const color = (token) => `rgb(var(--${token}-rgb) / <alpha-value>)`;
 const raw = (token) => `var(${token})`;
@@ -16,11 +16,14 @@ module.exports = {
   safelist: ['prose','prose-docs','max-w-3xl','mx-auto','px-6','py-10','not-prose'],
   theme: {
     extend: {
-      // Restore default colors so frappe-ui components can find 'blue.200' etc.
+      fontFamily: {
+        serif: ['"Merriweather"', '"Source Serif Pro"', 'Georgia', 'serif'],
+      },
       colors: {
+        // Spread default colors so frappe-ui can find 'blue', 'gray', etc.
         ...colors, 
-        
-        // Custom semantic aliases from your Frappe tokens
+
+        // Your semantic aliases
         ink:      color('ink'),
         slate:    color('slate'),
         canopy:   color('canopy'),
@@ -29,11 +32,9 @@ module.exports = {
         sky:      color('sky'),
         sand:     color('sand'),
         border:   color('border'),
+
         primary:  color('canopy'),
         secondary:color('leaf'),
-      },
-      fontFamily: {
-        serif: ['"Merriweather"', '"Source Serif Pro"', 'Georgia', 'serif'],
       },
       borderRadius: {
         lg: raw('--radius-lg'),
