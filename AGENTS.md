@@ -1,73 +1,77 @@
 # AGENTS.md
 
-## Project Architecture: Frappe + Astro Hybrid
+## Project Architecture: Dual-Mode Hybrid
 
-This repository (`ifitwala_doc`) implements a **Hybrid Monorepo** pattern combining:
-1.  **Frappe App** (Backend/CMS): Manages content, authentication, and dynamic API endpoints.
-2.  **Astro Project** (Frontend/SSG): Consumes Frappe content via API and builds static marketing/documentation pages.
+This repository (`ifitwala_doc`) implements a **Hybrid Monorepo** pattern combining a Frappe backend with two distinct frontend build pipelines. This ensures maximum SEO for documentation while allowing rich interactivity for marketing pages.
 
-### Content Flow
-- **Source of Truth**: Frappe DocTypes (`Ifitwala Web Page`, `Documentation`).
-- **Build Process**: Astro fetches content from `https://ifitwala.com` (defined in `.env` as `PUBLIC_DOCS_API`) and generates static HTML.
-- **Serving**:
-    - **Dynamic**: Handled by Frappe (Python/Gunicorn).
-    - **Static (`/docs`, `/features`)**: Handled by Nginx, serving pre-built assets from `sites/assets/ifitwala_doc`.
+### 1. Frappe App (Backend/CMS)
+- **Role**: Manages content, authentication, and dynamic API endpoints.
+- **Source of Truth**: DocTypes (`Ifitwala Web Page`, `Documentation`).
+- **Serving**: Python/Gunicorn handles dynamic requests; Nginx handles static assets.
+
+### 2. Frontend Pipeline A: Static Documentation (Astro)
+- **Scope**: `/docs/*`, `/features/*`.
+- **Tech**: Astro SSG (`astro.config.mjs`).
+- **Goal**: **Maximum SEO**, zero-JS by default (HTML-first).
+- **Hydration**: Uses standard Astro Islands (e.g., `<LeadForm client:visible />`) only where strictly necessary.
+- **Output**: `dist/` (Synced to `sites/assets/ifitwala_doc` via rsync).
+
+### 3. Frontend Pipeline B: Dynamic Marketing (Vite + Vue)
+- **Scope**: Homepage (`/`), Landing Pages.
+- **Tech**: Frappe Jinja Templates + Vue "Islands" (`vite.config.mjs`).
+- **Goal**: Rich interactivity, complex state management.
+- **Mechanism**:
+    - **Entry**: `src/main.js`.
+    - **Hydration**: Manual. `main.js` scans the DOM for data attributes (e.g., `data-vue="Hero"`) and mounts specific Vue components from the `registry`.
+- **Output**: `ifitwala_doc/public/dist/` (Bundled JS/CSS loaded by Jinja templates).
+
+---
+
+## Content & Build Flow
 
 ### Integration Points
 - **Trigger**: "Deploy Website" button in `Ifitwala Website Settings` (Desk UI).
-- **Execution**: Python `frappe.enqueue` $\rightarrow$ `api/build.py` $\rightarrow$ `yarn astro:build`.
-- **Deployment**: `rsync` moves `dist/` $\rightarrow$ `frappe-bench/sites/assets/ifitwala_doc`.
+- **Execution**: Python `frappe.enqueue` $\rightarrow$ `api/build.py`.
+- **Build Commands**:
+    1. `yarn build` (Vite): Compiles `base.js` and `site.css` for the dynamic marketing pages.
+    2. `yarn astro:build` (Astro): Generates the static HTML for documentation.
+- **Deployment**: `rsync` moves artifacts to `frappe-bench/sites/assets/ifitwala_doc`.
+
+### Styling Architecture
+- **Framework**: Tailwind CSS.
+- **Configuration**: `tailwind.config.cjs` (Shared config).
+- **Entry Points**:
+    - **Astro**: `src/styles/global.css` (Injected into Astro layouts).
+    - **Vite**: `src/styles/tailwind.css` (Bundled into `site.css` for non-Astro pages).
+    - *Note: Ensure token changes are reflected in both entry points until fully unified.*
 
 ---
 
 ## Lessons Learned (The "Gotchas")
 
-### 1. Nginx Configuration Management
-**Issue**: Placing a file with `location` directives directly into `/etc/nginx/conf.d/*.conf` causes global config errors ("location directive not allowed here").
+### 1. Build Artifact Management (The "React Error #62")
+**Issue**: Committing heavy build folders (`dist/`, `.astro/`) or leaving them in the workspace causes web-based IDEs (Gravity) to crash with "Minified React error #62".
 **Solution**:
-- Generate config snippets as `.inc` files (e.g., `ifitwala_doc_static.inc`).
-- **Manually include** them inside the specific `server { ... }` block of the main site config.
-- **Critical**: Ensure the include is placed in the **SSL (Port 443)** block, not just the HTTP redirect block, or users won't see the changes.
+- **Git**: Ensure `dist/`, `.astro/`, and `ifitwala_doc/public/dist/` are in `.gitignore`.
+- **Cleanup**: Build scripts should run `rm -rf dist` before starting to ensure a clean slate.
 
-### 2. Execution Environment (PATH & Env Vars)
-**Issue**: Background workers (Supervisor/Redis Queue) often run with a restricted `PATH` and do not source shell profiles (`.bashrc`, `.zshrc`).
+### 2. Nginx Configuration
+**Issue**: `location` directives inside `/etc/nginx/conf.d/*.conf` cause global errors.
 **Solution**:
-- **Explicit Path Discovery**: Do not assume `yarn` or `node` are in the path. Checks must explicitly look for NVM directories (`~/.nvm/...`) and add them to `os.environ["PATH"]`.
-- **Manual .env Loading**: Python scripts running outside a shell setup must manually parse and load `.env` files. Failing to do so can lead to "silent successes" where the build runs but generates empty pages because API URLs were missing.
+- Generate `.inc` snippets (e.g., `ifitwala_doc_static.inc`).
+- **Manually include** them inside the **SSL (Port 443)** server block of the main site config.
 
-### 3. Permissions & Context
-**Issue**: Scripts created by the agent might lack execution permissions (`chmod +x`).
-**Solution**: Always verify or explicitly set permissions when creating shell scripts.
+### 3. Execution Environment (PATH & Env Vars)
+**Issue**: Background workers (Supervisor/Redis) run with restricted `PATH` and don't load `.bashrc`.
+**Solution**:
+- **Explicit Discovery**: Python build scripts must explicitly find `node`/`yarn` binaries (e.g., in `~/.nvm/...`).
+- **Env Vars**: Python scripts must manually load `.env` variables (like `PUBLIC_DOCS_API`) before invoking build commands.
 
 ---
 
 ## Deployment Commands
-To manually deploy or debug:
+
+To manually deploy or debug (runs both pipelines):
 ```bash
 # 1. Ensure .env has PUBLIC_DOCS_API
-# 2. Run the deployment script
-./deploy_docs.sh
-```
-
-To update Nginx mapping:
-```bash
-./install_ifitwala_nginx.sh
-# Then follow instructions to edit frappe-bench.conf
-```
-
-## Vue + Astro Hydration Architecture
-**Context**: We use Astro as the site framework but leverage Vue for interactive components (like Forms).
-
-**How it works**:
-- **Configuration**: We use `@astrojs/vue` in `astro.config.mjs` to enable Vue support.
-- **Components**: Vue components live in `src/components/` (e.g., `LeadForm.vue`).
-- **Hydration**: When embedding a Vue component in an Astro page, we use a client directive to tell Astro when to load the JavaScript.
-    ```astro
-    <!-- src/pages/book-a-demo.astro -->
-    <LeadForm client:load /> 
-    ```
-    - `client:load`: Hydrates immediately on page load.
-    - `client:visible`: Hydrates only when scrolled into view.
-- **Styling**: Vue components inherit the global Tailwind CSS configuration, so no separate style setup is needed.
-
-**Benefit**: This specific architecture avoids sending a massive bundle for the whole site. We only send Vue.js for the specific "islands" that need interactivity.
+# 2. Run the deployment script    ./deploy_docs.sh
