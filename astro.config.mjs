@@ -15,15 +15,15 @@ export default defineConfig({
     assetsPrefix: '/assets/ifitwala_doc',
   },
   integrations: [
-    tailwind({ config: './tailwind.config.cjs', applyBaseStyles: false }),
+    // Update: Remove the 'config' path. Tailwind v4/PostCSS will find it automatically.
+    tailwind({ applyBaseStyles: false }), 
     vue(),
   ],
   vite: {
-    // Add the unplugin-icons plugin here
     plugins: [
       Icons({
-        compiler: 'astro',     // tells the plugin to generate Astro components
-        autoInstall: true      // (optional) automatically installs missing icon sets
+        compiler: 'astro',
+        autoInstall: true
       }),
     ],
     resolve: {
@@ -33,4 +33,3 @@ export default defineConfig({
     },
   },
 });
-
