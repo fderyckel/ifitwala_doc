@@ -4,6 +4,9 @@
 /* Bridges v4 engine with legacy config to fix blue.200 and semicolon errors */
 @config "../../../tailwind.config.cjs";
 
+/* Import overrides for frappe-ui components */
+@import "./frappe-ui-overrides.css";
+
 @layer base {
   html, body { height: 100%; }
 }

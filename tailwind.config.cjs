@@ -4,8 +4,7 @@
 const path = require('path');
 
 // Import only the palettes you need from tailwindcss/colors.
-// These will be exposed on the root theme.colors object so that
-// theme(colors.blue.200) and similar lookups work correctly.
+
 const {
   blue,
   gray,
