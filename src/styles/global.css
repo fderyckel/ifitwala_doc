@@ -1,165 +1,19 @@
 /* src/styles/global.css */
-
 @import './tokens.css';
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;600;700&display=swap');
 
-/* Reference legacy configuration for typography plugin and shared logic */
+/* Links shared config for typography and legacy colors */
 @config "../../tailwind.config.cjs";
-
-/* small defaults */
-html, body { height: 100%; }
 
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background-color: var(--sand);
     color: var(--ink);
-    position: relative;
-    min-height: 100%;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(120% 120% at 80% 0%, rgba(47, 125, 98, 0.14) 0%, rgba(47, 125, 98, 0) 65%),
-      radial-gradient(160% 140% at -10% 20%, rgba(235, 169, 78, 0.18) 0%, rgba(235, 169, 78, 0) 70%),
-      linear-gradient(
-        180deg,
-        rgba(241, 237, 228, 0.92) 0%,
-        rgba(249, 245, 235, 0.95) 32%,
-        rgba(236, 246, 241, 0.9) 68%,
-        rgba(255, 255, 255, 1) 100%
-      );
-    background-repeat: no-repeat;
-    background-size: 140% 140%, 180% 180%, 100% 300%;
-    background-position: top right, top left, top center;
-    opacity: 0.98;
-  }
-
-  strong {
-    color: var(--ink);
   }
 }
 
-/* Helpers that typography plugin doesn't handle */
 @utility scroll-mt-header {
   scroll-margin-top: 6rem;
-}
-
-/* Optional breadcrumb tint used in DocsLayout */
-@layer components {
-  .text-slate { color: var(--slate); }
-  .dark .text-slate { color: var(--slate); }
-
-  .glass-card {
-    @apply rounded-[28px] border border-white/60 bg-white/70 backdrop-blur shadow-card;
-  }
-
-  .docs-callout {
-    @apply border rounded-lg p-4 shadow-card;
-    border-color: var(--callout-border, var(--border));
-    border-left-width: 6px;
-    border-left-color: var(--callout-border-strong, color-mix(in srgb, var(--canopy) 35%, transparent));
-    background-color: var(--callout-bg, var(--sand));
-  }
-
-  .docs-callout-title {
-    @apply font-semibold mb-2 text-ink;
-  }
-
-  .docs-callout-body > :last-child {
-    margin-bottom: 0;
-  }
-
-  .doc-heading {
-    font-family: 'Merriweather', 'Source Serif Pro', Georgia, serif;
-    font-weight: 700;
-    color: var(--ink);
-    letter-spacing: -0.01em;
-    margin-top: 2.5rem;
-    margin-bottom: 1.25rem;
-    line-height: 1.25;
-  }
-
-  .doc-heading-1 {
-    color: var(--canopy);
-    font-size: clamp(2.35rem, 3.6vw, 2.9rem);
-    line-height: 1.18;
-  }
-
-  .doc-heading-2 {
-    font-size: clamp(1.85rem, 2.6vw, 2.2rem);
-  }
-
-  .doc-heading-3 {
-    font-size: clamp(1.4rem, 2.1vw, 1.65rem);
-    font-weight: 600;
-    margin-top: 2rem;
-  }
-
-  .doc-heading-4,
-  .doc-heading-5,
-  .doc-heading-6 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--slate);
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .prose .doc-heading:first-of-type {
-    margin-top: 1.5rem;
-  }
-
-  .prose a, .docs-prose a {
-    color: var(--canopy);
-    text-decoration: underline;
-    text-decoration-color: rgba(var(--leaf-rgb), 0.45);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-    transition: color 0.2s ease, text-decoration-color 0.2s ease;
-  }
-
-  .prose a:hover, .docs-prose a:hover {
-    text-decoration-color: rgba(var(--leaf-rgb), 0.75);
-  }
-
-  .docs-prose > *:not(:first-child) {
-    margin-top: 1.25rem;
-  }
-
-  .docs-prose .doc-heading + * {
-    margin-top: 1rem !important;
-  }
-
-  .docs-prose .docs-callout {
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .docs-prose ul,
-  .docs-prose ol {
-    padding-left: 1.6rem;
-  }
-
-  .docs-prose ul {
-    list-style: disc;
-  }
-
-  .docs-prose ol {
-    list-style: decimal;
-  }
-
-  .docs-prose p {
-    line-height: 1.7;
-  }
 }

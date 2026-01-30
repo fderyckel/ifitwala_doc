@@ -1,16 +1,16 @@
 <!-- ifitwala_doc/src/components/Hero.vue -->
 
 <script setup>
-	import { Button } from 'frappe-ui';
+import { Button } from 'frappe-ui';
 
-	const props = defineProps({
-		title: { type: String, default: 'A campus where curiosity blooms.' },
-		subtitle: { type: String, default: '' },
-		actions: {
-			type: Array,
-			default: () => ([])
-		}
-	});
+const props = defineProps({
+	title: { type: String, default: 'A campus where curiosity blooms.' },
+	subtitle: { type: String, default: '' },
+	actions: {
+		type: Array,
+		default: () => ([])
+	}
+});
 </script>
 
 <template>
@@ -39,4 +39,3 @@
 		</div>
 	</div>
 </template>
-
