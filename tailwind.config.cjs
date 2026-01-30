@@ -3,8 +3,9 @@
 /** @type {import('tailwindcss').Config} */
 const path = require('path');
 
-// Import only the palettes you need rather than the entire colors object.
-// Using the defaultTheme export ensures the palette is in the structure Tailwind expects.
+// Import only the palettes you need from tailwindcss/colors.
+// These will be exposed on the root theme.colors object so that
+// theme(colors.blue.200) and similar lookups work correctly.
 const {
   blue,
   gray,
@@ -12,28 +13,48 @@ const {
   sky,
 } = require('tailwindcss/colors');
 
+// Helper functions to reference CSS custom properties.
 const color = (token) => `rgb(var(--${token}-rgb) / <alpha-value>)`;
 const raw   = (token) => `var(${token})`;
 
 module.exports = {
   content: [
-    // Frappe web pages and templates
+    // Astro docs (root-level src)
+    path.join(__dirname, 'src', '**/*.{astro,md,mdx,vue,js,ts,tsx}'),
+
+    // Frappe web templates and pages
     path.join(__dirname, 'ifitwala_doc', 'ifitwala_doc', 'www', '**/*.{md,html,js}'),
     path.join(__dirname, 'ifitwala_doc', 'ifitwala_doc', 'templates', '**/*.{html,md,js}'),
-    // Vue components for marketing pages
+
+    // Vue marketing components
     path.join(__dirname, 'ifitwala_doc', 'src', '**/*.{vue,js,ts}'),
-    // Astro docs and components
-    path.join(__dirname, 'src', '**/*.{astro,md,mdx,vue,js,ts,tsx}'),
-    // Frappe‑UI components
+
+    // Frappe‑UI components from node_modules
     path.join(__dirname, 'node_modules', 'frappe-ui', '**/*.{vue,js}'),
   ],
 
-  // Classes we know need to exist but may not appear in scanned files
+  // Classes you know Tailwind should generate even if not found in templates
   safelist: [
-    'prose','prose-docs','max-w-3xl','mx-auto','px-6','py-10','not-prose',
+    'prose',
+    'prose-docs',
+    'max-w-3xl',
+    'mx-auto',
+    'px-6',
+    'py-10',
+    'not-prose',
   ],
 
   theme: {
+    // Expose default palettes on the root so `theme(colors.blue.200)` resolves.
+    colors: {
+      blue,
+      gray,
+      slate,
+      sky,
+      // You can add other default palettes (e.g. red, green) here if needed.
+    },
+
+    // Extend the default theme with custom values
     extend: {
       fontFamily: {
         serif: [
@@ -44,14 +65,9 @@ module.exports = {
         ],
       },
 
-      // Define Tailwind’s default palettes explicitly so theme('colors.*') works
+      // Semantic colours mapped to CSS custom properties.
+      // Use theme('colors.ink') etc. in your CSS for these.
       colors: {
-        blue,
-        gray,
-        slate,
-        sky,
-
-        // Semantic tokens mapped to CSS custom properties
         ink:       color('ink'),
         slate:     color('slate'),
         canopy:    color('canopy'),
@@ -65,35 +81,37 @@ module.exports = {
         secondary: color('leaf'),
       },
 
+      // Custom border radii using CSS vars.
       borderRadius: {
         lg: raw('--radius-lg'),
         xl: raw('--radius-xl'),
       },
 
+      // Custom shadows using CSS vars.
       boxShadow: {
         card:   raw('--shadow-soft'),
-        soft:   raw('--shadow-soft'),
+          soft:   raw('--shadow-soft'),
         strong: raw('--shadow-strong'),
       },
 
-      // Custom typography variant for documentation pages
+      // Define a "docs" typography variant that uses your tokens.
       typography: ({ theme }) => ({
         docs: {
           css: {
-            '--tw-prose-body':       theme('colors.ink'),
-            '--tw-prose-headings':   theme('colors.ink'),
-            '--tw-prose-links':      theme('colors.canopy'),
-            '--tw-prose-bold':       theme('colors.ink'),
-            '--tw-prose-counters':   theme('colors.slate'),
-            '--tw-prose-bullets':    theme('colors.slate'),
-            '--tw-prose-hr':         theme('colors.border'),
-            '--tw-prose-quotes':     theme('colors.ink'),
+            '--tw-prose-body':         theme('colors.ink'),
+            '--tw-prose-headings':     theme('colors.ink'),
+            '--tw-prose-links':        theme('colors.canopy'),
+            '--tw-prose-bold':         theme('colors.ink'),
+            '--tw-prose-counters':     theme('colors.slate'),
+            '--tw-prose-bullets':      theme('colors.slate'),
+            '--tw-prose-hr':           theme('colors.border'),
+            '--tw-prose-quotes':       theme('colors.ink'),
             '--tw-prose-quote-borders': theme('colors.leaf'),
-            '--tw-prose-captions':   theme('colors.slate'),
-            '--tw-prose-code':       theme('colors.canopy'),
-            '--tw-prose-pre-bg':     theme('colors.sky'),
-            '--tw-prose-th-borders': theme('colors.border'),
-            '--tw-prose-td-borders': theme('colors.border'),
+            '--tw-prose-captions':     theme('colors.slate'),
+            '--tw-prose-code':         theme('colors.canopy'),
+            '--tw-prose-pre-bg':       theme('colors.sky'),
+            '--tw-prose-th-borders':   theme('colors.border'),
+            '--tw-prose-td-borders':   theme('colors.border'),
 
             a: { textDecoration: 'none' },
             'a:hover': { textDecoration: 'underline' },
@@ -142,7 +160,7 @@ module.exports = {
             code: { fontWeight: '600' },
             pre: { borderRadius: theme('borderRadius.lg') },
 
-            figure:      { margin: '1.25rem 0' },
+            figure: { margin: '1.25rem 0' },
             'figure img': {
               borderRadius: theme('borderRadius.lg'),
               boxShadow: '0 1px 2px rgba(0,0,0,.05)',
