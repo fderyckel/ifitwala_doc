@@ -70,8 +70,8 @@ module.exports = {
             'a:hover': { textDecoration: 'underline' },
             h1: {
               color: theme('colors.canopy'),
-              fontFamily: `'Merriweather', 'Source Serif Pro', 'Georgia', serif`,
-              fontWeight: 700,
+              fontFamily: `"Merriweather", "Source Serif Pro", "Georgia", serif`,
+              fontWeight: '700',
               letterSpacing: '-0.02em',
               fontSize: 'clamp(2.25rem, 3.5vw, 2.875rem)',
               marginTop: '2.5rem',
@@ -80,8 +80,8 @@ module.exports = {
             },
             h2: {
               color: theme('colors.ink'),
-              fontFamily: `'Merriweather', 'Source Serif Pro', 'Georgia', serif`,
-              fontWeight: 700,
+              fontFamily: `"Merriweather", "Source Serif Pro", "Georgia", serif`,
+              fontWeight: '700',
               fontSize: 'clamp(1.75rem, 2.5vw, 2.125rem)',
               marginTop: '2.25rem',
               marginBottom: '1rem',
@@ -89,8 +89,8 @@ module.exports = {
             },
             h3: {
               color: theme('colors.ink'),
-              fontFamily: `'Merriweather', 'Source Serif Pro', 'Georgia', serif`,
-              fontWeight: 600,
+              fontFamily: `"Merriweather", "Source Serif Pro", "Georgia", serif`,
+              fontWeight: '600',
               fontSize: 'clamp(1.35rem, 2vw, 1.6rem)',
               marginTop: '1.75rem',
               marginBottom: '0.75rem',
@@ -98,7 +98,7 @@ module.exports = {
             },
             h4: {
               color: theme('colors.slate'),
-              fontWeight: 600,
+              fontWeight: '600',
               textTransform: 'uppercase',
               letterSpacing: '0.12em',
               marginTop: '1.5rem',

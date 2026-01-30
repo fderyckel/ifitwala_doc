@@ -1,19 +1,20 @@
-<script setup>
-import { Button } from 'frappe-ui';
+<!-- ifitwala_doc/src/components/Hero.vue -->
 
-const props = defineProps({
-	title: { type: String, default: 'A campus where curiosity blooms.' },
-	subtitle: { type: String, default: '' },
-	actions: {
-		type: Array,
-		default: () => ([])
-	}
-});
+<script setup>
+	import { Button } from 'frappe-ui';
+
+	const props = defineProps({
+		title: { type: String, default: 'A campus where curiosity blooms.' },
+		subtitle: { type: String, default: '' },
+		actions: {
+			type: Array,
+			default: () => ([])
+		}
+	});
 </script>
 
 <template>
 	<div class="relative">
-		<!-- subtle background flourish (future-proofed for animation) -->
 		<div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-white to-panel"></div>
 
 		<h1 class="max-w-3xl text-4xl font-semibold tracking-tight md:text-5xl">
@@ -39,6 +40,3 @@ const props = defineProps({
 	</div>
 </template>
 
-<style scoped>
-/* keep it minimal; layout handled by page */
-</style>

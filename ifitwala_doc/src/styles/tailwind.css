@@ -1,21 +1,18 @@
+/* ifitwala_doc/src/styles/tailwind.css */
+
 @import "tailwindcss";
 
-/* Reference the shared legacy configuration to maintain consistency 
-  with the Documentation pipeline and custom typography settings.
-*/
+/* Bridge v4 engine with the legacy shared configuration */
 @config "../../../tailwind.config.cjs";
 
-/* Global resets or marketing-specific base styles can be added here.
-  In v4, these automatically hook into the @import "tailwindcss" engine.
-*/
+/* Marketing-specific base styles */
 @layer base {
-  /* Add any marketing-specific base overrides if needed */
+  html, body { 
+    height: 100%; 
+  }
 }
 
-/* Marketing-specific components go here. 
-  Note: .prose classes are handled by the @tailwindcss/typography 
-  plugin referenced in your shared config.
-*/
+/* Marketing-specific component classes */
 @layer components {
-  /* Marketing-specific component classes */
+  /* Ensure components using @apply reference standard utility names */
 }

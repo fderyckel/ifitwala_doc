@@ -1,9 +1,11 @@
+/* src/styles/global.css */
+
 @import './tokens.css';
-@import "tailwindcss"; /* */
+@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;600;700&display=swap');
 
 /* Reference legacy configuration for typography plugin and shared logic */
-@config "../../tailwind.config.cjs"; /* */
+@config "../../tailwind.config.cjs";
 
 /* small defaults */
 html, body { height: 100%; }
