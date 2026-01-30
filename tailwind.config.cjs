@@ -2,7 +2,6 @@
 
 /** @type {import('tailwindcss').Config} */
 const path = require('path');
-const defaultTheme = require('tailwindcss/defaultTheme');
 
 // Helper functions to reference CSS custom properties.
 const color = (token) => `rgb(var(--${token}-rgb) / <alpha-value>)`;
@@ -47,12 +46,9 @@ module.exports = {
         ],
       },
 
-      // Color palettes - use default theme colors for compatibility
+      // Semantic colours mapped to CSS custom properties.
+      // Color palettes (blue, gray, slate, sky) are defined in CSS using @theme
       colors: {
-        // Use Tailwind's default colors which are properly formatted for v4
-        ...defaultTheme.colors,
-
-        // Semantic colours mapped to CSS custom properties.
         ink:       color('ink'),
         canopy:    color('canopy'),
         leaf:      color('leaf'),
