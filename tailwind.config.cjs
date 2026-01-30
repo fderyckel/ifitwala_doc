@@ -1,7 +1,9 @@
 // tailwind.config.cjs
 
+/** @type {import('tailwindcss').Config} */
 const path = require('path');
-const colors = require('tailwindcss/colors'); // Added for v4 compatibility
+// Import the standard Tailwind colors to satisfy frappe-ui requirements
+const colors = require('tailwindcss/colors'); 
 
 const color = (token) => `rgb(var(--${token}-rgb) / <alpha-value>)`;
 const raw = (token) => `var(${token})`;
@@ -21,10 +23,10 @@ module.exports = {
         serif: ['"Merriweather"', '"Source Serif Pro"', 'Georgia', 'serif'],
       },
       colors: {
-        // Spread default colors so frappe-ui can find 'blue', 'gray', etc.
+        // Spread the default palette so frappe-ui can find 'blue', 'gray', etc.
         ...colors, 
 
-        // Your semantic aliases
+        // Your custom semantic aliases
         ink:      color('ink'),
         slate:    color('slate'),
         canopy:   color('canopy'),
