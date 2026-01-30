@@ -1,8 +1,5 @@
-// tailwind.config.cjs
-
 /** @type {import('tailwindcss').Config} */
 const path = require('path');
-// Import the standard Tailwind colors to satisfy frappe-ui requirements
 const colors = require('tailwindcss/colors'); 
 
 const color = (token) => `rgb(var(--${token}-rgb) / <alpha-value>)`;
@@ -23,10 +20,7 @@ module.exports = {
         serif: ['"Merriweather"', '"Source Serif Pro"', 'Georgia', 'serif'],
       },
       colors: {
-        // Spread the default palette so frappe-ui can find 'blue', 'gray', etc.
         ...colors, 
-
-        // Your custom semantic aliases
         ink:      color('ink'),
         slate:    color('slate'),
         canopy:   color('canopy'),
@@ -35,7 +29,6 @@ module.exports = {
         sky:      color('sky'),
         sand:     color('sand'),
         border:   color('border'),
-
         primary:  color('canopy'),
         secondary:color('leaf'),
       },
@@ -65,7 +58,6 @@ module.exports = {
             '--tw-prose-pre-bg': theme('colors.sky'),
             '--tw-prose-th-borders': theme('colors.border'),
             '--tw-prose-td-borders': theme('colors.border'),
-
             a: { textDecoration: 'none' },
             'a:hover': { textDecoration: 'underline' },
             h1: {
@@ -105,10 +97,8 @@ module.exports = {
               marginBottom: '0.5rem',
               fontSize: '0.875rem',
             },
-
             code: { fontWeight: '600' },
             pre: { borderRadius: theme('borderRadius.lg') },
-
             figure: { margin: '1.25rem 0' },
             'figure img': {
               borderRadius: theme('borderRadius.lg'),
