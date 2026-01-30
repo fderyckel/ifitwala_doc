@@ -1,76 +1,90 @@
-# AGENTS.md
-
-## Project Architecture: Dual-Mode Hybrid
-
-This repository (`ifitwala_doc`) implements a **Hybrid Monorepo** pattern combining a Frappe backend with two distinct frontend build pipelines. This ensures maximum SEO for documentation while allowing rich interactivity for marketing pages.
-
-### 1. Frappe App (Backend/CMS)
-- **Role**: Manages content, authentication, and dynamic API endpoints.
-- **Source of Truth**: DocTypes (`Ifitwala Web Page`, `Documentation`).
-- **Serving**: Python/Gunicorn handles dynamic requests; Nginx handles static assets.
-
-### 2. Frontend Pipeline A: Static Documentation (Astro)
-- **Scope**: `/docs/*`, `/features/*`.
-- **Tech**: Astro SSG (`astro.config.mjs`).
-- **Goal**: **Maximum SEO**, zero-JS by default (HTML-first).
-- **Hydration**: Uses standard Astro Islands (e.g., `<LeadForm client:visible />`) only where strictly necessary.
-- **Output**: `dist/` (Synced to `sites/assets/ifitwala_doc` via rsync).
-
-### 3. Frontend Pipeline B: Dynamic Marketing (Vite + Vue)
-- **Scope**: Homepage (`/`), Landing Pages.
-- **Tech**: Frappe Jinja Templates + Vue "Islands" (`vite.config.mjs`).
-- **Goal**: Rich interactivity, complex state management.
-- **Mechanism**:
-    - **Entry**: `src/main.js`.
-    - **Hydration**: Manual. `main.js` scans the DOM for data attributes (e.g., `data-vue="Hero"`) and mounts specific Vue components from the `registry`.
-- **Output**: `ifitwala_doc/public/dist/` (Bundled JS/CSS loaded by Jinja templates).
+Here’s a revised version of **AGENTS.md** that better reflects the dual-architecture setup of the repository and provides more actionable context for a coding‑focused agent:
 
 ---
 
-## Content & Build Flow
+# Project Architecture
 
-### Integration Points
-- **Trigger**: "Deploy Website" button in `Ifitwala Website Settings` (Desk UI).
-- **Execution**: Python `frappe.enqueue` $\rightarrow$ `api/build.py`.
-- **Build Commands**:
-    1. `yarn build` (Vite): Compiles `base.js` and `site.css` for the dynamic marketing pages.
-    2. `yarn astro:build` (Astro): Generates the static HTML for documentation.
-- **Deployment**: `rsync` moves artifacts to `frappe-bench/sites/assets/ifitwala_doc`.
+## Overview
 
-### Styling Architecture
-- **Framework**: Tailwind CSS.
-- **Configuration**: `tailwind.config.cjs` (Shared config).
-- **Entry Points**:
-    - **Astro**: `src/styles/global.css` (Injected into Astro layouts).
-    - **Vite**: `src/styles/tailwind.css` (Bundled into `site.css` for non-Astro pages).
-    - *Note: Ensure token changes are reflected in both entry points until fully unified.*
+This repository is a hybrid monorepo that pairs a Frappe‑based backend with two distinct front‑end build pipelines:
+
+* **Backend/CMS (Frappe App)** – lives under `ifitwala_doc/`
+* **Static Documentation (Astro)** – source lives in the root `src/`
+* **Hydrated Vue Marketing Components** – source lives in `ifitwala_doc/src/` and mounts into Astro pages
+
+This dual‑architecture allows you to deliver zero‑JavaScript, SEO‑friendly documentation while still supporting rich interactivity on landing pages.
 
 ---
 
-## Lessons Learned (The "Gotchas")
+## 1. Frappe App (Backend/CMS)
 
-### 1. Build Artifact Management (The "React Error #62")
-**Issue**: Committing heavy build folders (`dist/`, `.astro/`) or leaving them in the workspace causes web-based IDEs (Gravity) to crash with "Minified React error #62".
-**Solution**:
-- **Git**: Ensure `dist/`, `.astro/`, and `ifitwala_doc/public/dist/` are in `.gitignore`.
-- **Cleanup**: Build scripts should run `rm -rf dist` before starting to ensure a clean slate.
+* **Purpose:** Manages content, authentication and API endpoints.
+* **Key Doctypes:**
 
-### 2. Nginx Configuration
-**Issue**: `location` directives inside `/etc/nginx/conf.d/*.conf` cause global errors.
-**Solution**:
-- Generate `.inc` snippets (e.g., `ifitwala_doc_static.inc`).
-- **Manually include** them inside the **SSL (Port 443)** server block of the main site config.
-
-### 3. Execution Environment (PATH & Env Vars)
-**Issue**: Background workers (Supervisor/Redis) run with restricted `PATH` and don't load `.bashrc`.
-**Solution**:
-- **Explicit Discovery**: Python build scripts must explicitly find `node`/`yarn` binaries (e.g., in `~/.nvm/...`).
-- **Env Vars**: Python scripts must manually load `.env` variables (like `PUBLIC_DOCS_API`) before invoking build commands.
+  * `Ifitwala Web Page`
+  * `Documentation`
+* **Serving:** Dynamic routes are handled by Python/Gunicorn; static assets are served via Nginx.
+* **Deployment:** Build artifacts (Astro docs and Vue marketing bundles) are synced into `frappe-bench/sites/assets/ifitwala_doc`.
 
 ---
 
-## Deployment Commands
+## 2. Static Documentation Pipeline (Astro)
 
-To manually deploy or debug (runs both pipelines):
-# 1. Ensure .env has PUBLIC_DOCS_API
-# 2. Run the deployment script    deploy_docs.sh
+* **Source:** `src/` at the root of the repo.
+* **Tech stack:** Astro SSG.
+* **Goal:** Generate fully static HTML for docs with maximum SEO; default output is zero‑JS.
+* **Content:** Markdown and MDX files under `src/pages/…`.
+* **Entry points:** Global styles live in `src/styles/global.css` and are injected by Astro layouts.
+* **Output:** Compiled into `dist/`; during deployment this is rsynced to `sites/assets/ifitwala_doc`.
+* **Hydration:** Only when necessary; Astro islands (e.g. `<LeadForm client:visible />`) are used sparingly.
+
+---
+
+## 3. Dynamic Marketing Pipeline (Vite + Vue)
+
+* **Source:** `ifitwala_doc/src/` inside the app.
+* **Tech stack:** Vue 3 bundled via Vite.
+* **Goal:** Deliver interactive marketing pages (home page, landing pages) that need client‑side state.
+* **Mechanism:**
+
+  * The entry point is `ifitwala_doc/src/main.js`.
+  * Vue components are registered in a component registry.
+  * On runtime, `main.js` scans the DOM for `data-vue="ComponentName"` attributes and hydrates those elements with the appropriate Vue component.
+* **Styles:** Imported from `ifitwala_doc/src/styles/tailwind.css` and compiled into `site.css` for inclusion in Frappe templates.
+* **Output:** Bundled JS/CSS is emitted to `ifitwala_doc/public/dist/` and referenced in Jinja templates (e.g. `/templates/www/index.html`).
+
+---
+
+## Content & Build Flow
+
+1. **Trigger:** A “Deploy Website” action in the Frappe Desk UI enqueues a build job (`api/build.py`).
+2. **Build Commands:**
+
+   * **Astro:** `yarn astro:build` generates static docs from `src/`.
+   * **Vite:** `yarn build` compiles the Vue marketing bundle from `ifitwala_doc/src/`.
+3. **Deployment:** Artifacts from both builds are rsynced to `frappe-bench/sites/assets/ifitwala_doc/` for Nginx to serve.
+4. **Cleanup:** Build scripts remove any stale `dist/` and `.astro/` folders before building to avoid conflicts.
+
+---
+
+## Styling Architecture
+
+* **Framework:** Tailwind CSS shared across both pipelines.
+* **Configuration:** Defined in `tailwind.config.cjs` at the repo root.
+* **Entry Points:**
+
+  * Astro uses `src/styles/global.css`.
+  * Vite/Vue uses `ifitwala_doc/src/styles/tailwind.css`.
+* **Custom Tokens:** Colour, radius and shadow tokens are exposed via CSS variables (e.g. `--ink-rgb`) and referenced in Tailwind via helper functions.
+* **Note:** Changes to tokens should be made in the Tailwind config so both pipelines stay in sync.
+
+---
+
+## Lessons Learned (Gotchas)
+
+* **Build Artifacts:** Never commit `dist/`, `.astro/`, or `ifitwala_doc/public/dist/`. They should always be git‑ignored and cleaned before builds to prevent IDE crashes and version control noise.
+* **Nginx Configuration:** Serve static assets via `.inc` snippets included in the SSL server block of your main `nginx.conf` to avoid conflicts.
+* **Environment Path:** Worker processes (e.g. Celery/Redis) run with restricted environment variables. Ensure your build scripts locate `node` and `yarn` executables explicitly.
+* **Colour Tokens:** If you introduce custom Tailwind colours, make sure they are accessible via `theme('colors.*')` syntax. When referencing nested values, quote the path (e.g. `theme('colors.blue.200')`) and provide a fallback if necessary.
+
+---
