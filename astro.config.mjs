@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite'; // Import the v4 Vite plugin
+// import tailwindcss from '@tailwindcss/vite'; // Import the v4 Vite plugin
 import vue from '@astrojs/vue';
 import Icons from 'unplugin-icons/vite';
 import { fileURLToPath } from 'node:url';
@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   vite: {
     plugins: [
-      tailwindcss(), // Tailwind v4 now runs as a Vite plugin
+      // tailwindcss(), // Tailwind v4 now runs as a Vite plugin
       Icons({
         compiler: 'astro',
         autoInstall: true
