@@ -2,12 +2,10 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'node:path';
 import Icons from 'unplugin-icons/vite';
-import tailwindcss from '@tailwindcss/vite'; // Added for Tailwind v4
 
 export default defineConfig({
   base: '/assets/ifitwala_doc/dist/',
   plugins: [
-    tailwindcss(), // First-party Tailwind v4 Vite plugin
     vue(),
     Icons({
       autoInstall: true,
