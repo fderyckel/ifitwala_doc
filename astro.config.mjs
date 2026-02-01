@@ -9,7 +9,7 @@ export default defineConfig({
   output: 'static',
   outDir: './dist',
   srcDir: './src',
-  publicDir: false, // Prevent copying of ifitwala_doc/public (output dir)
+  publicDir: './public', // Using empty root public dir to avoid circular copies
   trailingSlash: 'always',
   build: {
     assetsPrefix: '/assets/ifitwala_doc',
