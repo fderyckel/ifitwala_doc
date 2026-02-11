@@ -1,150 +1,160 @@
 ---
-title: Student Log
+title: "Student Logs: The Pulse of Your Campus"
 slug: student-log
-category: Student
+category: Students
 doc_order: 10
-summary: Tracks student-related notes, follow-ups, and pastoral care actions with configurable workflows, assignment, and visibility controls.
+summary: "Centralize every pastoral note, behavioral incident, and academic follow-up in one secure, intelligent timeline—so no student falls through the cracks."
 ---
 
-# Student Log
+# Student Logs: The Pulse of Your Campus
 
-## 1. Ecosystem Overview
+Stop chasing paper trails. Stop digging through email threads and scattered notebooks. Student Logs transforms how your school captures, tracks, and acts on every critical moment in a student's journey.
 
-**Purpose:** The Student Log DocType stores annotated notes about students, supporting academic, pastoral, and administrative tracking. Each log can be configured to require a follow‑up action, which triggers assignment, status tracking, and eventual completion.
+Whether it's a pastoral check-in, a behavioral incident, or an academic intervention, every note lives in one secure, intelligent timeline. Your staff stays aligned. Your follow-ups never stall. And your students get the support they need—exactly when they need it.
 
-**Touchpoints:**
-- **Desk List View:** Standard Frappe list and form views for administrative management.
-- **Student Dashboard Quick‑Entry:** Accessed via the “Add Log” button on student dashboards (Vue SPA).
-- **Staff Home Overlay:** Quick‑create flows for classroom groups (`StudentLogCreateOverlay.vue`).
-- **Follow‑Up Overlay:** Dedicated interface for adding follow‑up entries (`StudentLogFollowUpOverlay.vue`).
-- **Portal Visibility:** Students and guardians can view logs marked `visible_to_student` or `visible_to_guardians` via the student portal.
-- **Analytics Dashboard:** Aggregated metrics and filterable reports (`student_log_dashboard` API).
+## Intelligent Context Capture
 
-**Dependencies:**
-- **Student Log Type:** Categorizes logs (e.g., “Academic”, “Behavior”, “Pastoral”). Each type can be scoped to a specific school.
-- **Student Log Next Step:** Defines the required follow‑up action, associated role, and auto‑close duration.
-- **Student Log Follow Up:** Child DocType that records progress on a log’s follow‑up chain.
-- **Program Enrollment:** Provides default academic context (program, academic year, program offering, school) when a student is selected.
-- **School Tree:** Determines visibility and assignment boundaries via nested‑set hierarchy.
+Your staff shouldn't waste time manually entering academic context. When you select a student, the system automatically pulls their active Program Enrollment—filling in program, academic year, program offering, and school in a single click.
 
-## 2. Data Structure
+This means:
+- **Zero duplication** of effort
+- **Accurate reporting** across campuses and programs
+- **Instant visibility** into a student's academic standing when reviewing notes
 
-| Field Label | Type | Mandatory? | Logic/Notes |
-| :--- | :--- | :--- | :--- |
-| Student | Link (Student) | Yes | Only enabled students are selectable. |
-| Student Name | Data (read‑only) | No | Fetched from the Student master. |
-| Date | Date | Yes | Defaults to today. |
-| Time | Time | No | Defaults to current time. |
-| Log Type | Link (Student Log Type) | Yes | Determines the category of the note. |
-| Author Name | Data (read‑only) | No | Fetched from the linked Employee record of the current user. |
-| Academic Year | Link (Academic Year) | No | Auto‑filled from the student’s active Program Enrollment. |
-| Program | Link (Program) | No | Auto‑filled from the student’s active Program Enrollment. |
-| Program Offering | Link (Program Offering) | No | Auto‑filled from the student’s active Program Enrollment. |
-| School | Link (School) | No | Resolved from Program Offering → Program Enrollment → Academic Year (authoritative delivery school). |
-| Visible to Student | Check | No | Default `1`. When checked, the log appears in the student portal. |
-| Visible to Guardians | Check | No | Default `1`. When checked, guardians can view the log. |
-| Log | Text Editor | Yes | Rich‑text note body. Supports client‑side voice dictation via browser SpeechRecognition API. |
-| Requires Follow Up | Check | No | When enabled, fields `next_step`, `follow_up_role`, `follow_up_person`, and `follow_up_status` become mandatory. |
-| Next Step | Link (Student Log Next Step) | If follow‑up required | Defines the follow‑up action and associated role. |
-| Follow‑up Role | Data | If follow‑up required | Populated from the selected Next Step’s `associated_role` (default “Academic Staff”). |
-| Follow‑up User | Link (User) | If follow‑up required | Person responsible for the follow‑up. Role‑filtered and pre‑submit editable. |
-| Follow‑up Status | Select (Open / In Progress / Completed) | No | Derived automatically from the presence of open ToDos and follow‑up entries. Terminal state “Completed” locks core fields. |
-| Student Image | Attach Image (hidden) | No | Fetched from the Student master for UI display. |
+<Callout type="tip">
+**Did you know?** The system resolves school context intelligently—checking Program Offering first, then Enrollment, then Academic Year—ensuring the authoritative delivery school is always recorded correctly.
+</Callout>
 
-**Key Derived Fields:**
-- `follow_up_status` is computed as:
-  - **Open:** Exactly one open ToDo exists and no follow‑up entries.
-  - **In Progress:** At least one follow‑up entry exists (draft or submitted).
-  - **Completed:** Explicitly set by author/admin or via auto‑close after inactivity.
-- `school` is resolved in priority order:
-  1. Program Offering’s school.
-  2. Program Enrollment’s school (same academic year).
-  3. Academic Year’s school.
+## Streamlined Follow-Up Workflows
 
-## 3. Backend Logic
+Critical issues demand clear ownership. When a log requires follow-up, the system enforces accountability from day one:
 
-### Validation (`validate` method)
-- If `requires_follow_up` is checked:
-  - `next_step` is mandatory.
-  - When `follow_up_person` is set pre‑submit, exactly one open ToDo is ensured for that user (single‑assignee policy).
-  - Role guard: the selected `follow_up_person` must have the `follow_up_role` (from Next Step’s `associated_role`).
-  - The current open assignee is mirrored back into `follow_up_person`.
-- If `requires_follow_up` is unchecked:
-  - `next_step`, `follow_up_person`, and `follow_up_status` are cleared.
-  - Any existing open ToDos are closed.
-- Delivery context (program, academic year, program offering, school) is auto‑filled from the student’s active Program Enrollment when any of those fields is missing.
-- Status transitions are enforced:
-  - `Completed` is terminal; fields `requires_follow_up`, `next_step`, `follow_up_role`, `follow_up_person`, `program`, `academic_year` become immutable.
-  - Allowed transitions: `None` → `Open` / `In Progress`; `Open` → `In Progress` / `Completed`; `In Progress` → `Completed`.
+- **Smart Assignment:** Link a "Next Step" template to automatically set the required role and assignee
+- **Role Guard:** Only users with the designated role (e.g., "Academic Staff") can be assigned—no accidental misrouting
+- **Status Tracking:** Watch progress move from Open → In Progress → Completed with full audit visibility
+- **ToDo Integration:** Every assignment generates an open ToDo with automatic due dates based on your school's default settings
 
-### Post‑Submission (`on_submit` method)
-- If `requires_follow_up` is unchecked, the log is immediately marked `Completed`.
-- If `requires_follow_up` is checked:
-  - Exactly one open assignee must exist (creates a ToDo if `follow_up_person` is set but no assignment exists).
-  - `follow_up_person` is updated from the assignee.
-  - Status is recomputed (Open if only a ToDo exists, In Progress if any follow‑up entries exist).
+<Callout type="info">
+**Status transitions are enforced.** Once a log reaches "Completed," core fields lock—preserving the integrity of your audit trail.
+</Callout>
 
-### Scheduled Job (`auto_close_completed_logs`)
-- Runs daily via `hooks.py`.
-- Logs with `follow_up_status = "In Progress"` and `auto_close_after_days > 0` are moved to `Completed` after the specified days of inactivity (based on `modified` timestamp).
-- All open ToDos referencing those logs are closed.
-- A concise audit comment is added to each auto‑completed log.
+## Multi-Channel Accessibility
 
-### Permission & Visibility
+Student Logs meets your staff where they work:
 
-The visibility predicate (`get_student_log_visibility_predicate`) determines which logs a user can see based on role and context. Write, submit, and amend permissions are restricted to the author, Academic Admin, or current assignee.
+- **Desk View:** Full administrative control for Academic Admins and Counsellors
+- **Student Dashboard Quick-Entry:** Teachers can add logs directly from a student's profile
+- **Staff Home Overlay:** Classroom teachers log notes for entire rosters without leaving their workflow
+- **Follow-Up Overlay:** Dedicated interface for progressing existing logs
 
-| Role | Access Scope | Logic / Condition |
-| :--- | :--- | :--- |
-| System Manager, Administrator | Full system | Unrestricted access (admin roles). |
-| Academic Admin, Counsellor, Learning Support | School Branch | Can see all logs within their school's nested tree. |
-| Accreditation Visitor | Aggregate Only | Can see logs only for aggregate reporting (`allow_aggregate_only=True`); detail views are blocked. |
-| Pastoral Lead | Student Group | Limited to students they explicitly instruct in active Pastoral Student Groups. |
-| Academic Staff | Student Group | Limited to students they explicitly instruct in non‑pastoral Student Groups. |
-| Curriculum Coordinator | Program | Can see logs for students in programs they coordinate. |
-| Author / Assignee | Ownership | Always see their own logs and logs assigned to them. |
+Plus, students and guardians see only what they should. Mark logs `visible_to_student` or `visible_to_guardians` to share relevant updates while keeping sensitive notes internal.
+
+<Callout type="tip">
+**Did you know?** Students see their logs in the student portal with read-receipt tracking—so you know when important information has been acknowledged.
+</Callout>
+
+## Voice-Enabled Documentation
+
+Teachers are busy. That's why Student Logs supports **voice dictation** directly in the browser. Using the SpeechRecognition API (Chrome/Edge), staff can dictate rich-text notes hands-free—perfect for capturing observations while moving between classes or during active supervision.
+
+## Automated Housekeeping
+
+Keep your database pristine without lifting a finger. The system runs a daily scheduled job that auto-completes inactive follow-ups after your configured `auto_close_after_days` threshold. Open ToDos close automatically. Audit comments log every action.
+
+Your team focuses on **active issues**, not clutter.
+
+## Enterprise-Grade Privacy
+
+Staff only see students relevant to their specific role and scope:
+
+| Role | Access Scope |
+|------|--------------|
+| Academic Admin / Counsellor | Full school branch via nested hierarchy |
+| Academic Staff | Students in their assigned Student Groups |
+| Pastoral Lead | Students in their Pastoral Student Groups |
+| Curriculum Coordinator | Students in their coordinated programs |
+| Author / Assignee | Their own logs and assigned items |
+
+No configuration drift. No accidental data exposure. Privacy is **architected in**, not bolted on.
+
+## Analytics & Reporting
+
+Turn qualitative notes into quantitative insights. The built-in analytics dashboard aggregates logs across filters—student, log type, status, date range—so you can identify patterns, track intervention efficacy, and report to leadership with confidence.
+
+> **Screenshot:** The Student Log analytics dashboard showing filtered metrics and trend visualization
+
+---
+
+## Under the Hood (For IT)
+
+### DocType Structure
+- **Core DocType:** `Student Log` (`ifitwala_ed/student_management/doctype/student_log/`)
+- **Supporting DocTypes:**
+  - `Student Log Type` — Categorization (Academic, Behavior, Pastoral)
+  - `Student Log Next Step` — Follow-up templates with roles and auto-close settings
+  - `Student Log Follow Up` — Child table tracking follow-up progress
+
+### Key Backend Logic
+
+**Validation (`validate` method):**
+- Enforces `next_step` mandatory when `requires_follow_up` is checked
+- Ensures single-assignee policy (exactly one open ToDo)
+- Validates role compatibility for `follow_up_person`
+- Auto-fills delivery context from Program Enrollment
+- Enforces terminal "Completed" state locking
+
+**Post-Submission (`on_submit`):**
+- Marks complete immediately if no follow-up required
+- Creates ToDo if assignee set but no assignment exists
+- Recomputes status based on follow-up entries
+
+**Scheduled Job (`auto_close_completed_logs`):**
+- Runs daily via `hooks.py`
+- Closes logs with `auto_close_after_days > 0` after inactivity
+- Closes associated ToDos and appends audit comment
 
 ### API Endpoints (`ifitwala_ed.api.student_log`)
-- `get_student_logs`: Paginated list for the student portal (respects `visible_to_student` flag).
-- `get_student_log_detail`: Single log with read‑receipt tracking.
-- `search_students`, `search_follow_up_users`, `get_form_options`, `submit_student_log`: Support the Vue overlay quick‑create workflow.
+- `get_student_logs` — Paginated portal list (respects `visible_to_student`)
+- `get_student_log_detail` — Single log with read-receipt tracking
+- `search_students`, `search_follow_up_users`, `get_form_options`, `submit_student_log` — Vue overlay support
+- `assign_follow_up` — Assignment/reassignment with role and school validation
 
-### Assignment & Reassignment (`assign_follow_up`)
-- Can be invoked by the log author, Academic Admin, current assignee, or a user with the `follow_up_role`.
-- Validates that the new assignee’s school branch includes the log’s school.
-- Ensures the assignee has the required role (default “Academic Staff”).
-- Closes any existing open ToDos and creates a new open ToDo with a due date based on the school’s `default_follow_up_due_in_days`.
+### Permission & Visibility Predicate
+`get_student_log_visibility_predicate` handles role-based access:
+- System Manager / Administrator: Unrestricted
+- Academic Admin / Counsellor / Learning Support: School tree branch
+- Accreditation Visitor: Aggregate-only (`allow_aggregate_only=True`)
+- Pastoral Lead / Academic Staff: Student Group membership
+- Curriculum Coordinator: Program scope
 
-## 4. Frontend Integration (Technical Context)
-
-### Vue Components
-- **`StudentLogCreateOverlay.vue`:** Handles quick creation of logs in “single‑student” or “group‑roster” modes. Communicates with `studentLogService.ts`.
-- **`StudentLogFollowUpOverlay.vue`:** Dedicated form for adding follow‑up entries. Submits via `focusService.ts`.
-- **`FocusRouterOverlay.vue`:** Routes follow‑up submission and review actions.
+### Vue Frontend Components
+- `StudentLogCreateOverlay.vue` — Quick-create (single/group modes)
+- `StudentLogFollowUpOverlay.vue` — Follow-up entry form
+- `FocusRouterOverlay.vue` — Submission/review routing
 
 ### Service Layer (`src/lib/services/`)
-- **`studentLogService.ts`:** Encapsulates API calls for student search, follow‑up user search, form options, and log submission.
-- **`studentLogDashboardService.ts`:** Fetches filter metadata, dashboard data, recent logs, and distinct student lists for analytics.
-- **`focusService.ts`:** Handles follow‑up submission and outcome review.
+- `studentLogService.ts` — Student search, user search, form options, submission
+- `studentLogDashboardService.ts` — Dashboard data, filters, recent logs
+- `focusService.ts` — Follow-up submission, outcome review
 
 ### UI Signals (`src/lib/uiSignals.ts`)
-- `SIGNAL_STUDENT_LOG_INVALIDATE`: Triggers refetch of log data.
-- `SIGNAL_STUDENT_LOG_DASHBOARD_INVALIDATE`: Invalidates dashboard caches.
-- `SIGNAL_STUDENT_LOG_RECENT_LOGS_INVALIDATE`: Invalidates recent‑logs lists.
-- `SIGNAL_STUDENT_LOG_FILTER_META_INVALIDATE`: Invalidates filter metadata.
+- `SIGNAL_STUDENT_LOG_INVALIDATE`
+- `SIGNAL_STUDENT_LOG_DASHBOARD_INVALIDATE`
+- `SIGNAL_STUDENT_LOG_RECENT_LOGS_INVALIDATE`
+- `SIGNAL_STUDENT_LOG_FILTER_META_INVALIDATE`
 
-### Client‑Script Behaviors (`student_log.js`)
-- **Voice Dictation:** Browser SpeechRecognition API integration for hands‑free note entry (Chrome/Edge only).
-- **Dynamic Field Visibility:** Follow‑up fields are shown/hidden based on the `requires_follow_up` checkbox.
-- **Pre‑submit Assignment:** The `follow_up_person` field is editable before submission and filtered by the role derived from the selected Next Step.
-- **Custom Buttons:** Context‑aware buttons for Assign/Re‑assign, Follow Up, Complete, and Reopen appear based on user role and log status.
-- **Student Change Handler:** Automatically populates program, academic year, program offering, and school from the student’s active Program Enrollment.
-
-### Reports
-- **Student Log & Follow‑up Report (`student_logs`):** Script‑based report providing filtered views of logs and their follow‑up chains. Accessible to System Manager, Academic Admin, Academic Staff, and Counselor roles.
+### Client-Script Behaviors (`student_log.js`)
+- Voice dictation via SpeechRecognition API
+- Dynamic field visibility based on `requires_follow_up`
+- Pre-submit assignment with role-filtered user selection
+- Context-aware buttons (Assign, Follow Up, Complete, Reopen)
+- Auto-population of academic context on student change
 
 ### Integration Points
-- **ToDo System:** Each follow‑up generates an open ToDo with a due date; closing ToDos does not automatically complete the log.
-- **Portal Read Receipts:** Unread logs are highlighted in the student portal via the `Portal Read Receipt` mechanism.
-- **Realtime Notifications:** Authors receive a toast notification when a follow‑up is ready for review (`follow_up_ready_to_review` event).
-- **School‑tree Awareness:** All assignment and visibility checks respect the nested‑set school hierarchy.
+- **ToDo System:** Open/close tracking; closing ToDo does not auto-complete log
+- **Portal Read Receipts:** `Portal Read Receipt` mechanism for unread highlighting
+- **Realtime Notifications:** `follow_up_ready_to_review` toast events for authors
+- **School Tree:** Nested-set hierarchy for all visibility and assignment checks
+
+### Reports
+- **Student Log & Follow-up Report** (`student_logs`): Filtered views of logs and follow-up chains (roles: System Manager, Academic Admin, Academic Staff, Counselor)
