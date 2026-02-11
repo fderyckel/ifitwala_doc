@@ -1,7 +1,7 @@
 ---
 title: "Student Logs: Keeping Track of What Matters"
 slug: student-log
-category: Students
+category: Student
 doc_order: 5
 summary: "A simple way to record student conversations, incidents, and follow-ups—so nothing falls through the cracks."
 ---
