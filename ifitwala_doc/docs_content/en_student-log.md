@@ -38,6 +38,65 @@ Critical issues demand clear ownership. When a log requires follow-up, the syste
 **Status transitions are enforced.** Once a log reaches "Completed," core fields lock—preserving the integrity of your audit trail.
 </Callout>
 
+## ⚙️ Configuring the Workflow
+
+You define the rules. The system enforces your policy. Here's how to pre-configure Student Logs so your staff can focus on students, not guesswork.
+
+### Step 1: Define Your Categories (Student Log Type)
+
+First, establish the categories of notes your school captures. These are entirely customizable to your context:
+
+- **Academic** — Intervention notes, progress updates, learning support flags
+- **Behavioral** — Conduct incidents, positive behavior recognition
+- **Pastoral** — Wellbeing check-ins, counselor referrals, home concerns
+- **Administrative** — Attendance issues, uniform violations, documentation
+
+You create these in **Student Log Type**. Each can be scoped to specific schools if you run a multi-campus setup.
+
+### Step 2: Build Your Automation Engine (Student Log Next Step)
+
+This is where the magic happens. **Student Log Next Step** templates are the automation engine that routes issues to the right people instantly.
+
+Each Next Step defines:
+
+| Element | Purpose | Example |
+|---------|---------|---------|
+| **Action Name** | What needs to happen | "Refer to Counselor" |
+| **Associated Role** | Who is qualified to handle it | "Student Counsellor" |
+| **Default Due Date** | How long they have to respond | "2 Days" |
+| **Auto-Close After** | When to archive inactive items | "30 Days" |
+
+<Callout type="tip">
+**Pro tip:** Create Next Steps for your most common interventions. When a teacher selects "Refer to Counselor," the system doesn't ask them to hunt for a name—it automatically assigns anyone with the "Student Counsellor" role and sets the due date you defined.
+</Callout>
+
+### Step 3: The Teacher Experience
+
+Here's what happens when your workflow is configured:
+
+1. **Teacher creates a log** — They select the student and choose a Log Type (e.g., "Behavioral")
+2. **They check "Requires Follow Up"** — This reveals the Next Step field
+3. **They pick the action, not the person** — "Refer to Counselor" (not "Mrs. Johnson specifically")
+4. **The system handles the rest** — It finds the right role, assigns the ToDo, sets the due date, and notifies the assignee
+
+The teacher doesn't need to know who's on duty. They don't need to check calendars. They just describe the concern and select the appropriate action. Your pre-defined rules handle the routing.
+
+<Callout type="warning">
+**Role Guard in action:** If no user with the required role exists at the student's school, the system won't let the log submit. This prevents issues from falling into a black hole—you'll know immediately if your staffing coverage has gaps.
+</Callout>
+
+### What You Control
+
+As an Admin, you decide:
+
+- **Which Log Types exist** at each school
+- **Which Next Steps are available** for each type
+- **Who gets assigned** via role-based routing
+- **How long they have** to respond
+- **When old logs auto-close** to keep your data clean
+
+Your teachers get a streamlined experience. You get consistent, enforceable processes across every campus.
+
 ## Multi-Channel Accessibility
 
 Student Logs meets your staff where they work:
