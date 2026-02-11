@@ -1,8 +1,8 @@
 ---
 title: "Programs: How We Structure Learning"
 slug: program
-category: Academics
-doc_order: 20
+category: Curriculum
+doc_order: 3
 summary: "Set up academic programs that group courses, define how students are assessed, and control what appears on your website."
 ---
 
