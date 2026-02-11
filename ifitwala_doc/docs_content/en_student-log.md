@@ -1,155 +1,134 @@
 ---
-title: "Student Logs: The Pulse of Your Campus"
+title: "Student Logs: Keeping Track of What Matters"
 slug: student-log
 category: Students
 doc_order: 10
-summary: "Centralize every pastoral note, behavioral incident, and academic follow-up in one secure, intelligent timeline—so no student falls through the cracks."
+summary: "A simple way to record student conversations, incidents, and follow-ups—so nothing falls through the cracks."
 ---
 
-# Student Logs: The Pulse of Your Campus
+# Student Logs: Keeping Track of What Matters
 
-Stop chasing paper trails. Stop digging through email threads and scattered notebooks. Student Logs transforms how your school captures, tracks, and acts on every critical moment in a student's journey.
+We all know the feeling: you had an important conversation with a student, you meant to write it down, and now it's three days later and you can't remember the details. Or worse, a colleague asks "what happened with that incident last month?" and you're digging through emails trying to piece it together.
 
-Whether it's a pastoral check-in, a behavioral incident, or an academic intervention, every note lives in one secure, intelligent timeline. Your staff stays aligned. Your follow-ups never stall. And your students get the support they need—exactly when they need it.
+Student Logs fixes that. It's a simple place to record notes about students—pastoral conversations, behavioral incidents, academic concerns, whatever your school needs to track. Everything lives in one place, tied to the student record, with clear ownership when something needs to happen next.
 
-## Intelligent Context Capture
+## How It Helps
 
-Your staff shouldn't waste time manually entering academic context. When you select a student, the system automatically pulls their active Program Enrollment—filling in program, academic year, program offering, and school in a single click.
+When you open a new log and select a student, the system already knows which program they're in, which academic year, which school. You don't have to fill in the same information ten times a day. The system pulls it from their enrollment record automatically.
 
 This means:
-- **Zero duplication** of effort
-- **Accurate reporting** across campuses and programs
-- **Instant visibility** into a student's academic standing when reviewing notes
+- **Less busywork** — no duplicating information the system already has
+- **Fewer errors** — the context is accurate because it comes from the official record
+- **Clearer picture** — when you look back at a log, you know exactly where the student was at that moment
 
 <Callout type="tip">
-**Did you know?** The system resolves school context intelligently—checking Program Offering first, then Enrollment, then Academic Year—ensuring the authoritative delivery school is always recorded correctly.
+**Did you know?** The system is smart about which school to record. It checks the program offering first, then the enrollment, then the academic year—so the right campus is always attached, even in multi-school setups.
 </Callout>
 
-## Streamlined Follow-Up Workflows
+## Setting Up the Workflow (For Admins)
 
-Critical issues demand clear ownership. When a log requires follow-up, the system enforces accountability from day one:
+Before teachers can use this properly, someone needs to set up the categories and workflows. Here's what that looks like:
 
-- **Smart Assignment:** Link a "Next Step" template to automatically set the required role and assignee
-- **Role Guard:** Only users with the designated role (e.g., "Academic Staff") can be assigned—no accidental misrouting
-- **Status Tracking:** Watch progress move from Open → In Progress → Completed with full audit visibility
-- **ToDo Integration:** Every assignment generates an open ToDo with automatic due dates based on your school's default settings
+### Step 1: Decide What Kinds of Logs You Need
 
-<Callout type="info">
-**Status transitions are enforced.** Once a log reaches "Completed," core fields lock—preserving the integrity of your audit trail.
-</Callout>
+First, create the **Student Log Types** your school actually uses. These are entirely up to you:
 
-## ⚙️ Configuring the Workflow
+- **Academic** — for learning support notes, intervention records, progress updates
+- **Behavioral** — conduct incidents, positive behavior recognition
+- **Pastoral** — wellbeing check-ins, counselor referrals, concerns about home life
+- **Administrative** — attendance issues, uniform violations, general documentation
 
-You define the rules. The system enforces your policy. Here's how to pre-configure Student Logs so your staff can focus on students, not guesswork.
+You can have different types for different schools if you run a multi-campus setup.
 
-### Step 1: Define Your Categories (Student Log Type)
+### Step 2: Set Up What Happens Next
 
-First, establish the categories of notes your school captures. These are entirely customizable to your context:
+This is where the real time-saving happens. You create **Student Log Next Steps** — templates that automatically route issues to the right person.
 
-- **Academic** — Intervention notes, progress updates, learning support flags
-- **Behavioral** — Conduct incidents, positive behavior recognition
-- **Pastoral** — Wellbeing check-ins, counselor referrals, home concerns
-- **Administrative** — Attendance issues, uniform violations, documentation
+Each template defines:
 
-You create these in **Student Log Type**. Each can be scoped to specific schools if you run a multi-campus setup.
+| What you set | What it means | Example |
+|-------------|-------------|---------|
+| **The action** | What needs to happen | "Refer to Counselor" |
+| **The role** | Who is qualified to do it | "Student Counsellor" |
+| **Due date** | How quickly they should respond | "2 days" |
+| **Auto-close** | When to archive old items | "30 days" |
 
-### Step 2: Build Your Automation Engine (Student Log Next Step)
-
-This is where the magic happens. **Student Log Next Step** templates are the automation engine that routes issues to the right people instantly.
-
-Each Next Step defines:
-
-| Element | Purpose | Example |
-|---------|---------|---------|
-| **Action Name** | What needs to happen | "Refer to Counselor" |
-| **Associated Role** | Who is qualified to handle it | "Student Counsellor" |
-| **Default Due Date** | How long they have to respond | "2 Days" |
-| **Auto-Close After** | When to archive inactive items | "30 Days" |
+Here's why this matters: when a teacher logs a concern and selects "Refer to Counselor," they don't have to figure out which counselor is on duty, or whether Mrs. Johnson is the right person, or whether she's even available. They just pick the action. The system finds someone with the "Student Counsellor" role, assigns the task, sets the due date, and notifies them.
 
 <Callout type="tip">
-**Pro tip:** Create Next Steps for your most common interventions. When a teacher selects "Refer to Counselor," the system doesn't ask them to hunt for a name—it automatically assigns anyone with the "Student Counsellor" role and sets the due date you defined.
+**A practical example:** Set up a "Learning Support Review" next step that assigns to your SEN coordinator within 3 days. Now any teacher who flags a potential learning issue knows it will reach the right person quickly—without them having to remember who that person is or how to contact them.
 </Callout>
 
 ### Step 3: The Teacher Experience
 
-Here's what happens when your workflow is configured:
+Once you've set this up, here's what a teacher actually does:
 
-1. **Teacher creates a log** — They select the student and choose a Log Type (e.g., "Behavioral")
-2. **They check "Requires Follow Up"** — This reveals the Next Step field
-3. **They pick the action, not the person** — "Refer to Counselor" (not "Mrs. Johnson specifically")
-4. **The system handles the rest** — It finds the right role, assigns the ToDo, sets the due date, and notifies the assignee
+1. **They create a log** — select the student, choose a type (e.g., "Behavioral")
+2. **They check "Requires Follow Up"** — this reveals the "Next Step" field
+3. **They pick the action** — "Refer to Counselor" (not a specific person)
+4. **The system handles the rest** — finds the right role, assigns a ToDo, sets the deadline
 
-The teacher doesn't need to know who's on duty. They don't need to check calendars. They just describe the concern and select the appropriate action. Your pre-defined rules handle the routing.
+The teacher describes what happened in their own words. They don't need to know your staffing roster or who's on call. They just say what the concern is and what kind of response it needs. Your pre-defined rules handle the routing.
 
 <Callout type="warning">
-**Role Guard in action:** If no user with the required role exists at the student's school, the system won't let the log submit. This prevents issues from falling into a black hole—you'll know immediately if your staffing coverage has gaps.
+**Important:** If no one at that student's school has the required role (e.g., no "Student Counsellor" exists), the system won't let the teacher submit the log. This prevents issues from disappearing into a void—you'll know immediately if your staffing coverage has gaps.
 </Callout>
 
-### What You Control
+## Where Teachers Can Use It
 
-As an Admin, you decide:
+Student Logs appears wherever your staff already work:
 
-- **Which Log Types exist** at each school
-- **Which Next Steps are available** for each type
-- **Who gets assigned** via role-based routing
-- **How long they have** to respond
-- **When old logs auto-close** to keep your data clean
+- **From the Desk** — full access for Academic Admins and Counsellors to manage everything
+- **From a Student's Profile** — teachers can add a log directly while looking at a student's record
+- **From the Staff Home** — classroom teachers can log notes for whole groups without navigating away
+- **Follow-up Interface** — a dedicated view for people who are assigned tasks to progress them
 
-Your teachers get a streamlined experience. You get consistent, enforceable processes across every campus.
-
-## Multi-Channel Accessibility
-
-Student Logs meets your staff where they work:
-
-- **Desk View:** Full administrative control for Academic Admins and Counsellors
-- **Student Dashboard Quick-Entry:** Teachers can add logs directly from a student's profile
-- **Staff Home Overlay:** Classroom teachers log notes for entire rosters without leaving their workflow
-- **Follow-Up Overlay:** Dedicated interface for progressing existing logs
-
-Plus, students and guardians see only what they should. Mark logs `visible_to_student` or `visible_to_guardians` to share relevant updates while keeping sensitive notes internal.
+Students and guardians can see logs you've marked as visible to them. Keep sensitive notes internal; share the ones that help families stay informed.
 
 <Callout type="tip">
-**Did you know?** Students see their logs in the student portal with read-receipt tracking—so you know when important information has been acknowledged.
+**Did you know?** When a student views their log in the portal, the system tracks whether they've seen it. So you know if that important behavioral note actually reached the family.
 </Callout>
 
-## Voice-Enabled Documentation
+## Voice Dictation for Busy Teachers
 
-Teachers are busy. That's why Student Logs supports **voice dictation** directly in the browser. Using the SpeechRecognition API (Chrome/Edge), staff can dictate rich-text notes hands-free—perfect for capturing observations while moving between classes or during active supervision.
+Sometimes you're walking between classrooms, or supervising lunch, or simply don't have a free hand to type. Student Logs supports voice dictation right in the browser (works in Chrome and Edge). Teachers can dictate their note and clean it up later—much better than forgetting to record it at all.
 
-## Automated Housekeeping
+## Keeping Things Tidy
 
-Keep your database pristine without lifting a finger. The system runs a daily scheduled job that auto-completes inactive follow-ups after your configured `auto_close_after_days` threshold. Open ToDos close automatically. Audit comments log every action.
+Old logs don't clutter your view forever. The system runs a daily check and automatically closes follow-ups that haven't been touched in the time you specified (your `auto_close_after_days` setting). Open ToDos close with them. The log gets an audit comment showing it was auto-completed, so you have a record.
 
-Your team focuses on **active issues**, not clutter.
+Your team focuses on active concerns, not a backlog of stale items.
 
-## Enterprise-Grade Privacy
+## Who Can See What
 
-Staff only see students relevant to their specific role and scope:
+Not everyone should see everything. The system respects your school structure and staff assignments:
 
-| Role | Access Scope |
-|------|--------------|
-| Academic Admin / Counsellor | Full school branch via nested hierarchy |
-| Academic Staff | Students in their assigned Student Groups |
-| Pastoral Lead | Students in their Pastoral Student Groups |
-| Curriculum Coordinator | Students in their coordinated programs |
-| Author / Assignee | Their own logs and assigned items |
+| Role | What they can see |
+|------|-------------------|
+| Academic Admin / Counsellor | All logs in their school branch |
+| Academic Staff | Only students in their assigned Student Groups |
+| Pastoral Lead | Only students in their Pastoral Groups |
+| Curriculum Coordinator | Students in programs they coordinate |
+| Author / Assigned person | Their own logs and anything assigned to them |
 
-No configuration drift. No accidental data exposure. Privacy is **architected in**, not bolted on.
+Teachers won't see students they don't teach. Staff won't see schools they don't work in. It's simple, and it prevents those awkward moments of stumbling across information you shouldn't have.
 
-## Analytics & Reporting
+## Seeing the Patterns
 
-Turn qualitative notes into quantitative insights. The built-in analytics dashboard aggregates logs across filters—student, log type, status, date range—so you can identify patterns, track intervention efficacy, and report to leadership with confidence.
+When you have enough logs, the analytics dashboard helps you spot trends. How many behavioral incidents this month compared to last? Which students have multiple pastoral concerns? Are follow-ups being completed on time?
 
-> **Screenshot:** The Student Log analytics dashboard showing filtered metrics and trend visualization
+This isn't about surveillance—it's about knowing where to focus your attention and resources.
+
+> **Screenshot:** The Student Log analytics dashboard showing filtered metrics and a simple trend chart
 
 ---
 
-## Under the Hood (For IT)
+## Technical Details (For IT)
 
 ### DocType Structure
 - **Core DocType:** `Student Log` (`ifitwala_ed/student_management/doctype/student_log/`)
 - **Supporting DocTypes:**
-  - `Student Log Type` — Categorization (Academic, Behavior, Pastoral)
+  - `Student Log Type` — Categorization (Academic, Behavior, Pastoral, etc.)
   - `Student Log Next Step` — Follow-up templates with roles and auto-close settings
   - `Student Log Follow Up` — Child table tracking follow-up progress
 
