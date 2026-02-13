@@ -199,8 +199,8 @@ def run_astro_build():
         run_yarn("--version")
         _run("node --version", cwd=proj_root, env=env)
 
-        # 2) Build via package.json script (runs 'astro build')
-        run_yarn("astro:build")
+        # 2) Build via package.json script (runs 'astro build' and other steps)
+        run_yarn("build:docs")
 
         # 3) Deploy built assets
         dist_root = os.path.join(proj_root, "dist")

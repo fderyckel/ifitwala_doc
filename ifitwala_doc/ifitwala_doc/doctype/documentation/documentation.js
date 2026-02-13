@@ -33,7 +33,22 @@ frappe.ui.form.on('Documentation', {
     // ───────────────────────────────────────────────────────────
     // Screenshots grid toolbar (one-time bind)
     // ───────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────────────────────
+    // Screenshots grid toolbar (one-time bind)
+    // ───────────────────────────────────────────────────────────
     bind_screenshot_toolbar(frm);
+
+    // ───────────────────────────────────────────────────────────
+    // Realtime Feedback
+    // ───────────────────────────────────────────────────────────
+    frappe.realtime.off('astro_build_status');
+    frappe.realtime.on('astro_build_status', (data) => {
+      if (data.status === 'completed') {
+        frappe.show_alert({ message: data.message, indicator: 'green' });
+      } else if (data.status === 'failed') {
+        frappe.msgprint({ title: 'Build Failed', message: data.message, indicator: 'red' });
+      }
+    });
   },
 
   title(frm) {
