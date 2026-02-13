@@ -58,6 +58,9 @@ module.exports = {
 
         primary:   color('canopy'),
         secondary: color('leaf'),
+
+        slate:     color('slate'),
+        sky:       color('sky'),
       },
 
       // Custom border radii using CSS vars.
