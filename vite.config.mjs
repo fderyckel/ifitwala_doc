@@ -25,7 +25,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         // Dual entry points for the Marketing pipeline
-        base: path.resolve(__dirname, 'ifitwala_doc/src/main.js'),
+        marketing: path.resolve(__dirname, 'ifitwala_doc/src/main.js'),
         site: path.resolve(__dirname, 'ifitwala_doc/src/styles/tailwind.css')
       },
       output: {
