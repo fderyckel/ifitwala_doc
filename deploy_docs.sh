@@ -31,7 +31,7 @@ echo "==> Installing deps (yarn)…"
 yarn install --frozen-lockfile --check-files
 
 echo "==> Building with Astro…"
-yarn astro:build
+yarn build:docs
 
 # 2) Deploy (rsync entire dist/)
 DIST_SRC="$SRC_ROOT"
