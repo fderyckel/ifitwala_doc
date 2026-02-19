@@ -30,6 +30,9 @@ echo "==> Content API base: $API_BASE"
 echo "==> Installing deps (yarn)…"
 yarn install --frozen-lockfile --check-files
 
+echo "==> Cleaning previous build outputs…"
+yarn clean
+
 echo "==> Building with Astro…"
 yarn build:marketing
 yarn build:docs
