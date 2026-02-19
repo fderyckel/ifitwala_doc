@@ -6,11 +6,14 @@ from frappe.utils import format_datetime
 from hashlib import md5
 from frappe import _
 import os
+from urllib.parse import urlparse
 from frappe.utils import get_site_path
-from ifitwala_doc.ifitwala_doc.image_utils import slugify
+from ifitwala_doc.ifitwala_doc.image_utils import resize_and_save, slugify
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$", re.M)
 SLUG_SAFE_RE = re.compile(r"[^a-z0-9-]+")
+IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".svg")
+DOC_CATEGORY_ICON_FOLDER = slugify("Doc Category")
 
 def _extract_headings(md: str):
     return [m.group(2).strip() for m in HEADING_RE.finditer(md or "")]
@@ -114,6 +117,84 @@ def _file_exists(url: str) -> bool:
         return False
     path = get_site_path("public", url.lstrip("/"))
     return os.path.exists(path)
+
+
+def _is_image_source(value: str) -> bool:
+    lowered = (value or "").strip().lower()
+    if not lowered:
+        return False
+    return lowered.startswith(("http://", "https://", "data:", "/")) or lowered.endswith(IMAGE_EXTENSIONS)
+
+
+def _extract_local_file_url(value: str) -> str | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    if raw.startswith("/files/"):
+        return raw
+    parsed = urlparse(raw)
+    if parsed.path.startswith("/files/"):
+        return parsed.path
+    return None
+
+
+def _category_icon_thumb(icon_value: str) -> str:
+    file_url = _extract_local_file_url(icon_value)
+    if not file_url:
+        return icon_value
+
+    filename = os.path.basename(file_url)
+    if filename.startswith(("hero_", "medium_", "card_", "thumb_")):
+        return file_url
+
+    base_name = os.path.splitext(filename)[0]
+    thumb_url = f"/files/gallery_resized/{DOC_CATEGORY_ICON_FOLDER}/thumb_{slugify(base_name)}.webp"
+    if _file_exists(thumb_url):
+        return thumb_url
+
+    original_path = get_site_path("public", file_url.lstrip("/"))
+    if not os.path.exists(original_path):
+        return file_url
+
+    file_row = (
+        frappe.db.get_value(
+            "File",
+            {"file_url": file_url},
+            ["attached_to_doctype", "attached_to_name", "attached_to_field"],
+            as_dict=True,
+        )
+        or {}
+    )
+    file_doc = frappe._dict(file_row)
+
+    try:
+        resize_and_save(
+            doc=file_doc,
+            original_path=original_path,
+            base_filename=base_name,
+            doctype_folder=DOC_CATEGORY_ICON_FOLDER,
+            size_label="thumb",
+            width=160,
+            quality=78,
+        )
+    except Exception as error:
+        frappe.log_error(f"Doc Category icon resize failed for {file_url}: {error}", "Doc Category Icon Resize")
+        return file_url
+
+    return thumb_url if _file_exists(thumb_url) else file_url
+
+
+def _decorate_category_icon(record: dict | None):
+    if not record:
+        return record
+    icon = (record.get("icon") or "").strip()
+    if not icon or not _is_image_source(icon):
+        return record
+    thumb = _category_icon_thumb(icon)
+    if thumb and thumb != icon:
+        record["icon_original"] = icon
+        record["icon"] = thumb
+    return record
 
 def _variant_bases(anchor: str) -> list[str]:
     """
@@ -436,22 +517,26 @@ def search():
 @frappe.whitelist(allow_guest=True)
 def get_categories(language="en"):
     """Doc Category cards (ordered)."""
-    return frappe.get_all(
+    rows = frappe.get_all(
         "Doc Category",
         fields=["name", "slug", "label", "icon", "description", "cat_order"],
         order_by="IFNULL(cat_order, 9999), label asc",
         limit_page_length=500,
     )
+    for row in rows:
+        _decorate_category_icon(row)
+    return rows
 
 @frappe.whitelist(allow_guest=True)
 def get_category(slug: str):
     """Single category by slug."""
-    return frappe.db.get_value(
+    row = frappe.db.get_value(
         "Doc Category",
         {"slug": slug},
         ["name", "slug", "label", "icon", "description", "cat_order"],
         as_dict=True,
     )
+    return _decorate_category_icon(row)
 
 @frappe.whitelist(allow_guest=True)
 def get_docs_in_category(language: str, category_slug: str):

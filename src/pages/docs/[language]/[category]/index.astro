@@ -97,7 +97,7 @@ const description = cat?.description || 'Category'
 <DocsShell lang={languageRaw || 'en'} title={title} description={description}>
   <main class="mx-auto max-w-6xl px-6 py-10">
     <nav class="text-sm text-slate mb-4">
-      <a class="hover:underline" href={`/docs/${languageSlug || 'en'}`}>Docs</a>
+      <a class="hover:underline" href={`/docs/${languageSlug || 'en'}/`}>Docs</a>
       <span class="mx-1">›</span>
       <span>{cat?.label || category}</span>
     </nav>
@@ -150,7 +150,7 @@ const description = cat?.description || 'Category'
         {docs.map((d) => (
           <li>
             <a
-              href={`/docs/${languageSlug}/${d.slug}`}
+              href={`/docs/${languageSlug}/${d.slug}/`}
               class="block bg-white border rounded-2xl p-5 hover:shadow-lg transition"
             >
               <div class="font-semibold">{d.title}</div>

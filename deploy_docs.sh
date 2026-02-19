@@ -47,6 +47,12 @@ mkdir -p "$DEST_ROOT"
 echo "==> Rsync dist/ -> $DEST_ROOT/"
 rsync -a --delete "$DIST_SRC/" "$DEST_ROOT/"
 
+if [[ -d "$APP_ROOT/ifitwala_doc/public/js" ]]; then
+  echo "==> Sync app public js -> $DEST_ROOT/js/"
+  mkdir -p "$DEST_ROOT/js"
+  rsync -a "$APP_ROOT/ifitwala_doc/public/js/" "$DEST_ROOT/js/"
+fi
+
 echo
 echo "✅ Deployed:"
 echo "   - dist  -> $DEST_ROOT"

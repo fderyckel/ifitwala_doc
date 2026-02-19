@@ -210,6 +210,17 @@ def run_astro_build():
         # Absolute paths; neutral cwd avoids accidental relatives
         _run(f"rsync -a --delete {shlex.quote(dist_root)}/ {shlex.quote(out_root)}/", cwd="/", env=env)
 
+        # Keep app-level web scripts that are not part of Astro dist (e.g. hooks web_include_js).
+        public_js_root = os.path.join(app_root, "public", "js")
+        target_js_root = os.path.join(out_root, "js")
+        if os.path.isdir(public_js_root):
+            os.makedirs(target_js_root, exist_ok=True)
+            _run(
+                f"rsync -a {shlex.quote(public_js_root)}/ {shlex.quote(target_js_root)}/",
+                cwd="/",
+                env=env,
+            )
+
         # ─────────────────── Status Update (Success) ────────────────
         settings.last_build_status = "Success"
         settings.last_build_time = frappe.utils.now()

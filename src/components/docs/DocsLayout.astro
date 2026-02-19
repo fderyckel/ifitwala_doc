@@ -9,9 +9,9 @@ const docSlug =
   typeof doc?.slug === 'string' ? doc.slug.trim().replace(/^\/+|\/+$/g, '') : ''
 const docsLangRoot = `/docs/${lang || 'en'}`
   .replace(/\/{2,}/g, '/')
-  .replace(/\/$/, '')
+  .replace(/\/$/, '') + '/'
 const canonicalDocPath = docSlug
-  ? `${docsLangRoot}/${docSlug}`.replace(/\/{2,}/g, '/').replace(/\/$/, '')
+  ? `${docsLangRoot}${docSlug}/`.replace(/\/{2,}/g, '/')
   : docsLangRoot
 
 function normalizeShots(raw) {
@@ -411,16 +411,16 @@ if (doc?.author) {
 
   <main class="docs-prose prose prose-docs w-full flex-1 min-w-0 max-w-3xl lg:max-w-4xl">
     <nav class="not-prose mb-4 text-sm text-slate">
-      <a href={`/docs/${lang}`} class="hover:underline">Docs</a>
+      <a href={`/docs/${lang}/`} class="hover:underline">Docs</a>
       {doc.category && <>
         <span class="mx-1">›</span>
-        <a href={`/docs/${lang}/${doc.category}`} class="hover:underline">
+        <a href={`/docs/${lang}/${doc.category}/`} class="hover:underline">
           {doc.category_label || doc.category}
         </a>
       </>}
       {doc.sub_category && <>
         <span class="mx-1">›</span>
-        <a href={`/docs/${lang}/${doc.category}/${doc.sub_category}`} class="hover:underline">
+        <a href={`/docs/${lang}/${doc.category}/${doc.sub_category}/`} class="hover:underline">
           {doc.sub_category_label || doc.sub_category}
         </a>
       </>}

@@ -32,7 +32,7 @@ app_license = "mit"
 # web_include_css = "/assets/ifitwala_doc/css/ifitwala_doc.css"
 # web_include_js = "/assets/ifitwala_doc/js/ifitwala_doc.js"
 web_include_js = [
-    "assets/ifitwala_doc/js/marketing.js",        # (keeps header/footer nav hydrated on fallback templates)
+    "/assets/ifitwala_doc/js/marketing.js",       # (keeps header/footer nav hydrated on fallback templates)
 ]
 
 # include custom scss in every website theme (without file extension ".scss")
