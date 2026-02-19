@@ -98,6 +98,12 @@ const CALLOUT_COLORS = {
 }
 
 const ALLOWED_CALLOUT_TYPES = new Set(Object.keys(CALLOUT_COLORS))
+const CALLOUT_BORDER_CLASS = {
+  info: 'border-leaf/70',
+  warning: 'border-[color:rgba(214,138,40,0.6)]',
+  tip: 'border-canopy/60',
+  note: 'border-border',
+}
 
 function figById(id) {
   return shots.find(s => (s.fig || '').toLowerCase() === (id || '').toLowerCase())
@@ -139,12 +145,20 @@ function toPictureHTML(fig, explicitSize) {
 }
 
 function decodeEntities(str = '') {
-  return str
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+  let current = String(str || '')
+  for (let i = 0; i < 4; i += 1) {
+    const decoded = current
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+    if (decoded === current) {
+      return decoded
+    }
+    current = decoded
+  }
+  return current
 }
 
 function parseAttrs(str = '') {
@@ -307,7 +321,7 @@ function renderMarkdown(
   }
 
   const callouts = []
-  const CALL_REGEX = /(?:&lt;|<)Callout\b([^>]*?)(?:&gt;|>)([\s\S]*?)(?:&lt;|<)\/Callout(?:&gt;|>)/gi
+  const CALL_REGEX = /(?:&(?:amp;)?lt;|<)Callout\b([^>]*?)(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/Callout(?:&(?:amp;)?gt;|>)/gi
 
   md = md.replace(CALL_REGEX, (_, rawAttrs, rawBody) => {
     const id = `callout-${callouts.length}`
@@ -330,10 +344,11 @@ function renderMarkdown(
       allowCallouts: true,
       slugger: activeSlugger,
     }).trim()
-    const titleHtml = title ? `<div class="docs-callout-title">${escapeHtml(title)}</div>` : ''
+    const titleHtml = title ? `<div class="docs-callout-title mb-1 font-semibold">${escapeHtml(title)}</div>` : ''
     const palette = CALLOUT_COLORS[type] || CALLOUT_COLORS.info
-    const styleAttr = ` style="--callout-bg:${palette.bg};--callout-border:${palette.border};--callout-border-strong:${palette.accent}"`
-    const calloutHtml = `<div class="docs-callout not-prose docs-callout-${type}" data-callout-type="${type}"${styleAttr}>${titleHtml}<div class="docs-callout-body prose prose-docs max-w-none">${bodyHtml}</div></div>`
+    const borderClass = CALLOUT_BORDER_CLASS[type] || CALLOUT_BORDER_CLASS.info
+    const styleAttr = ` style="--callout-bg:${palette.bg};--callout-border:${palette.border};--callout-border-strong:${palette.accent};border-color:var(--callout-border-strong);background:var(--callout-bg)"`
+    const calloutHtml = `<div class="docs-callout not-prose docs-callout-${type} border-l-4 rounded p-3 ${borderClass}" data-callout-type="${type}"${styleAttr}>${titleHtml}<div class="docs-callout-body prose prose-docs max-w-none">${bodyHtml}</div></div>`
     const placeholder = `<div data-callout-placeholder="${callout.id}"></div>`
     if (html.includes(placeholder)) {
       html = html.split(placeholder).join(calloutHtml)

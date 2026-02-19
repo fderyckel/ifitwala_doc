@@ -7,7 +7,7 @@
     {% if doc.summary %}
       <p class="text-slate">{{ doc.summary }}</p>
     {% endif %}
-    <div>{{ body_html or "" }}</div>
+    <div>{{ (body_html or "") | safe }}</div>
     <hr class="my-8" />
     <div class="text-xs text-slate">
       Preview of <code>/docs/{{ doc.language }}/{{ doc.slug }}/</code> •
