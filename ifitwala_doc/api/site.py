@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict
 import frappe
 from frappe.model.document import Document
 from frappe.utils import format_datetime
+from urllib.parse import urlparse
 
 
 class SectionDict(TypedDict):
@@ -53,10 +54,39 @@ THEME_DEFAULTS: Dict[str, str] = {
     "focus_ring": "0 0 0 3px rgba(47, 133, 90, 0.35)",
 }
 
+BOOK_A_DEMO_PATH = "/book-a-demo/"
+DEMO_LABEL_HINTS = {
+    "demo",
+    "book a demo",
+    "see a live demo",
+}
+
 
 # -----------------------
 # Block mappers
 # -----------------------
+
+def _normalize_demo_href(label: Any, href: Any) -> str:
+    label_value = (label or "").strip().lower()
+    href_value = (href or "").strip()
+
+    if not href_value:
+        if label_value in DEMO_LABEL_HINTS:
+            return BOOK_A_DEMO_PATH
+        return href_value
+
+    parsed_path = ""
+    try:
+        parsed_path = (urlparse(href_value).path or "").strip().rstrip("/")
+    except Exception:
+        parsed_path = href_value.strip().rstrip("/")
+
+    if label_value in DEMO_LABEL_HINTS:
+        return BOOK_A_DEMO_PATH
+    if parsed_path in {"/demo", "/book-demo", "/book-a-demo"}:
+        return BOOK_A_DEMO_PATH
+
+    return href_value
 
 def _hero_props(doc: Document) -> Dict[str, Any]:
     return {
@@ -66,7 +96,11 @@ def _hero_props(doc: Document) -> Dict[str, Any]:
         "align": (doc.align or "left"),
         "theme": (doc.theme or "light"),
         "actions": [
-            {"label": r.label, "href": r.href, "variant": (r.variant or "primary")}
+            {
+                "label": r.label,
+                "href": _normalize_demo_href(r.label, r.href),
+                "variant": (r.variant or "primary"),
+            }
             for r in (doc.actions or [])
         ],
     }
@@ -346,7 +380,7 @@ def get_nav(location: str = "Header") -> List[Dict[str, Any]]:
     return [
         {
             "label": r["label"],
-            "href": r["href"],
+            "href": _normalize_demo_href(r.get("label"), r.get("href")),
             "target_blank": int(r.get("target_blank") or 0),
             "order": int(r.get("item_order") or 0),
         }
@@ -498,7 +532,7 @@ def get_site_settings() -> Dict[str, Any]:
         "brand_logo_alt": ws.brand_logo_alt,
         "tagline": ws.tagline,
         "primary_cta_label": ws.primary_cta_label,
-        "primary_cta_url": ws.primary_cta_url,
+        "primary_cta_url": _normalize_demo_href(ws.primary_cta_label, ws.primary_cta_url),
         "footer_md": ws.footer_md,
         "social_links": social_links,
         "social_same_as": [link["url"] for link in social_links if link.get("url")],

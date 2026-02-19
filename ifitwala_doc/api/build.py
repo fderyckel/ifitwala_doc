@@ -48,6 +48,51 @@ def run_astro_build():
                 entries.append(os.path.normpath(entry))
         return entries
 
+    def _parse_semver_from_path(bin_path):
+        """Parse ~/.nvm/.../vX.Y.Z/bin into (major, minor, patch) or None."""
+        try:
+            version_dir = os.path.basename(os.path.dirname(bin_path))  # v22.12.0
+            raw = version_dir.lstrip("vV")
+            parts = raw.split(".")
+            major = int(parts[0])
+            minor = int(parts[1]) if len(parts) > 1 else 0
+            patch = int(parts[2]) if len(parts) > 2 else 0
+            return major, minor, patch
+        except Exception:
+            return None
+
+    def _preferred_node_majors():
+        configured = (
+            env.get("IFITWALA_DOC_NODE_PREFERRED_MAJORS")
+            or frappe.conf.get("docs_build_node_preferred_majors")
+            or "22,20,18"
+        )
+        values = []
+        for token in str(configured).split(","):
+            token = token.strip()
+            if not token:
+                continue
+            try:
+                values.append(int(token))
+            except ValueError:
+                continue
+        return values or [22, 20, 18]
+
+    def _sort_nvm_bins(paths):
+        """Prefer known stable LTS majors before other versions."""
+        preferred = _preferred_node_majors()
+        priority_map = {major: idx for idx, major in enumerate(preferred)}
+
+        def key(path):
+            parsed = _parse_semver_from_path(path)
+            if not parsed:
+                return (len(preferred) + 1, 0, 0, 0)
+            major, minor, patch = parsed
+            priority = priority_map.get(major, len(preferred))
+            return (priority, -major, -minor, -patch)
+
+        return sorted(paths, key=key)
+
     def _resolve_yarn(execution_env, project_root):
         """Return (yarn_invocation_path, requires_node_wrapper)."""
         explicit_bins = [
@@ -151,6 +196,13 @@ def run_astro_build():
         os.path.join(proj_root, ".yarn", "bin"),
     ]
     
+    # Explicit Node binary path override (if configured)
+    explicit_node_bin = env.get("IFITWALA_DOC_NODE_BIN") or frappe.conf.get("docs_build_node_bin")
+    if explicit_node_bin:
+        explicit_node_dir = os.path.dirname(os.path.expanduser(str(explicit_node_bin)))
+        if explicit_node_dir:
+            path_hints.insert(0, os.path.normpath(explicit_node_dir))
+
     # Attempt to find NVM paths
     nvm_paths = glob.glob(os.path.expanduser("~/.nvm/versions/node/*/bin"))
     if not nvm_paths:
@@ -159,8 +211,7 @@ def run_astro_build():
         nvm_paths = glob.glob(os.path.join(possible_home, ".nvm/versions/node/*/bin"))
     
     if nvm_paths:
-        # Sort by version (latest first approximately)
-        nvm_paths.sort(reverse=True)
+        nvm_paths = _sort_nvm_bins(nvm_paths)
         path_hints.extend(nvm_paths)
 
     path_hints.extend(_normalize_path_entries(frappe.conf.get("docs_build_yarn_paths")))
@@ -200,7 +251,22 @@ def run_astro_build():
         _run("node --version", cwd=proj_root, env=env)
 
         # 2) Build via package.json script (runs 'astro build' and other steps)
-        run_yarn("build:docs")
+        try:
+            run_yarn("build:docs")
+        except Exception as build_error:
+            error_text = str(build_error).lower()
+            # Astro occasionally fails with missing dist/renderers.mjs when stale output is present.
+            # Clean and retry once to recover without manual intervention.
+            if "renderers.mjs" not in error_text:
+                raise
+            dist_dir = os.path.join(proj_root, "dist")
+            astro_cache_dir = os.path.join(proj_root, ".astro")
+            _run(
+                f"rm -rf {shlex.quote(dist_dir)} {shlex.quote(astro_cache_dir)}",
+                cwd="/",
+                env=env,
+            )
+            run_yarn("build:docs")
 
         # 3) Deploy built assets
         dist_root = os.path.join(proj_root, "dist")
@@ -209,17 +275,6 @@ def run_astro_build():
 
         # Absolute paths; neutral cwd avoids accidental relatives
         _run(f"rsync -a --delete {shlex.quote(dist_root)}/ {shlex.quote(out_root)}/", cwd="/", env=env)
-
-        # Keep app-level web scripts that are not part of Astro dist (e.g. hooks web_include_js).
-        public_js_root = os.path.join(app_root, "public", "js")
-        target_js_root = os.path.join(out_root, "js")
-        if os.path.isdir(public_js_root):
-            os.makedirs(target_js_root, exist_ok=True)
-            _run(
-                f"rsync -a {shlex.quote(public_js_root)}/ {shlex.quote(target_js_root)}/",
-                cwd="/",
-                env=env,
-            )
 
         # ─────────────────── Status Update (Success) ────────────────
         settings.last_build_status = "Success"

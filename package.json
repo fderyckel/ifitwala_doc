@@ -7,7 +7,7 @@
     "dev:marketing": "vite",
     "dev:docs": "node scripts/pull_theme_tokens.mjs --silent || true && astro dev",
     "build:marketing": "vite build",
-    "build:docs": "node scripts/pull_theme_tokens.mjs && astro build && cp -r dist/* ifitwala_doc/public/",
+    "build:docs": "node scripts/pull_theme_tokens.mjs && mkdir -p public/js && cp -f ifitwala_doc/public/js/marketing.js public/js/marketing.js && astro build",
     "build": "yarn clean && yarn build:marketing && yarn build:docs",
     "preview": "vite preview",
     "build:docs-index": "python3 scripts/build_docs_index.py || true"
