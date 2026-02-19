@@ -303,17 +303,31 @@ function renderMarkdown(
 
   const renderer = new marked.Renderer()
 
-  renderer.heading = (text, level, raw) => {
-    const source = typeof raw === 'string' ? raw : text
+  renderer.heading = function (...args) {
+    // marked v16+ passes a heading token object; older versions pass (text, level, raw).
+    if (
+      args[0] &&
+      typeof args[0] === 'object' &&
+      ('depth' in args[0] || 'tokens' in args[0])
+    ) {
+      const token = args[0]
+      const level = Number(token.depth || 1)
+      const rawText = typeof token.text === 'string' ? token.text : ''
+      const innerHtml =
+        this?.parser?.parseInline && Array.isArray(token.tokens)
+          ? this.parser.parseInline(token.tokens)
+          : escapeHtml(rawText)
+      const id = activeSlugger(rawText)
+      return `<h${level} id="${escapeHtml(id)}" class="doc-heading doc-heading-${level}">${innerHtml}</h${level}>`
+    }
+
+    const text = args[0]
+    const level = Number(args[1] || 1)
+    const raw = args[2]
+    const source = typeof raw === 'string' ? raw : String(text ?? '')
     const id = activeSlugger(source)
-    const label =
-      typeof text === 'string'
-        ? text
-        : (text && typeof text === 'object' && 'text' in text && typeof text.text === 'string')
-          ? text.text
-          : String(text ?? '')
-    const safeLabel = label
-    return `<h${level} id="${escapeHtml(id)}" class="doc-heading doc-heading-${level}">${safeLabel}</h${level}>`
+    const label = typeof text === 'string' ? text : String(text ?? '')
+    return `<h${level} id="${escapeHtml(id)}" class="doc-heading doc-heading-${level}">${label}</h${level}>`
   }
 
   if (!allowCallouts) {
