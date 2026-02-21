@@ -3,18 +3,32 @@ const { headings = [] } = Astro.props
 const items = (Array.isArray(headings) ? headings : []).filter(
   h => h && typeof h.depth === 'number' && h.depth <= 2
 )
+const widgetId = `docs-toc-${Math.random().toString(36).slice(2)}`
 ---
 {items.length > 0 && (
-  <div class="rounded-2xl border bg-white p-3 text-xs shadow-sm lg:sticky lg:top-24">
+  <div
+    class="docs-toc-card rounded-2xl border border-border/70 bg-white/95 p-3 text-xs shadow-soft lg:sticky lg:top-24"
+    data-toc-widget={widgetId}
+  >
     <div class="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-slate">
       On this page
+    </div>
+    <div class="mb-3 h-1 w-full overflow-hidden rounded-full bg-border/60">
+      <div
+        data-toc-progress
+        class="h-full w-0 rounded-full bg-gradient-to-r from-leaf to-canopy transition-[width] duration-150"
+      ></div>
     </div>
     <ul class="space-y-1.5">
       {items.map(h => (
         <li>
           <a
             href={`#${h.slug || ''}`}
-            class="block leading-snug text-slate hover:text-primary"
+            data-toc-link
+            data-toc-slug={h.slug || ''}
+            class={`docs-toc-link block rounded-lg border-l-2 border-transparent py-1 pr-2 leading-snug text-slate transition hover:text-primary ${
+              h.depth > 1 ? 'pl-5' : 'pl-3'
+            }`}
           >
             {h.text}
           </a>
@@ -23,3 +37,109 @@ const items = (Array.isArray(headings) ? headings : []).filter(
     </ul>
   </div>
 )}
+
+<script type="module">
+  ;(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    const scriptEl = document.currentScript
+    const root = scriptEl ? scriptEl.previousElementSibling : null
+    if (!root || !root.querySelectorAll || !root.hasAttribute('data-toc-widget')) {
+      return
+    }
+
+    const links = Array.from(root.querySelectorAll('a[data-toc-link]'))
+    if (!links.length) {
+      return
+    }
+
+    const progressEl = root.querySelector('[data-toc-progress]')
+    const article =
+      document.querySelector('main.docs-prose') ||
+      document.querySelector('article.docs-prose') ||
+      document.querySelector('main')
+
+    const entries = links
+      .map((link) => {
+        const href = link.getAttribute('href') || ''
+        const rawId = href.replace(/^#/, '')
+        let id = rawId
+        try {
+          id = decodeURIComponent(rawId)
+        } catch {
+          id = rawId
+        }
+        return {
+          link,
+          id,
+          target: id ? document.getElementById(id) : null,
+        }
+      })
+      .filter((entry) => entry.target)
+
+    if (!entries.length) {
+      return
+    }
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
+    let ticking = false
+
+    const update = () => {
+      ticking = false
+      const markerY = window.scrollY + 140
+      let activeId = entries[0].id
+
+      for (const entry of entries) {
+        if (!entry.target) {
+          continue
+        }
+        const top = entry.target.getBoundingClientRect().top + window.scrollY
+        if (top <= markerY) {
+          activeId = entry.id
+        }
+      }
+
+      for (const entry of entries) {
+        const active = entry.id === activeId
+        entry.link.setAttribute('data-active', active ? 'true' : 'false')
+        if (active) {
+          entry.link.setAttribute('aria-current', 'true')
+        } else {
+          entry.link.removeAttribute('aria-current')
+        }
+      }
+
+      if (progressEl && article) {
+        const articleTop = article.getBoundingClientRect().top + window.scrollY
+        const articleBottom = articleTop + article.scrollHeight - window.innerHeight
+        const ratio =
+          articleBottom <= articleTop
+            ? 1
+            : clamp((window.scrollY - articleTop) / (articleBottom - articleTop), 0, 1)
+        progressEl.style.width = `${Math.round(ratio * 100)}%`
+      }
+    }
+
+    const requestUpdate = () => {
+      if (ticking) {
+        return
+      }
+      ticking = true
+      window.requestAnimationFrame(update)
+    }
+
+    window.addEventListener('scroll', requestUpdate, { passive: true })
+    window.addEventListener('resize', requestUpdate)
+    requestUpdate()
+  })()
+</script>
+
+<style>
+  .docs-toc-link[data-active='true'] {
+    border-left-color: rgb(var(--leaf-rgb) / 0.9);
+    background: rgb(var(--moss-rgb) / 0.28);
+    color: rgb(var(--canopy-rgb) / 1);
+    font-weight: 600;
+  }
+</style>

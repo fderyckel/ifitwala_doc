@@ -1,5 +1,7 @@
 ---
 import { marked } from 'marked'
+import { getAllDocs } from '@/lib/docsClient'
+import { describeLanguage } from '@/lib/language'
 import Sidebar from './Sidebar.astro'
 import TOC from './TOC.astro'
 
@@ -173,6 +175,59 @@ function parseAttrs(str = '') {
   return attrs
 }
 
+function normalizeSlug(input = '') {
+  return String(input || '')
+    .trim()
+    .replace(/^\/+|\/+$/g, '')
+    .toLowerCase()
+}
+
+function parseSlugList(raw = '') {
+  const dedupe = new Set()
+  for (const token of String(raw || '').split(/[,\s]+/)) {
+    const slug = normalizeSlug(token)
+    if (slug) {
+      dedupe.add(slug)
+    }
+  }
+  return Array.from(dedupe)
+}
+
+function extractRelatedDocRequests(md = '') {
+  const requests = []
+  if (!md) {
+    return requests
+  }
+
+  const pushAttrs = rawAttrs => {
+    const attrs = parseAttrs(decodeEntities(rawAttrs || ''))
+    const slugs = parseSlugList(attrs.slugs || attrs.slug || '')
+    if (!slugs.length) {
+      return
+    }
+    requests.push({
+      slugs,
+      title: String(attrs.title || 'Related docs').trim() || 'Related docs',
+    })
+  }
+
+  const SELF_RELATED_REGEX =
+    /(?:&(?:amp;)?lt;|<)RelatedDocs\b([^>]*?)(?:\/(?:&(?:amp;)?gt;|>))/gi
+  const BLOCK_RELATED_REGEX =
+    /(?:&(?:amp;)?lt;|<)RelatedDocs\b([^>]*?)(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/RelatedDocs(?:&(?:amp;)?gt;|>)/gi
+
+  md.replace(SELF_RELATED_REGEX, (_, rawAttrs) => {
+    pushAttrs(rawAttrs)
+    return ''
+  })
+  md.replace(BLOCK_RELATED_REGEX, (_, rawAttrs) => {
+    pushAttrs(rawAttrs)
+    return ''
+  })
+
+  return requests
+}
+
 function resolveAssetUrl(input) {
   if (!input) return ''
   const trimmed = String(input || '').trim()
@@ -330,42 +385,250 @@ function renderMarkdown(
     return `<h${level} id="${escapeHtml(id)}" class="doc-heading doc-heading-${level}">${label}</h${level}>`
   }
 
-  if (!allowCallouts) {
-    return marked.parse(md, { renderer, mangle: false })
-  }
-
   const callouts = []
   const CALL_REGEX = /(?:&(?:amp;)?lt;|<)Callout\b([^>]*?)(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/Callout(?:&(?:amp;)?gt;|>)/gi
 
-  md = md.replace(CALL_REGEX, (_, rawAttrs, rawBody) => {
-    const id = `callout-${callouts.length}`
-    const placeholder = `<div data-callout-placeholder="${id}"></div>`
-    callouts.push({
+  if (allowCallouts) {
+    md = md.replace(CALL_REGEX, (_, rawAttrs, rawBody) => {
+      const id = `callout-${callouts.length}`
+      const placeholder = `<div data-callout-placeholder="${id}"></div>`
+      callouts.push({
+        id,
+        attrs: parseAttrs(decodeEntities(rawAttrs || '')),
+        bodyMd: (rawBody || '').trim(),
+      })
+      return `\n\n${placeholder}\n\n`
+    })
+  }
+
+  const stepsBlocks = []
+  const STEPS_REGEX =
+    /(?:&(?:amp;)?lt;|<)Steps\b([^>]*?)(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/Steps(?:&(?:amp;)?gt;|>)/gi
+  const STEP_REGEX =
+    /(?:&(?:amp;)?lt;|<)Step\b([^>]*?)(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/Step(?:&(?:amp;)?gt;|>)/gi
+
+  md = md.replace(STEPS_REGEX, (_, rawAttrs, rawBody) => {
+    const id = `steps-${stepsBlocks.length}`
+    const placeholder = `<div data-steps-placeholder="${id}"></div>`
+    const attrs = parseAttrs(decodeEntities(rawAttrs || ''))
+    const items = []
+    let match
+    while ((match = STEP_REGEX.exec(rawBody || ''))) {
+      const stepAttrs = parseAttrs(decodeEntities(match[1] || ''))
+      const bodyMd = (match[2] || '').trim()
+      if (!bodyMd && !stepAttrs.title) {
+        continue
+      }
+      items.push({
+        title: String(stepAttrs.title || '').trim(),
+        bodyMd,
+      })
+    }
+    STEP_REGEX.lastIndex = 0
+
+    stepsBlocks.push({
       id,
-      attrs: parseAttrs(decodeEntities(rawAttrs || '')),
-      bodyMd: (rawBody || '').trim(),
+      title: String(attrs.title || '').trim(),
+      items,
     })
     return `\n\n${placeholder}\n\n`
   })
 
+  const doDontBlocks = []
+  const DODONT_REGEX =
+    /(?:&(?:amp;)?lt;|<)DoDont\b([^>]*?)(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/DoDont(?:&(?:amp;)?gt;|>)/gi
+  const DO_REGEX =
+    /(?:&(?:amp;)?lt;|<)Do(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/Do(?:&(?:amp;)?gt;|>)/gi
+  const DONT_REGEX =
+    /(?:&(?:amp;)?lt;|<)Dont(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/Dont(?:&(?:amp;)?gt;|>)/gi
+
+  md = md.replace(DODONT_REGEX, (_, rawAttrs, rawBody) => {
+    const id = `dodont-${doDontBlocks.length}`
+    const placeholder = `<div data-dodont-placeholder="${id}"></div>`
+    const attrs = parseAttrs(decodeEntities(rawAttrs || ''))
+    const dos = []
+    const donts = []
+
+    let match
+    while ((match = DO_REGEX.exec(rawBody || ''))) {
+      const bodyMd = (match[1] || '').trim()
+      if (bodyMd) {
+        dos.push(bodyMd)
+      }
+    }
+    DO_REGEX.lastIndex = 0
+
+    while ((match = DONT_REGEX.exec(rawBody || ''))) {
+      const bodyMd = (match[1] || '').trim()
+      if (bodyMd) {
+        donts.push(bodyMd)
+      }
+    }
+    DONT_REGEX.lastIndex = 0
+
+    doDontBlocks.push({
+      id,
+      doTitle: String(attrs.doTitle || attrs.do_title || 'Do').trim() || 'Do',
+      dontTitle: String(attrs.dontTitle || attrs.dont_title || "Don't").trim() || "Don't",
+      dos,
+      donts,
+    })
+    return `\n\n${placeholder}\n\n`
+  })
+
+  const relatedBlocks = []
+  const RELATED_DOCS_SELF_REGEX =
+    /(?:&(?:amp;)?lt;|<)RelatedDocs\b([^>]*?)(?:\/(?:&(?:amp;)?gt;|>))/gi
+  const RELATED_DOCS_BLOCK_REGEX =
+    /(?:&(?:amp;)?lt;|<)RelatedDocs\b([^>]*?)(?:&(?:amp;)?gt;|>)([\s\S]*?)(?:&(?:amp;)?lt;|<)\/RelatedDocs(?:&(?:amp;)?gt;|>)/gi
+
+  const captureRelatedBlock = rawAttrs => {
+    const id = `related-${relatedBlocks.length}`
+    const placeholder = `<div data-related-placeholder="${id}"></div>`
+    relatedBlocks.push({
+      id,
+      attrs: parseAttrs(decodeEntities(rawAttrs || '')),
+    })
+    return `\n\n${placeholder}\n\n`
+  }
+
+  md = md.replace(RELATED_DOCS_SELF_REGEX, (_, rawAttrs) => captureRelatedBlock(rawAttrs))
+  md = md.replace(RELATED_DOCS_BLOCK_REGEX, (_, rawAttrs) => captureRelatedBlock(rawAttrs))
+
   let html = marked.parse(md, { renderer, mangle: false })
 
-  for (const callout of callouts) {
-    const typeRaw = (callout.attrs.type || 'info').toLowerCase()
-    const type = ALLOWED_CALLOUT_TYPES.has(typeRaw) ? typeRaw : 'info'
-    const title = callout.attrs.title || ''
-    const bodyHtml = renderMarkdown(callout.bodyMd, {
-      allowCallouts: true,
-      slugger: activeSlugger,
-    }).trim()
-    const titleHtml = title ? `<div class="docs-callout-title mb-1 font-semibold">${escapeHtml(title)}</div>` : ''
-    const palette = CALLOUT_COLORS[type] || CALLOUT_COLORS.info
-    const borderClass = CALLOUT_BORDER_CLASS[type] || CALLOUT_BORDER_CLASS.info
-    const styleAttr = ` style="--callout-bg:${palette.bg};--callout-border:${palette.border};--callout-border-strong:${palette.accent};border-color:var(--callout-border-strong);background:var(--callout-bg)"`
-    const calloutHtml = `<div class="docs-callout not-prose docs-callout-${type} border-l-4 rounded p-3 ${borderClass}" data-callout-type="${type}"${styleAttr}>${titleHtml}<div class="docs-callout-body prose prose-docs max-w-none">${bodyHtml}</div></div>`
-    const placeholder = `<div data-callout-placeholder="${callout.id}"></div>`
+  for (const block of stepsBlocks) {
+    const titleHtml = block.title
+      ? `<div class="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-slate">${escapeHtml(block.title)}</div>`
+      : ''
+    const cardsHtml = block.items
+      .map((item, index) => {
+        const cardTitle = escapeHtml(item.title || `Step ${index + 1}`)
+        const bodyHtml = renderMarkdown(item.bodyMd, {
+          allowCallouts: true,
+          slugger: activeSlugger,
+        }).trim()
+        return `<article class="rounded-2xl border border-border/70 bg-white/80 p-4 shadow-soft">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-leaf/15 text-sm font-semibold text-canopy">${index + 1}</span>
+            <h3 class="m-0 text-base font-semibold text-ink">${cardTitle}</h3>
+          </div>
+          <div class="prose prose-docs max-w-none text-sm">${bodyHtml}</div>
+        </article>`
+      })
+      .join('')
+
+    const placeholder = `<div data-steps-placeholder="${block.id}"></div>`
+    const stepsHtml = block.items.length
+      ? `<section class="docs-steps not-prose my-8">${titleHtml}<div class="grid gap-4 md:grid-cols-2">${cardsHtml}</div></section>`
+      : ''
     if (html.includes(placeholder)) {
-      html = html.split(placeholder).join(calloutHtml)
+      html = html.split(placeholder).join(stepsHtml)
+    }
+  }
+
+  for (const block of doDontBlocks) {
+    const renderEntries = (items, tone) => {
+      if (!items.length) {
+        return `<p class="text-sm text-slate">No entries yet.</p>`
+      }
+      return `<ul class="space-y-3">${items
+        .map(item => {
+          const bodyHtml = renderMarkdown(item, {
+            allowCallouts: true,
+            slugger: activeSlugger,
+          }).trim()
+          return `<li class="rounded-xl border p-3 ${
+            tone === 'do'
+              ? 'border-canopy/20 bg-[rgba(41,159,101,0.08)]'
+              : 'border-[rgba(214,138,40,0.3)] bg-[rgba(208,135,0,0.08)]'
+          }"><div class="prose prose-docs max-w-none text-sm">${bodyHtml}</div></li>`
+        })
+        .join('')}</ul>`
+    }
+
+    const doHtml = renderEntries(block.dos, 'do')
+    const dontHtml = renderEntries(block.donts, 'dont')
+    const placeholder = `<div data-dodont-placeholder="${block.id}"></div>`
+    const blockHtml = `<section class="docs-do-dont not-prose my-8 grid gap-4 md:grid-cols-2">
+      <article class="rounded-2xl border border-canopy/30 bg-[rgba(41,159,101,0.06)] p-4 shadow-soft">
+        <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-canopy">${escapeHtml(block.doTitle)}</h3>
+        ${doHtml}
+      </article>
+      <article class="rounded-2xl border border-[rgba(214,138,40,0.35)] bg-[rgba(208,135,0,0.06)] p-4 shadow-soft">
+        <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[rgba(166,96,23,0.95)]">${escapeHtml(block.dontTitle)}</h3>
+        ${dontHtml}
+      </article>
+    </section>`
+    if (html.includes(placeholder)) {
+      html = html.split(placeholder).join(blockHtml)
+    }
+  }
+
+  for (const block of relatedBlocks) {
+    const slugs = parseSlugList(block.attrs.slugs || block.attrs.slug || '')
+    const relatedDocs = []
+    const seen = new Set()
+    for (const slug of slugs) {
+      if (seen.has(slug)) {
+        continue
+      }
+      seen.add(slug)
+      const item = relatedDocsLookup.get(slug)
+      if (item) {
+        relatedDocs.push(item)
+      }
+    }
+
+    const title = String(block.attrs.title || 'Related docs').trim() || 'Related docs'
+    const cards = relatedDocs
+      .map(item => {
+        const href = `/docs/${encodeURIComponent(item.languageSlug)}/${encodeURIComponent(item.slug)}/`
+        const summary = item.summary ? `<p class="mt-2 text-sm text-slate">${escapeHtml(item.summary)}</p>` : ''
+        const category = item.category
+          ? `<span class="inline-flex rounded-full bg-moss/35 px-2.5 py-1 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-canopy">${escapeHtml(item.category)}</span>`
+          : ''
+        return `<a href="${href}" class="group block rounded-2xl border border-border/70 bg-white/80 p-4 shadow-soft transition hover:shadow-strong">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="m-0 text-base font-semibold text-ink group-hover:text-canopy">${escapeHtml(item.title || item.slug)}</h3>
+            <span class="text-lg leading-none text-leaf">-&gt;</span>
+          </div>
+          ${category}
+          ${summary}
+        </a>`
+      })
+      .join('')
+
+    const emptyState =
+      '<p class="rounded-xl border border-border/70 bg-white/60 p-4 text-sm text-slate">No related docs found for these slugs yet.</p>'
+    const relatedHtml = `<section class="docs-related not-prose my-8 rounded-2xl border border-border/70 bg-sky/35 p-5">
+      <div class="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-slate">${escapeHtml(title)}</div>
+      <div class="grid gap-3 sm:grid-cols-2">${cards || emptyState}</div>
+    </section>`
+    const placeholder = `<div data-related-placeholder="${block.id}"></div>`
+    if (html.includes(placeholder)) {
+      html = html.split(placeholder).join(relatedHtml)
+    }
+  }
+
+  if (allowCallouts) {
+    for (const callout of callouts) {
+      const typeRaw = (callout.attrs.type || 'info').toLowerCase()
+      const type = ALLOWED_CALLOUT_TYPES.has(typeRaw) ? typeRaw : 'info'
+      const title = callout.attrs.title || ''
+      const bodyHtml = renderMarkdown(callout.bodyMd, {
+        allowCallouts: true,
+        slugger: activeSlugger,
+      }).trim()
+      const titleHtml = title ? `<div class="docs-callout-title mb-1 font-semibold">${escapeHtml(title)}</div>` : ''
+      const palette = CALLOUT_COLORS[type] || CALLOUT_COLORS.info
+      const borderClass = CALLOUT_BORDER_CLASS[type] || CALLOUT_BORDER_CLASS.info
+      const styleAttr = ` style="--callout-bg:${palette.bg};--callout-border:${palette.border};--callout-border-strong:${palette.accent};border-color:var(--callout-border-strong);background:var(--callout-bg)"`
+      const calloutHtml = `<div class="docs-callout not-prose docs-callout-${type} border-l-4 rounded p-3 ${borderClass}" data-callout-type="${type}"${styleAttr}>${titleHtml}<div class="docs-callout-body prose prose-docs max-w-none">${bodyHtml}</div></div>`
+      const placeholder = `<div data-callout-placeholder="${callout.id}"></div>`
+      if (html.includes(placeholder)) {
+        html = html.split(placeholder).join(calloutHtml)
+      }
     }
   }
 
@@ -373,6 +636,32 @@ function renderMarkdown(
 }
 
 const rawMarkdown = doc.body_md || ''
+const relatedDocRequests = extractRelatedDocRequests(rawMarkdown)
+const relatedDocsLookup = new Map()
+
+if (relatedDocRequests.length) {
+  try {
+    const payload = await getAllDocs(lang || 'en')
+    const docs = Array.isArray(payload?.docs) ? payload.docs : []
+    for (const item of docs) {
+      const slug = normalizeSlug(item?.slug)
+      if (!slug || relatedDocsLookup.has(slug)) {
+        continue
+      }
+      const languageInfo = describeLanguage(item?.language || lang || 'en')
+      relatedDocsLookup.set(slug, {
+        slug: String(item?.slug || '').trim().replace(/^\/+|\/+$/g, ''),
+        title: String(item?.title || '').trim(),
+        summary: String(item?.summary || '').trim(),
+        category: String(item?.category_label || item?.category || '').trim(),
+        languageSlug: languageInfo.slug || (lang || 'en'),
+      })
+    }
+  } catch {
+    // Fallback to an empty related-docs section if indexing fails.
+  }
+}
+
 const transformedMarkdown = applyDocTransforms(rawMarkdown)
 const headings = extractHeadings(transformedMarkdown)
 const html = renderMarkdown(transformedMarkdown, { allowCallouts: true, alreadyTransformed: true })
