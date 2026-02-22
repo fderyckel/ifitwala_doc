@@ -1,15 +1,32 @@
 ---
 import DocsLayout from '@/components/docs/DocsLayout.astro'
 import DocsShell from '@/layouts/DocsShell.astro'
-import { getAllDocs, getOneDoc } from '@/lib/docsClient'
+import {
+  getAllDocs,
+  getCategories,
+  getCategory,
+  getDocsInCategory,
+  getOneDoc,
+} from '@/lib/docsClient'
 import { describeLanguage } from '@/lib/language'
 
 export const prerender = true
 
 export async function getStaticPaths() {
   try {
-    const payload = await getAllDocs()
+    const [payload, categoriesRaw] = await Promise.all([getAllDocs(), getCategories()])
     const docs = Array.isArray(payload?.docs) ? payload.docs : []
+    const categories = Array.isArray(categoriesRaw) ? categoriesRaw : []
+    const categorySlugByName = new Map<string, string>()
+    for (const cat of categories) {
+      const name = typeof cat?.name === 'string' ? cat.name.trim() : ''
+      const slug = typeof cat?.slug === 'string' ? cat.slug.trim() : ''
+      if (!name || !slug) {
+        continue
+      }
+      categorySlugByName.set(name, slug)
+    }
+
     const seen = new Set<string>()
     const paths = []
 
@@ -26,6 +43,21 @@ export async function getStaticPaths() {
       seen.add(key)
       paths.push({
         params: { language: languageSlug, slug: docSlug },
+        props: { languageRaw, languageSlug },
+      })
+
+      const categoryName = typeof d?.category === 'string' ? d.category.trim() : ''
+      const categorySlug = categoryName ? categorySlugByName.get(categoryName) : ''
+      if (!categorySlug) {
+        continue
+      }
+      const categoryKey = `${languageSlug}::${categorySlug}`
+      if (seen.has(categoryKey)) {
+        continue
+      }
+      seen.add(categoryKey)
+      paths.push({
+        params: { language: languageSlug, slug: categorySlug },
         props: { languageRaw, languageSlug },
       })
     }
@@ -47,7 +79,7 @@ const languageForApi = initialLanguage.raw || 'en'
 const languageSlugParam = propLanguageSlug || initialLanguage.slug || 'en'
 
 const slug = slugParam
-let doc
+let doc: any = null
 try {
   doc = await getOneDoc(languageForApi, slug)
 } catch {
@@ -58,6 +90,23 @@ const docLanguage = describeLanguage(doc?.language || languageForApi)
 const langRaw = docLanguage.raw || languageForApi
 const langSlug = docLanguage.slug || languageSlugParam
 
+let category: any = null
+let docsInCategory: any[] = []
+if (!doc && slug) {
+  try {
+    category = await getCategory(slug)
+  } catch {
+    category = null
+  }
+  if (category) {
+    try {
+      docsInCategory = await getDocsInCategory(languageForApi, slug)
+    } catch {
+      docsInCategory = []
+    }
+  }
+}
+
 function toBool(value: any): boolean {
   if (typeof value === 'boolean') return value
   if (typeof value === 'number') return value !== 0
@@ -66,10 +115,20 @@ function toBool(value: any): boolean {
 }
 
 const baseTitle = doc ? (typeof doc?.seo_title === 'string' && doc.seo_title.trim() ? doc.seo_title.trim() : doc.title) : ''
-const shellTitle = doc ? `${baseTitle} | Ifitwala Ed Docs` : 'Not Found | Ifitwala Ed Docs'
-const metaDescription = doc ? (typeof doc?.seo_description === 'string' && doc.seo_description.trim() ? doc.seo_description.trim() : doc.summary || '') : ''
+const categoryTitle = category ? `${category?.label || slug} — Docs (${langRaw})` : ''
+const shellTitle = doc
+  ? `${baseTitle} | Ifitwala Ed Docs`
+  : category
+    ? `${categoryTitle} | Ifitwala Ed Docs`
+    : 'Not Found | Ifitwala Ed Docs'
+const ogTitle = doc ? baseTitle : (category ? categoryTitle : '')
+const metaDescription = doc
+  ? (typeof doc?.seo_description === 'string' && doc.seo_description.trim() ? doc.seo_description.trim() : doc.summary || '')
+  : (typeof category?.description === 'string' ? category.description : '')
 
-const canonical = doc ? (typeof doc?.canonical_url === 'string' && doc.canonical_url.trim() ? doc.canonical_url.trim() : `/docs/${langSlug}/${doc.slug}/`) : undefined
+const canonical = doc
+  ? (typeof doc?.canonical_url === 'string' && doc.canonical_url.trim() ? doc.canonical_url.trim() : `/docs/${langSlug}/${doc.slug}/`)
+  : (category ? `/docs/${langSlug}/${category?.slug || slug}/` : undefined)
 
 const ogCandidate = (() => {
   if (typeof doc?.og_image === 'string' && doc.og_image.trim()) {
@@ -86,6 +145,28 @@ const ogCandidate = (() => {
 
 const ogImage = ogCandidate || null
 const noindex = doc ? toBool(doc.noindex) : false
+
+const ICON_PATHS = {
+  book:     'M4 19.5V6.75A2.25 2.25 0 016.25 4.5h11.5m-13.75 15A2.25 2.25 0 006.25 21h11.5m-13.75-1.5h13.5m0-15A2.25 2.25 0 0121 6.75V21M6.75 7.5h6',
+  users:    'M16 14a4 4 0 10-8 0m-5 6a7 7 0 0114 0M12 8a4 4 0 110-8 4 4 0 010 8',
+  check:    'M4.5 12.75l6 6 9-13.5',
+  beaker:   'M9 2.25h6M9 2.25v5.25L4.5 15.75A6 6 0 0010.5 21h3a6 6 0 006-5.25L15 7.5V2.25',
+  calendar: 'M6 8h12M7 4v4m10-4v4M6 20h12a2 2 0 002-2V8H4v10a2 2 0 002 2',
+}
+
+function normalizeIconSource(raw: unknown) {
+  if (typeof raw !== 'string') return null
+  const value = raw.trim()
+  if (!value) return null
+  const isImage =
+    /^(https?:|data:|\/)/i.test(value) ||
+    value.toLowerCase().endsWith('.svg') ||
+    value.toLowerCase().endsWith('.png') ||
+    value.toLowerCase().endsWith('.jpg') ||
+    value.toLowerCase().endsWith('.jpeg') ||
+    value.toLowerCase().endsWith('.webp')
+  return { value, isImage }
+}
 ---
 
 <DocsShell
@@ -94,11 +175,82 @@ const noindex = doc ? toBool(doc.noindex) : false
   description={metaDescription}
   canonical={canonical}
   ogImage={ogImage}
-  ogTitle={baseTitle}
+  ogTitle={ogTitle}
   ogDescription={metaDescription}
   noindex={noindex}
 >
-  {!doc ? (
+  {doc ? (
+    <DocsLayout doc={doc} />
+  ) : category ? (
+    <main class="mx-auto max-w-6xl px-6 py-10">
+      <nav class="text-sm text-slate mb-4">
+        <a class="hover:underline" href={`/docs/${langSlug || 'en'}/`}>Docs</a>
+        <span class="mx-1">›</span>
+        <span>{category?.label || slug}</span>
+      </nav>
+
+      <header class="mb-6">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+          {(() => {
+            const rawIcon = typeof category?.icon === 'string' ? category.icon : ''
+            if (!rawIcon) return null
+            const svgPath = ICON_PATHS[rawIcon.trim().toLowerCase()]
+            if (svgPath) {
+              return (
+                <span class="inline-flex h-8 w-8 items-center justify-center text-canopy">
+                  <svg
+                    viewBox="0 0 24 24"
+                    class="w-6 h-6 opacity-80"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d={svgPath} />
+                  </svg>
+                </span>
+              )
+            }
+            const fallback = normalizeIconSource(rawIcon)
+            if (fallback?.isImage) {
+              return (
+                <span class="inline-flex h-8 w-8 items-center justify-center">
+                  <img
+                    src={fallback.value}
+                    alt={`${category?.label || slug} icon`}
+                    class="h-8 w-8 object-contain"
+                    loading="lazy"
+                  />
+                </span>
+              )
+            }
+            return <span class="text-xl">{fallback?.value || rawIcon}</span>
+          })()}
+          <span>{category?.label || slug}</span>
+        </h1>
+        {category?.description && <p class="text-slate mt-1">{category.description}</p>}
+      </header>
+
+      {docsInCategory?.length ? (
+        <ul class="grid sm:grid-cols-2 gap-4">
+          {docsInCategory.map((item) => (
+            <li>
+              <a
+                href={`/docs/${langSlug}/${item.slug}/`}
+                class="block bg-white border rounded-2xl p-5 hover:shadow-lg transition"
+              >
+                <div class="font-semibold">{item.title}</div>
+                {item.summary && <div class="text-sm text-slate mt-1">{item.summary}</div>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="text-slate">No documents in this category yet.</div>
+      )}
+    </main>
+  ) : (
     <main class="mx-auto max-w-3xl px-6 py-10">
       <h1 class="text-2xl font-semibold text-primary mb-2">Page not found</h1>
       <p class="text-slate mb-6">
@@ -106,7 +258,5 @@ const noindex = doc ? toBool(doc.noindex) : false
       </p>
       <a class="text-primary underline" href={`/docs/${langSlug || 'en'}/`}>Back to docs</a>
     </main>
-  ) : (
-    <DocsLayout doc={doc} />
   )}
 </DocsShell>

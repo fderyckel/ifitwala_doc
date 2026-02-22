@@ -111,6 +111,41 @@ def _slug_safe(s: str) -> str:
     """Kebab-case for URLs; keep hyphens."""
     return SLUG_SAFE_RE.sub("", (s or "").strip().lower().replace(" ", "-")).strip("-")
 
+def _doc_category_meta_map() -> dict[str, dict]:
+    rows = frappe.get_all(
+        "Doc Category",
+        fields=["name", "slug", "label"],
+        limit_page_length=1000,
+        ignore_permissions=True,
+    )
+    out: dict[str, dict] = {}
+    for row in rows:
+        name = (row.get("name") or "").strip()
+        if not name:
+            continue
+        out[name] = {
+            "slug": (row.get("slug") or "").strip(),
+            "label": (row.get("label") or "").strip(),
+        }
+    return out
+
+def _attach_category_fields(record: dict, category_meta: dict[str, dict] | None = None):
+    category_name = (record.get("category") or "").strip()
+    if category_name:
+        meta = (category_meta or {}).get(category_name) or {}
+        category_slug = (meta.get("slug") or "").strip() or _slug_safe(category_name)
+        category_label = (meta.get("label") or "").strip() or category_name
+        record["category_slug"] = category_slug
+        record["category_label"] = category_label
+
+    sub_value = (record.get("subcategory") or record.get("sub_category") or "").strip()
+    if sub_value:
+        record["sub_category"] = sub_value
+        record["sub_category_slug"] = _slug_safe(sub_value)
+        record["sub_category_label"] = sub_value
+
+    return record
+
 def _file_exists(url: str) -> bool:
     """Check for /public files existence from a /files/... URL."""
     if not url:
@@ -354,9 +389,11 @@ def fetch_all(language: str | None = None):
                   else "category, doc_order, title"),
         ignore_permissions=True,
     )
+    category_meta = _doc_category_meta_map()
     tags = _load_tags_for([d["name"] for d in docs])
     for d in docs:
         _normalize_subcategory(d, subcat_col)
+        _attach_category_fields(d, category_meta)
         d["tags"] = tags.get(d.get("name"), [])
     payload = frappe.as_json({"docs": docs})
     if _set_cache_headers(payload.encode(), max((d.modified for d in docs), default=None)):
@@ -384,6 +421,7 @@ def fetch_one(language: str, slug: str):
         frappe.throw("Not Found", frappe.DoesNotExistError)
 
     _normalize_subcategory(d, subcat_col)
+    _attach_category_fields(d, _doc_category_meta_map())
     tags = _load_tags_for([d.get("name")])
     d["tags"] = tags.get(d.get("name"), [])
 

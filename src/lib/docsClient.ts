@@ -3,7 +3,12 @@ type Doc = {
   title: string;
   language: string;
   category?: string;
+  category_slug?: string;
+  category_label?: string;
   sub_category?: string;
+  sub_category_slug?: string;
+  sub_category_label?: string;
+  subcategory?: string;
   summary?: string;
   version?: string;
   published_on?: string;

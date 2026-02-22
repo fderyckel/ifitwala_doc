@@ -683,6 +683,11 @@ function formatDateLabel(input?: string | null) {
 
 const publishedLabel = formatDateLabel(doc?.published_on)
 const updatedLabel = formatDateLabel(doc?.modified)
+const categorySlug = normalizeSlug(doc?.category_slug || doc?.category || '')
+const categoryLabel = String(doc?.category_label || doc?.category || '').trim()
+const subCategoryRaw = doc?.sub_category || doc?.subcategory || ''
+const subCategorySlug = normalizeSlug(doc?.sub_category_slug || subCategoryRaw)
+const subCategoryLabel = String(doc?.sub_category_label || subCategoryRaw || '').trim()
 const metaItems = []
 if (publishedLabel) {
   metaItems.push({ label: 'Published', value: publishedLabel })
@@ -701,16 +706,16 @@ if (doc?.author) {
   <main class="docs-prose prose prose-docs w-full flex-1 min-w-0 max-w-3xl lg:max-w-4xl">
     <nav class="not-prose mb-4 text-sm text-slate">
       <a href={`/docs/${lang}/`} class="hover:underline">Docs</a>
-      {doc.category && <>
+      {categorySlug && <>
         <span class="mx-1">›</span>
-        <a href={`/docs/${lang}/${doc.category}/`} class="hover:underline">
-          {doc.category_label || doc.category}
+        <a href={`/docs/${lang}/${categorySlug}/`} class="hover:underline">
+          {categoryLabel || categorySlug}
         </a>
       </>}
-      {doc.sub_category && <>
+      {categorySlug && subCategorySlug && <>
         <span class="mx-1">›</span>
-        <a href={`/docs/${lang}/${doc.category}/${doc.sub_category}/`} class="hover:underline">
-          {doc.sub_category_label || doc.sub_category}
+        <a href={`/docs/${lang}/${categorySlug}/${subCategorySlug}/`} class="hover:underline">
+          {subCategoryLabel || subCategorySlug}
         </a>
       </>}
     </nav>
