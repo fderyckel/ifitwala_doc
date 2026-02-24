@@ -255,9 +255,15 @@ def run_astro_build():
             run_yarn("build:docs")
         except Exception as build_error:
             error_text = str(build_error).lower()
-            # Astro occasionally fails with missing dist/renderers.mjs when stale output is present.
-            # Clean and retry once to recover without manual intervention.
-            if "renderers.mjs" not in error_text:
+            # Astro can fail when stale compile artifacts are present in dist/.astro.
+            # Retry once after clearing caches for known missing-generated-module patterns.
+            missing_renderer = "renderers.mjs" in error_text
+            missing_page_module = (
+                "cannot find module" in error_text
+                and "/dist/pages/" in error_text
+                and ".astro.mjs" in error_text
+            )
+            if not (missing_renderer or missing_page_module):
                 raise
             dist_dir = os.path.join(proj_root, "dist")
             astro_cache_dir = os.path.join(proj_root, ".astro")
