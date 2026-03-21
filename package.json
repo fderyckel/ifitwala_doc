@@ -2,6 +2,9 @@
   "name": "ifitwala_doc",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "clean": "rm -rf dist .astro ifitwala_doc/public/dist",
     "dev:marketing": "vite",

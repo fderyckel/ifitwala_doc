@@ -1,0 +1,149 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - "release/**"
+      - "version/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-checks:
+    name: Python Checks
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install Ruff
+        run: python -m pip install --upgrade pip ruff
+
+      - name: Ruff
+        run: ruff check .
+
+      - name: Compile Python
+        run: python -m compileall ifitwala_doc
+
+  frontend-build:
+    name: Frontend Build
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: yarn
+
+      - name: Install Yarn 1
+        run: npm install -g yarn@1.22.22
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --check-files
+
+      - name: Build frontend
+        run: yarn build
+
+  frappe-smoke:
+    name: Frappe v16 Smoke
+    runs-on: ubuntu-24.04
+
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+      redis:
+        image: redis:7.2
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+
+    env:
+      ADMIN_PASSWORD: admin
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_ROOT_PASSWORD: root
+      SITE_NAME: test.localhost
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            build-essential \
+            libmariadb-dev \
+            mariadb-client \
+            pkg-config \
+            redis-tools \
+            xvfb
+
+      - name: Install Bench CLI
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install frappe-bench
+          npm install -g yarn@1.22.22
+
+      - name: Create v16 bench and site
+        run: |
+          bench init \
+            --skip-redis-config-generation \
+            --frappe-branch version-16 \
+            --python "$(command -v python)" \
+            frappe-bench
+          cd frappe-bench
+          bench config set-common-config -c redis_cache "redis://127.0.0.1:6379"
+          bench config set-common-config -c redis_queue "redis://127.0.0.1:6379"
+          bench config set-common-config -c redis_socketio "redis://127.0.0.1:6379"
+          bench new-site "$SITE_NAME" \
+            --admin-password "$ADMIN_PASSWORD" \
+            --db-root-password "$DB_ROOT_PASSWORD" \
+            --db-host "$DB_HOST" \
+            --db-port "$DB_PORT" \
+            --no-mariadb-socket
+
+      - name: Install app and run smoke tests
+        run: |
+          cd frappe-bench
+          bench get-app "$GITHUB_WORKSPACE"
+          bench --site "$SITE_NAME" install-app ifitwala_doc
+          bench --site "$SITE_NAME" run-tests --app ifitwala_doc

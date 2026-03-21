@@ -65,7 +65,7 @@ def run_astro_build():
         configured = (
             env.get("IFITWALA_DOC_NODE_PREFERRED_MAJORS")
             or frappe.conf.get("docs_build_node_preferred_majors")
-            or "22,20,18"
+            or "24,22,20"
         )
         values = []
         for token in str(configured).split(","):
@@ -76,7 +76,7 @@ def run_astro_build():
                 values.append(int(token))
             except ValueError:
                 continue
-        return values or [22, 20, 18]
+        return values or [24, 22, 20]
 
     def _sort_nvm_bins(paths):
         """Prefer known stable LTS majors before other versions."""
