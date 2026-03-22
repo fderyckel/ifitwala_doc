@@ -103,11 +103,11 @@ const DEFAULT_THEME: ThemeTokens = {
 const BASE =
   (typeof import.meta !== 'undefined' &&
     (import.meta as any).env &&
-    ((import.meta as any).env.PUBLIC_SITE_API ||
-      (import.meta as any).env.PUBLIC_DOCS_API)) ||
+    (import.meta as any).env.PUBLIC_SITE_API) ||
   process.env.SITE_API_BASE ||
-  process.env.DOCS_API_BASE ||
   'http://127.0.0.1:8000'
+
+const warnedFallbacks = new Set<string>()
 
 function normalizeUrl(path: string) {
   const root = BASE.replace(/\/$/, '')
@@ -159,6 +159,22 @@ function unwrap<T = any>(data: any): T {
     return (data as any).message as T
   }
   return data as T
+}
+
+function warnOptionalFetchFailure(scope: string, error: unknown) {
+  if (warnedFallbacks.has(scope)) {
+    return
+  }
+  warnedFallbacks.add(scope)
+
+  const message =
+    error instanceof Error
+      ? error.message.split('\n')[0]
+      : typeof error === 'string'
+        ? error
+        : 'unknown error'
+
+  console.warn(`[site] ${scope} unavailable, using fallback (${message})`)
 }
 
 function normalizeSlug(value: unknown): string {
@@ -216,17 +232,27 @@ export async function getPage(slug = '/', opts?: { includeDrafts?: boolean }): P
 }
 
 export async function getNav(location = 'Header'): Promise<NavItem[]> {
-  const qp = new URLSearchParams({ location })
-  const url = normalizeUrl(`/api/method/ifitwala_doc.api.site.get_nav?${qp.toString()}`)
-  const raw = await fetchJSON(url)
-  const items = unwrap<NavItem[]>(raw)
-  return Array.isArray(items) ? items : []
+  try {
+    const qp = new URLSearchParams({ location })
+    const url = normalizeUrl(`/api/method/ifitwala_doc.api.site.get_nav?${qp.toString()}`)
+    const raw = await fetchJSON(url)
+    const items = unwrap<NavItem[]>(raw)
+    return Array.isArray(items) ? items : []
+  } catch (error) {
+    warnOptionalFetchFailure(`nav:${location}`, error)
+    return []
+  }
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  const url = normalizeUrl(`/api/method/ifitwala_doc.api.site.get_site_settings`)
-  const raw = await fetchJSON(url)
-  return unwrap<SiteSettings>(raw) || {}
+  try {
+    const url = normalizeUrl(`/api/method/ifitwala_doc.api.site.get_site_settings`)
+    const raw = await fetchJSON(url)
+    return unwrap<SiteSettings>(raw) || {}
+  } catch (error) {
+    warnOptionalFetchFailure('site-settings', error)
+    return {}
+  }
 }
 
 export async function getThemeTokens(): Promise<ThemeTokens> {
