@@ -17,11 +17,10 @@
   --sky-rgb: 230 243 249;
   --sand-rgb: 244 239 231;
   --border-rgb: 226 232 240;
-
+  
   /* Additional tokens mapped to CSS vars */
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
   --shadow-soft: 0 6px 20px rgba(15, 23, 42, 0.06);
   --shadow-strong: 0 12px 32px rgba(15, 23, 42, 0.1);
 }
-
