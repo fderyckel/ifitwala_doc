@@ -8,6 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 const targetPath = path.join(projectRoot, 'src', 'styles', 'tokens.css');
+const LOCAL_API_HOSTS = new Set(['127.0.0.1', 'localhost']);
 
 const DEFAULT_THEME = {
   ink_color: '#0F172A',
@@ -38,11 +39,70 @@ function resolveBase() {
   return process.env.PUBLIC_SITE_API || process.env.SITE_API_BASE || 'http://127.0.0.1:8000';
 }
 
+function resolveBenchSiteName() {
+  const explicitCandidates = [
+    process.env.IFITWALA_DOC_SITE_NAME,
+    process.env.FRAPPE_SITE,
+    process.env.SITE_NAME,
+  ];
+  for (const candidate of explicitCandidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  let currentDir = projectRoot;
+  for (let depth = 0; depth < 6; depth += 1) {
+    const sitesDir = path.join(currentDir, 'sites');
+    const commonConfig = path.join(sitesDir, 'common_site_config.json');
+    if (fs.existsSync(commonConfig)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(commonConfig, 'utf8'));
+        if (typeof parsed?.default_site === 'string' && parsed.default_site.trim()) {
+          return parsed.default_site.trim();
+        }
+      } catch {
+        // Ignore malformed local config and continue searching.
+      }
+    }
+
+    const currentSiteFile = path.join(sitesDir, 'currentsite.txt');
+    if (fs.existsSync(currentSiteFile)) {
+      try {
+        const siteName = fs.readFileSync(currentSiteFile, 'utf8').trim();
+        if (siteName) {
+          return siteName;
+        }
+      } catch {
+        // Ignore unreadable fallback files and continue searching.
+      }
+    }
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+    currentDir = parentDir;
+  }
+
+  return undefined;
+}
+
 async function fetchTheme() {
   const base = resolveBase();
   const url = new URL('/api/method/ifitwala_doc.api.site.get_theme', base).toString();
+  const headers = { Accept: 'application/json' };
+  const siteName = resolveBenchSiteName();
   try {
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    const hostname = new URL(url).hostname.toLowerCase();
+    if (siteName && LOCAL_API_HOSTS.has(hostname)) {
+      headers['X-Frappe-Site-Name'] = siteName;
+    }
+  } catch {
+    // Ignore invalid URLs and use the base headers.
+  }
+  try {
+    const res = await fetch(url, { headers });
     if (!res.ok) throw new Error(`${res.status}`);
     const json = await res.json();
     return json.message || json;

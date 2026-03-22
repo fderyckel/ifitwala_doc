@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 type Doc = {
   slug: string;
   title: string;
@@ -32,8 +35,75 @@ const BASE =
   process.env.DOCS_API_BASE ||
   'http://127.0.0.1:8000';
 
+const LOCAL_API_HOSTS = new Set(['127.0.0.1', 'localhost']);
+const SITE_NAME_HEADER = resolveBenchSiteName();
+
 function normalizeUrl(path: string) {
   return `${BASE.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+}
+
+function resolveBenchSiteName(): string | undefined {
+  const explicitCandidates = [
+    process.env.IFITWALA_DOC_SITE_NAME,
+    process.env.FRAPPE_SITE,
+    process.env.SITE_NAME,
+  ];
+  for (const candidate of explicitCandidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  let currentDir = process.cwd();
+  for (let depth = 0; depth < 6; depth += 1) {
+    const sitesDir = path.join(currentDir, 'sites');
+    const commonConfig = path.join(sitesDir, 'common_site_config.json');
+    if (fs.existsSync(commonConfig)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(commonConfig, 'utf8'));
+        if (typeof parsed?.default_site === 'string' && parsed.default_site.trim()) {
+          return parsed.default_site.trim();
+        }
+      } catch {
+        // Ignore malformed local config and continue searching.
+      }
+    }
+
+    const currentSiteFile = path.join(sitesDir, 'currentsite.txt');
+    if (fs.existsSync(currentSiteFile)) {
+      try {
+        const siteName = fs.readFileSync(currentSiteFile, 'utf8').trim();
+        if (siteName) {
+          return siteName;
+        }
+      } catch {
+        // Ignore unreadable fallback files and continue searching.
+      }
+    }
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+    currentDir = parentDir;
+  }
+
+  return undefined;
+}
+
+function maybeAttachSiteHeader(targetUrl: string, headers: Record<string, string>) {
+  if (!SITE_NAME_HEADER) {
+    return;
+  }
+
+  try {
+    const hostname = new URL(targetUrl).hostname.toLowerCase();
+    if (LOCAL_API_HOSTS.has(hostname)) {
+      headers['X-Frappe-Site-Name'] = SITE_NAME_HEADER;
+    }
+  } catch {
+    // Ignore invalid URLs and fall back to plain headers.
+  }
 }
 
 function withCacheBust(url: string, token?: string) {
@@ -48,6 +118,7 @@ async function fetchJSON(url: string, attempt = 1): Promise<any> {
     'Accept': 'application/json',
   };
   const targetUrl = attempt === 1 ? url : withCacheBust(url, `${Date.now()}_${attempt}`);
+  maybeAttachSiteHeader(targetUrl, headers);
   if (attempt > 1) {
     headers['Cache-Control'] = 'no-cache, no-store';
     headers['Pragma'] = 'no-cache';
