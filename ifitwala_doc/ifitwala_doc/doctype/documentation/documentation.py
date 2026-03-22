@@ -3,14 +3,16 @@
 
 # ifitwala_doc/ifitwala_doc/doctype/documentation/documentation.py
 
+import hashlib
 import os
 import re
-import hashlib
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import nowdate, get_site_path, cint
-from ifitwala_doc.ifitwala_doc.image_utils import slugify, resize_and_save
+from frappe.utils import cint, get_site_path, nowdate
+
+from ifitwala_doc.ifitwala_doc.image_utils import resize_and_save, slugify
 
 # ────────────────────────────────────────────────────────────────────────────
 # Local helpers (renamed to avoid colliding with image_utils.slugify)

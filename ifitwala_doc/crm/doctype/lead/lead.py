@@ -2,6 +2,7 @@
 import frappe
 from frappe.model.document import Document
 
+
 class Lead(Document):
 	def validate(self):
 		self.set_full_name()

@@ -1,7 +1,12 @@
 # ifitwala_doc/ifitwala_doc/api/build.py
 
-import os, subprocess, shlex, shutil
+import os
+import shlex
+import shutil
+import subprocess
+
 import frappe
+
 
 def _require_token():
     expected = frappe.conf.get("docs_build_token")
@@ -28,7 +33,6 @@ def trigger():
 
 def run_astro_build():
     """Build the Astro site (marketing + docs) and deploy to sites/assets/ifitwala_doc."""
-    import os, shlex, shutil
     import frappe
 
     def _normalize_path_entries(value):
@@ -173,7 +177,7 @@ def run_astro_build():
     # Load .env file manually since we aren't in a shell that sources it
     dotenv_path = os.path.join(proj_root, ".env")
     if os.path.isfile(dotenv_path):
-        with open(dotenv_path, "r") as f:
+        with open(dotenv_path) as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith("#") or "=" not in line:
@@ -195,7 +199,7 @@ def run_astro_build():
         os.path.join(proj_root, "node_modules", ".bin"),
         os.path.join(proj_root, ".yarn", "bin"),
     ]
-    
+
     # Explicit Node binary path override (if configured)
     explicit_node_bin = env.get("IFITWALA_DOC_NODE_BIN") or frappe.conf.get("docs_build_node_bin")
     if explicit_node_bin:
@@ -209,7 +213,7 @@ def run_astro_build():
         # Fallback: check based on bench_root ownership if running as root/restricted
         possible_home = os.path.dirname(os.path.dirname(bench_root)) # /home/user or /opt
         nvm_paths = glob.glob(os.path.join(possible_home, ".nvm/versions/node/*/bin"))
-    
+
     if nvm_paths:
         nvm_paths = _sort_nvm_bins(nvm_paths)
         path_hints.extend(nvm_paths)
@@ -297,7 +301,7 @@ def run_astro_build():
 
     except Exception as e:
         frappe.logger("ifitwala_doc").error(f"Build failed: {e}", exc_info=True)
-        
+
         # ─────────────────── Status Update (Failure) ────────────────
         settings.last_build_status = "Failed"
         settings.last_build_time = frappe.utils.now()
@@ -307,7 +311,7 @@ def run_astro_build():
 
         frappe.publish_realtime(
             "astro_build_status",
-            {"status": "failed", "message": f"Build failed: {str(e)}"},
+            {"status": "failed", "message": f"Build failed: {e!s}"},
             user=frappe.session.user
         )
         raise e
@@ -326,11 +330,11 @@ def debug_headers():
 def kick_build():
     """Trigger the Astro build process directly from the Desk."""
     frappe.only_for(("System Manager", "Website Manager"))
-    
+
     frappe.enqueue(
         "ifitwala_doc.api.build.run_astro_build",
         queue="long",
         timeout=1500
     )
-    
+
     return {"queued": True, "message": "Build started. You will be notified when complete."}

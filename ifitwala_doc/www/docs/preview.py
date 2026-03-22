@@ -3,10 +3,10 @@ no_cache = 1
 
 import re
 from urllib.parse import quote
+
 import frappe
 from frappe.utils.data import md_to_html
 from markupsafe import Markup
-
 
 _CALLOUT_RE = re.compile(
     r"(?:&(?:amp;)?lt;|<)Callout\b([^>]*?)(?:&(?:amp;)?gt;|>)"

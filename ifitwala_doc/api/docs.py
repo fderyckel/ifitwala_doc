@@ -1,13 +1,14 @@
 # apps/ifitwala_doc/ifitwala_doc/api/docs.py
 
-import re
-import frappe
-from frappe.utils import format_datetime
-from hashlib import md5
-from frappe import _
 import os
+import re
+from hashlib import md5
 from urllib.parse import urlparse
-from frappe.utils import get_site_path
+
+import frappe
+from frappe import _
+from frappe.utils import format_datetime, get_site_path
+
 from ifitwala_doc.ifitwala_doc.image_utils import resize_and_save, slugify
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$", re.M)

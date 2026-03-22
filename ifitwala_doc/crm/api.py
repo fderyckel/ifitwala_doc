@@ -1,6 +1,7 @@
 
 import frappe
 
+
 @frappe.whitelist(allow_guest=True)
 def capture_lead(
     first_name,
