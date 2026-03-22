@@ -36,7 +36,13 @@ const argFlags = new Set(process.argv.slice(2));
 const silent = argFlags.has('--silent');
 
 function resolveBase() {
-  return process.env.PUBLIC_SITE_API || process.env.SITE_API_BASE || 'http://127.0.0.1:8000';
+  return (
+    process.env.PUBLIC_SITE_API ||
+    process.env.SITE_API_BASE ||
+    process.env.PUBLIC_DOCS_API ||
+    process.env.DOCS_API_BASE ||
+    'http://127.0.0.1:8000'
+  );
 }
 
 function resolveBenchSiteName() {

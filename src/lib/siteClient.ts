@@ -106,8 +106,10 @@ const DEFAULT_THEME: ThemeTokens = {
 const BASE =
   (typeof import.meta !== 'undefined' &&
     (import.meta as any).env &&
-    (import.meta as any).env.PUBLIC_SITE_API) ||
+    ((import.meta as any).env.PUBLIC_SITE_API ||
+      (import.meta as any).env.PUBLIC_DOCS_API)) ||
   process.env.SITE_API_BASE ||
+  process.env.DOCS_API_BASE ||
   'http://127.0.0.1:8000'
 
 const LOCAL_API_HOSTS = new Set(['127.0.0.1', 'localhost'])
