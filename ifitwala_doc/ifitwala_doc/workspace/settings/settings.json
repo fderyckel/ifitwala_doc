@@ -1,0 +1,92 @@
+{
+ "app": "ifitwala_doc",
+ "charts": [],
+ "content": "[{\"id\":\"settings-header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Settings</span>\",\"col\":12}},{\"id\":\"settings-shortcut-site-settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Website Settings\",\"col\":4}},{\"id\":\"settings-shortcut-theme-settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Theme Settings\",\"col\":4}},{\"id\":\"settings-shortcut-navigation\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Navigation Menus\",\"col\":4}},{\"id\":\"settings-spacer\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"settings-card-config\",\"type\":\"card\",\"data\":{\"card_name\":\"Configuration\",\"col\":12}}]",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "setting-gear",
+ "idx": 0,
+ "indicator_color": "grey",
+ "is_hidden": 0,
+ "label": "Settings",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Configuration",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ifitwala Website Settings",
+   "link_count": 0,
+   "link_to": "Ifitwala Website Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ifitwala Theme Settings",
+   "link_count": 0,
+   "link_to": "Ifitwala Theme Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Navigation Menu",
+   "link_count": 0,
+   "link_to": "Navigation Menu",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "module": "Ifitwala Doc",
+ "name": "Settings",
+ "number_cards": [],
+ "parent_page": "Ifitwala Doc",
+ "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "sequence_id": 5.0,
+ "shortcuts": [
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Website Settings",
+   "link_to": "Ifitwala Website Settings",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Theme Settings",
+   "link_to": "Ifitwala Theme Settings",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Purple",
+   "doc_view": "List",
+   "label": "Navigation Menus",
+   "link_to": "Navigation Menu",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Settings",
+ "type": "Workspace"
+}

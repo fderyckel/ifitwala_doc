@@ -1,0 +1,119 @@
+{
+ "app": "ifitwala_doc",
+ "charts": [],
+ "content": "[{\"id\":\"website-header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Website</span>\",\"col\":12}},{\"id\":\"website-shortcut-pages\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Web Pages\",\"col\":3}},{\"id\":\"website-shortcut-navigation\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Navigation Menus\",\"col\":3}},{\"id\":\"website-shortcut-site-settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Website Settings\",\"col\":3}},{\"id\":\"website-shortcut-theme-settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Theme Settings\",\"col\":3}},{\"id\":\"website-spacer\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"website-card-content\",\"type\":\"card\",\"data\":{\"card_name\":\"Pages and Navigation\",\"col\":6}},{\"id\":\"website-card-settings\",\"type\":\"card\",\"data\":{\"card_name\":\"Site Settings\",\"col\":6}}]",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "website",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Website",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Pages and Navigation",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ifitwala Web Page",
+   "link_count": 0,
+   "link_to": "Ifitwala Web Page",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Navigation Menu",
+   "link_count": 0,
+   "link_to": "Navigation Menu",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Site Settings",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ifitwala Website Settings",
+   "link_count": 0,
+   "link_to": "Ifitwala Website Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ifitwala Theme Settings",
+   "link_count": 0,
+   "link_to": "Ifitwala Theme Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "module": "Ifitwala Doc",
+ "name": "Website",
+ "number_cards": [],
+ "parent_page": "Ifitwala Doc",
+ "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "sequence_id": 3.0,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Web Pages",
+   "link_to": "Ifitwala Web Page",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Purple",
+   "doc_view": "List",
+   "label": "Navigation Menus",
+   "link_to": "Navigation Menu",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Website Settings",
+   "link_to": "Ifitwala Website Settings",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Theme Settings",
+   "link_to": "Ifitwala Theme Settings",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Website",
+ "type": "Workspace"
+}
