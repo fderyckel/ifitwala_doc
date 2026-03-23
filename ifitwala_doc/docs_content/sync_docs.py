@@ -61,7 +61,7 @@ def execute():
             doc.title = post.metadata.get('title')
             doc.category = post.metadata.get('category')      # Must match 'Doc Category' name
             doc.subcategory = post.metadata.get('subcategory') # Must match 'Doc Subcategory' name
-            doc.doc_order = post.metadata.get('doc_order', 0)
+            doc.doc_order = post.metadata.get('doc_order')
             doc.summary = post.metadata.get('summary')
 
             # SEO Fields

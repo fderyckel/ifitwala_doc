@@ -24,7 +24,7 @@ class TestIfitwalaWebsiteSettings(FrappeTestCase):
 		)
 
 		social_links = [
-			{"platform": "X (Twitter)", "url": "https://example.com/x", "icon": None, "display_order": None},
+			{"platform": "X (Twitter)", "url": "https://example.com/x", "icon": None, "display_order": 0},
 			{"platform": "LinkedIn", "url": "https://example.com/linkedin", "icon": None, "display_order": 2},
 			{"platform": "GitHub", "url": "https://example.com/github", "icon": None, "display_order": 1},
 		]

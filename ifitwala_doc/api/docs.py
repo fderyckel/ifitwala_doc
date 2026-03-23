@@ -105,9 +105,13 @@ def _null_last_int_sort_key(value):
     if value in (None, ""):
         return (1, 0)
     try:
-        return (0, int(value))
+        parsed = int(value)
     except (TypeError, ValueError):
         return (0, 0)
+    # Frappe v16 normalizes blank Int fields to 0 on readback, so treat 0 as unset.
+    if parsed == 0:
+        return (1, 0)
+    return (0, parsed)
 
 def _shot_folder(slug: str) -> str:
     """
