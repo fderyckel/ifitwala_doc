@@ -102,6 +102,14 @@ def _normalize_demo_href(label: Any, href: Any) -> str:
 
     return href_value
 
+def _null_last_int_sort_key(value: Any) -> tuple[int, int]:
+    if value in (None, ""):
+        return (1, 0)
+    try:
+        return (0, int(value))
+    except (TypeError, ValueError):
+        return (0, 0)
+
 def _hero_props(doc: Document) -> dict[str, Any]:
     return {
         "title": doc.heading,
@@ -538,7 +546,13 @@ def get_site_settings() -> dict[str, Any]:
         "Website Social Link",
         filters={"parent": ws.name, "parenttype": "Ifitwala Website Settings"},
         fields=["platform", "url", "icon", "display_order"],
-        order_by="IFNULL(display_order, 9999), platform asc",
+        order_by="platform asc",
+    )
+    social_links.sort(
+        key=lambda row: (
+            _null_last_int_sort_key(row.get("display_order")),
+            (row.get("platform") or "").lower(),
+        )
     )
     return {
         "site_name": ws.site_name,

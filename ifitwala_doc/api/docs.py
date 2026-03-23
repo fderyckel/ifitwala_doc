@@ -101,6 +101,14 @@ def _normalize_subcategory(record: dict, column: str | None):
         record["subcategory"] = record.pop(column, None)
     return record
 
+def _null_last_int_sort_key(value):
+    if value in (None, ""):
+        return (1, 0)
+    try:
+        return (0, int(value))
+    except (TypeError, ValueError):
+        return (0, 0)
+
 def _shot_folder(slug: str) -> str:
     """
     Folder name that matches image_util.resize_and_save (single level under gallery_resized).
@@ -274,11 +282,17 @@ def _shot_manifest_for(docname: str, slug: str) -> list[dict]:
         "Doc Screenshot",
         filters={"parenttype": "Documentation", "parent": docname},
         fields=[
-            "idx", "anchor_id", "title", "image", "display_size",
+            "idx", "image_order", "anchor_id", "title", "image", "display_size",
             "caption_md", "alt_text", "is_og_image"
         ],
-        order_by="IFNULL(image_order, 9999), idx",
+        order_by="idx asc",
         ignore_permissions=True,
+    )
+    rows.sort(
+        key=lambda row: (
+            _null_last_int_sort_key(row.get("image_order")),
+            _null_last_int_sort_key(row.get("idx")),
+        )
     )
 
     folder = f"docs_{slug}_shots"             # e.g. docs_student_shots
@@ -559,8 +573,14 @@ def get_categories(language="en"):
     rows = frappe.get_all(
         "Doc Category",
         fields=["name", "slug", "label", "icon", "description", "cat_order"],
-        order_by="IFNULL(cat_order, 9999), label asc",
+        order_by="label asc",
         limit_page_length=500,
+    )
+    rows.sort(
+        key=lambda row: (
+            _null_last_int_sort_key(row.get("cat_order")),
+            (row.get("label") or "").lower(),
+        )
     )
     for row in rows:
         _decorate_category_icon(row)
@@ -593,10 +613,17 @@ def get_docs_in_category(language: str, category_slug: str):
         "language": language,
         "category": cat,
     }
-    return frappe.get_all(
+    rows = frappe.get_all(
         "Documentation",
         filters=filters,
         fields=["name", "title", "slug", "summary", "doc_order"],
-        order_by="IFNULL(doc_order, 9999), title asc",
+        order_by="title asc",
         limit_page_length=1000,
     )
+    rows.sort(
+        key=lambda row: (
+            _null_last_int_sort_key(row.get("doc_order")),
+            (row.get("title") or "").lower(),
+        )
+    )
+    return rows
