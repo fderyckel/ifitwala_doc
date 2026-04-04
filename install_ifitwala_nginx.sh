@@ -36,7 +36,8 @@ location /docs/_astro/ {
 # ---- Static documentation pages ----
 location /docs/ {
     alias ${ASSETS_ROOT}/docs/;
-    try_files \$uri \$uri/ /docs/index.html;
+    index index.html;
+    try_files \$uri \$uri/index.html \$uri/ /docs/index.html;
 }
 
 # ---- Static marketing 'features' pages ----
