@@ -49,6 +49,8 @@ class TestCatchAll(TestCase):
             assets_root = Path(tmpdir)
 
             with patch("ifitwala_doc.api.catch_all._resolve_assets_root", return_value=assets_root):
-                resolved = catch_all.resolve_loader_route("/docs/fr")
+                with patch("ifitwala_doc.api.catch_all.resolve_path", return_value="docs/preview") as resolve_path:
+                    resolved = catch_all.resolve_loader_route("/docs/preview/en/school")
 
-        self.assertIsNone(resolved)
+        self.assertEqual(resolved, "docs/preview")
+        resolve_path.assert_called_once_with("docs/preview/en/school")

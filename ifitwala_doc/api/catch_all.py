@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 import frappe
+from frappe.website.path_resolver import resolve_path
 
 
 def _normalize_path(path: str | None) -> str:
@@ -74,10 +75,11 @@ def _find_static_target(path: str | None, assets_root: Path | None = None) -> Pa
 
 def resolve_loader_route(path: str | None) -> str | None:
     normalized = _normalize_path(path)
-    if normalized == "/":
-        return None
+    if normalized != "/" and _find_static_target(normalized) is not None:
+        return "index"
 
-    if _find_static_target(normalized) is None:
-        return None
-
-    return "index"
+    # Frappe skips its default route resolution entirely when a custom
+    # website_path_resolver hook is present, so we must explicitly delegate
+    # non-static paths back to the framework. This keeps dynamic routes such as
+    # /docs/preview/<language>/<slug> working alongside the Astro catch-all.
+    return resolve_path(normalized.lstrip("/"))
