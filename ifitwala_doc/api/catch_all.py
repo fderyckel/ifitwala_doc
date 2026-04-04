@@ -72,35 +72,12 @@ def _find_static_target(path: str | None, assets_root: Path | None = None) -> Pa
     return None
 
 
-def _published_web_page_exists(slug: str) -> bool:
-    page = frappe.get_all(
-        "Ifitwala Web Page",
-        filters={"slug": slug, "is_published": 1},
-        fields=["name"],
-        limit=1,
-    )
-    return bool(page)
+def resolve_loader_route(path: str | None) -> str | None:
+    normalized = _normalize_path(path)
+    if normalized == "/":
+        return None
 
+    if _find_static_target(normalized) is None:
+        return None
 
-def _serve_loader():
-    loader_path = Path(frappe.get_app_path("ifitwala_doc", "www", "index.html"))
-    html = loader_path.read_text(encoding="utf-8")
-    frappe.local.response.type = "page"
-    frappe.local.response.data = html
-    frappe.local.response.headers = frappe.local.response.get("headers") or {}
-    frappe.local.response.headers["Content-Type"] = "text/html; charset=utf-8"
-    return html
-
-
-def handle(path: str):
-    """Serve the static site loader for Astro routes and published web pages."""
-    try:
-        slug = _normalize_path(path)
-        has_static_route = _find_static_target(slug) is not None
-        if not has_static_route and not _published_web_page_exists(slug):
-            return
-
-        return _serve_loader()
-    except Exception:
-        frappe.log_error("Error handling marketing catch-all", "ifitwala_doc")
-        return
+    return "index"
