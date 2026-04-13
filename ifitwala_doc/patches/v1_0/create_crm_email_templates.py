@@ -67,28 +67,52 @@ def execute():
 	fieldnames = {field.fieldname for field in meta.fields}
 
 	for template in TEMPLATES:
-		doc = get_or_initialize_template(template["name"], fieldnames)
+		doc, exists = get_or_initialize_template(template["name"], fieldnames)
 		apply_template_values(doc, template, fieldnames)
 
-		if doc.is_new():
-			doc.insert(ignore_permissions=True)
-		else:
+		if exists:
 			doc.save(ignore_permissions=True)
+		else:
+			doc.insert(ignore_permissions=True)
 
 
 def get_or_initialize_template(template_name, fieldnames):
-	if frappe.db.exists("Email Template", template_name):
-		return frappe.get_doc("Email Template", template_name)
+	existing_template_name = find_existing_template_name(template_name, fieldnames)
+	if existing_template_name:
+		return frappe.get_doc("Email Template", existing_template_name), True
 
-	values = {"doctype": "Email Template", "name": template_name}
+	doc = frappe.new_doc("Email Template")
 
 	if "title" in fieldnames:
-		values["title"] = template_name
+		doc.title = template_name
 
 	if "template_name" in fieldnames:
-		values["template_name"] = template_name
+		doc.template_name = template_name
 
-	return frappe.get_doc(values)
+	if "title" not in fieldnames and "template_name" not in fieldnames:
+		doc.name = template_name
+
+	return doc, False
+
+
+def find_existing_template_name(template_name, fieldnames):
+	existing_by_name = frappe.db.exists("Email Template", template_name)
+	if existing_by_name:
+		return existing_by_name
+
+	if "template_name" in fieldnames:
+		existing_by_template_name = frappe.db.exists(
+			"Email Template", {"template_name": template_name}
+		)
+		if existing_by_template_name:
+			return existing_by_template_name
+
+	if "title" in fieldnames:
+		existing_by_title = frappe.db.exists("Email Template", {"title": template_name})
+		if existing_by_title:
+			return existing_by_title
+
+	return None
 
 
 def apply_template_values(doc, template, fieldnames):
@@ -109,4 +133,3 @@ def apply_template_values(doc, template, fieldnames):
 
 	if "response" in fieldnames:
 		doc.response = template["response"]
-
