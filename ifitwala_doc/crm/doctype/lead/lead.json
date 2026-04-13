@@ -19,9 +19,13 @@
   "current_system",
   "section_status",
   "status",
+  "lead_owner",
+  "next_follow_up_on",
   "source",
   "interest_level",
   "column_break_notes",
+  "follow_up_status",
+  "last_contacted_on",
   "notes"
  ],
  "fields": [
@@ -103,6 +107,17 @@
    "default": "New"
   },
   {
+   "fieldname": "lead_owner",
+   "fieldtype": "Link",
+   "label": "Lead Owner",
+   "options": "User"
+  },
+  {
+   "fieldname": "next_follow_up_on",
+   "fieldtype": "Datetime",
+   "label": "Next Follow-Up On"
+  },
+  {
    "fieldname": "source",
    "fieldtype": "Select",
    "label": "Source",
@@ -118,6 +133,19 @@
   {
    "fieldname": "column_break_notes",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "Not Scheduled",
+   "fieldname": "follow_up_status",
+   "fieldtype": "Select",
+   "label": "Follow-Up Status",
+   "options": "Not Scheduled\nScheduled\nDue Today\nOverdue\nClosed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_contacted_on",
+   "fieldtype": "Datetime",
+   "label": "Last Contacted On"
   },
   {
    "fieldname": "notes",
