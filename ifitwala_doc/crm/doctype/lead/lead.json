@@ -102,6 +102,7 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
    "options": "New\nContacted\nQualified\nConverted\nLost",
    "default": "New"
@@ -109,12 +110,16 @@
   {
    "fieldname": "lead_owner",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Lead Owner",
    "options": "User"
   },
   {
    "fieldname": "next_follow_up_on",
    "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Next Follow-Up On"
   },
   {
@@ -138,6 +143,8 @@
    "default": "Not Scheduled",
    "fieldname": "follow_up_status",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Follow-Up Status",
    "options": "Not Scheduled\nScheduled\nDue Today\nOverdue\nClosed",
    "read_only": 1

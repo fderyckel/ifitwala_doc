@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
-from frappe.utils import getdate
+from frappe.utils import add_to_date, getdate, now_datetime
 
 from ifitwala_doc.crm.api import capture_lead
 from ifitwala_doc.crm.doctype.lead.lead import FOLLOW_UP_TODO_PREFIX
@@ -159,3 +159,21 @@ class TestLead(FrappeTestCase):
 
 		lead = frappe.get_doc("Lead", lead_name)
 		self.assertEqual(lead.lead_owner, referral_owner)
+
+	def test_follow_up_status_supports_daily_queue_states(self):
+		lead = frappe.get_doc(
+			{
+				"doctype": "Lead",
+				"first_name": "Queue",
+				"email": _unique_email(),
+				"lead_owner": "Administrator",
+				"next_follow_up_on": add_to_date(now_datetime(), days=-1, as_datetime=True),
+			}
+		).insert()
+
+		self.assertEqual(lead.follow_up_status, "Overdue")
+
+		lead.next_follow_up_on = now_datetime()
+		lead.save()
+
+		self.assertEqual(lead.follow_up_status, "Due Today")
