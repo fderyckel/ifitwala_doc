@@ -122,7 +122,7 @@ class TestLead(FrappeTestCase):
 		settings.source_assignment_rules = []
 		settings.save(ignore_permissions=True)
 
-		with patch("frappe.session.user", "Guest"):
+		with patch.dict(frappe.session, {"user": "Guest"}):
 			lead_name = capture_lead(first_name="Sara", email=_unique_email(), source="Website")
 
 		lead = frappe.get_doc("Lead", lead_name)
@@ -154,7 +154,7 @@ class TestLead(FrappeTestCase):
 		)
 		settings.save(ignore_permissions=True)
 
-		with patch("frappe.session.user", "Guest"):
+		with patch.dict(frappe.session, {"user": "Guest"}):
 			lead_name = capture_lead(first_name="Mila", email=_unique_email(), source="Referral")
 
 		lead = frappe.get_doc("Lead", lead_name)

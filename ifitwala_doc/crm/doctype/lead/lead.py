@@ -4,7 +4,6 @@ from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
 from ifitwala_doc.crm.doctype.ifitwala_crm_settings.ifitwala_crm_settings import get_configured_lead_owner
 
-
 FOLLOW_UP_TODO_PREFIX = "Lead follow-up:"
 CONTACTED_STATUSES = {"Contacted", "Qualified", "Converted"}
 TERMINAL_STATUSES = {"Converted", "Lost"}

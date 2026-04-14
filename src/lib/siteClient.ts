@@ -87,6 +87,54 @@ export type ThemeTokens = {
   focus_ring: string
 }
 
+export type StorySummary = {
+  name?: string
+  slug: string
+  title: string
+  hero_subtitle?: string | null
+  summary?: string | null
+  story_type?: string | null
+  topic?: string | null
+  author_name?: string | null
+  author_role?: string | null
+  published_on?: string | null
+  estimated_read_minutes?: number | null
+  cover_image?: string | null
+  cover_image_alt?: string | null
+  featured?: number | boolean
+  featured_priority?: number | null
+}
+
+export type StoryCTA = {
+  label: string
+  href: string
+}
+
+export type StoryTakeaway = {
+  title?: string
+  detail?: string
+  order?: number
+}
+
+export type StoryPayload = StorySummary & {
+  status?: string | null
+  body_md?: string | null
+  seo_title?: string | null
+  seo_description?: string | null
+  canonical_url?: string | null
+  og_image?: string | null
+  noindex?: number | boolean
+  key_takeaways?: StoryTakeaway[]
+  primary_cta?: StoryCTA | null
+  secondary_cta?: StoryCTA | null
+  related_stories?: StorySummary[]
+}
+
+export type StoryTopic = {
+  topic: string
+  count: number
+}
+
 const DEFAULT_THEME: ThemeTokens = {
   ink_color: '#0F172A',
   slate_color: '#475569',
@@ -276,6 +324,13 @@ function normalizeSlug(value: unknown): string {
   return `/${normalized}`
 }
 
+function normalizeStorySlug(value: unknown): string {
+  if (typeof value !== 'string') {
+    return ''
+  }
+  return value.trim().replace(/^\/+|\/+$/g, '').toLowerCase()
+}
+
 export function slugToSegments(slug: string): string[] {
   return normalizeSlug(slug)
     .split('/')
@@ -355,5 +410,73 @@ export async function getThemeTokens(): Promise<ThemeTokens> {
     return { ...DEFAULT_THEME, ...(theme || {}) }
   } catch (error) {
     return { ...DEFAULT_THEME }
+  }
+}
+
+export async function listStories(opts?: {
+  includeDrafts?: boolean
+  topic?: string
+  storyType?: string
+  limit?: number
+}): Promise<StorySummary[]> {
+  try {
+    const params = new URLSearchParams()
+    if (opts?.includeDrafts) {
+      params.set('include_unpublished', '1')
+    }
+    if (opts?.topic) {
+      params.set('topic', opts.topic)
+    }
+    if (opts?.storyType) {
+      params.set('story_type', opts.storyType)
+    }
+    if (typeof opts?.limit === 'number' && Number.isFinite(opts.limit) && opts.limit > 0) {
+      params.set('limit', String(Math.floor(opts.limit)))
+    }
+    const suffix = params.toString() ? `?${params.toString()}` : ''
+    const raw = await fetchJSON(normalizeUrl(`/api/method/ifitwala_doc.api.site.list_stories${suffix}`))
+    const items = unwrap<StorySummary[]>(raw)
+    return Array.isArray(items) ? items : []
+  } catch (error) {
+    warnOptionalFetchFailure('stories:list', error)
+    return []
+  }
+}
+
+export async function getStory(
+  slug: string,
+  opts?: { includeDrafts?: boolean }
+): Promise<StoryPayload> {
+  const normalizedSlug = normalizeStorySlug(slug)
+  try {
+    const params = new URLSearchParams({ slug: normalizedSlug })
+    if (opts?.includeDrafts) {
+      params.set('include_unpublished', '1')
+    }
+    const raw = await fetchJSON(
+      normalizeUrl(`/api/method/ifitwala_doc.api.site.get_story?${params.toString()}`)
+    )
+    return unwrap<StoryPayload>(raw) || { slug: normalizedSlug, title: '' }
+  } catch (error) {
+    warnOptionalFetchFailure(`story:${normalizedSlug || 'unknown'}`, error)
+    return { slug: normalizedSlug, title: '' }
+  }
+}
+
+export async function getStoryTopics(opts?: { includeDrafts?: boolean }): Promise<StoryTopic[]> {
+  try {
+    const params = new URLSearchParams()
+    if (opts?.includeDrafts) {
+      params.set('include_unpublished', '1')
+    }
+    const suffix = params.toString() ? `?${params.toString()}` : ''
+    const raw = await fetchJSON(
+      normalizeUrl(`/api/method/ifitwala_doc.api.site.get_story_topics${suffix}`)
+    )
+    const items = unwrap<StoryTopic[]>(raw)
+    return Array.isArray(items) ? items : []
+  } catch (error) {
+    warnOptionalFetchFailure('stories:topics', error)
+    return []
   }
 }

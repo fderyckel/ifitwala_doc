@@ -1,0 +1,261 @@
+---
+import { marked } from 'marked'
+
+import StoryCTA from '@/components/stories/StoryCTA.astro'
+import StoryCard from '@/components/stories/StoryCard.astro'
+import StoryMeta from '@/components/stories/StoryMeta.astro'
+import { formatStoryDate, storyHref } from '@/components/stories/helpers'
+import SiteShell from '@/layouts/SiteShell.astro'
+import {
+  getNav,
+  getSiteSettings,
+  getStory,
+  listStories,
+  type StoryPayload,
+} from '@/lib/siteClient'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  try {
+    const stories = await listStories({ limit: 200 })
+    return stories
+      .filter((story) => story?.slug)
+      .map((story) => ({
+        params: { slug: story.slug },
+        props: { slug: story.slug },
+      }))
+  } catch {
+    return []
+  }
+}
+
+const slug = typeof Astro.params.slug === 'string' ? Astro.params.slug : ''
+const [story, settings, headerNav, footerNav] = await Promise.all([
+  getStory(slug),
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+])
+
+const currentStory = (story || { slug, title: '' }) as StoryPayload
+if (!currentStory?.title) {
+  Astro.response.status = 404
+}
+
+const bodyHtml = typeof currentStory?.body_md === 'string' ? await marked.parse(currentStory.body_md) : ''
+const takeaways = Array.isArray(currentStory?.key_takeaways) ? currentStory.key_takeaways : []
+const relatedStories = Array.isArray(currentStory?.related_stories) ? currentStory.related_stories : []
+const canonical = currentStory?.canonical_url || storyHref(currentStory?.slug)
+const pageTitle = currentStory?.seo_title || `${currentStory?.title || 'Insight'} | Ifitwala Ed`
+const pageDescription =
+  currentStory?.seo_description || currentStory?.hero_subtitle || currentStory?.summary || settings?.tagline || ''
+const ogImage = currentStory?.og_image || currentStory?.cover_image || undefined
+const primaryCTA = currentStory?.primary_cta || { label: 'Book a Demo', href: '/book-a-demo/' }
+const secondaryCTA = currentStory?.secondary_cta || { label: 'Explore the Platform', href: '/platform/' }
+const articleUrl = Astro.site ? new URL(canonical, Astro.site).toString() : canonical
+const imageUrl = (() => {
+  if (!ogImage) return undefined
+  if (/^([a-z]+:)?\/\//i.test(ogImage) || ogImage.startsWith('data:')) {
+    return ogImage
+  }
+  if (!Astro.site) return ogImage
+  return new URL(ogImage.replace(/^\//, ''), Astro.site).toString()
+})()
+const articleSchema = currentStory?.title
+  ? {
+      '@context': 'https://schema.org',
+      '@type': currentStory?.story_type === "What's New" ? 'NewsArticle' : 'Article',
+      headline: currentStory.title,
+      description: pageDescription,
+      datePublished: currentStory?.published_on || undefined,
+      author: currentStory?.author_name
+        ? {
+            '@type': 'Person',
+            name: currentStory.author_name,
+            jobTitle: currentStory.author_role || undefined,
+          }
+        : undefined,
+      image: imageUrl ? [imageUrl] : undefined,
+      mainEntityOfPage: articleUrl,
+      publisher: {
+        '@type': 'Organization',
+        name: settings?.site_name || 'Ifitwala Ed',
+      },
+    }
+  : null
+---
+
+<SiteShell
+  lang="en"
+  title={pageTitle}
+  description={pageDescription}
+  canonical={canonical}
+  settings={settings}
+  headerNav={headerNav}
+  footerNav={footerNav}
+  ogTitle={currentStory?.title || undefined}
+  ogDescription={pageDescription}
+  ogImage={ogImage}
+  ogType="article"
+  noindex={Boolean(currentStory?.noindex)}
+>
+  {articleSchema && (
+    <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
+  )}
+
+  {currentStory?.title ? (
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-12 px-6 py-14 md:gap-16 md:py-16">
+      <section class="overflow-hidden rounded-[2.4rem] border border-border/70 bg-[linear-gradient(160deg,rgba(255,252,248,0.96),rgba(245,249,247,0.96),rgba(230,243,249,0.88))] shadow-strong">
+        <div class="grid gap-10 px-6 py-8 md:px-8 md:py-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:px-10 lg:py-10">
+          <div class="space-y-6">
+            <a href="/insights/" class="inline-flex items-center gap-2 text-sm font-semibold text-canopy transition hover:text-leaf">
+              <span aria-hidden="true">←</span>
+              Back to insights
+            </a>
+
+            <div class="space-y-4">
+              <div class="flex flex-wrap items-center gap-2">
+                {currentStory?.story_type && (
+                  <span class="eyebrow-label">{currentStory.story_type}</span>
+                )}
+                {currentStory?.topic && (
+                  <span class="inline-flex rounded-full border border-canopy/10 bg-white/75 px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-canopy/80">
+                    {currentStory.topic}
+                  </span>
+                )}
+              </div>
+              <h1 class="max-w-4xl font-serif text-[2.8rem] leading-[0.98] tracking-[-0.06em] text-ink md:text-[4.25rem]">
+                {currentStory.title}
+              </h1>
+              {(currentStory?.hero_subtitle || currentStory?.summary) && (
+                <p class="max-w-3xl text-base leading-7 text-slate md:text-lg">
+                  {currentStory.hero_subtitle || currentStory.summary}
+                </p>
+              )}
+            </div>
+
+            <StoryMeta story={currentStory} />
+          </div>
+
+          <div class="relative overflow-hidden rounded-[2rem] border border-white/70 bg-[#101923] shadow-soft">
+            {currentStory?.cover_image ? (
+              <img
+                src={currentStory.cover_image}
+                alt={currentStory.cover_image_alt || currentStory.title}
+                class="aspect-[5/4] h-full w-full object-cover"
+                loading="eager"
+              />
+            ) : (
+              <div class="aspect-[5/4] bg-[linear-gradient(140deg,#162331_0%,#1f3a2d_45%,#f7f3ed_100%)]" />
+            )}
+            <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(16,25,35,0)_0%,rgba(16,25,35,0.56)_100%)]" />
+            <div class="absolute inset-x-0 bottom-0 p-6 text-white">
+              <p class="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-white/70">Published</p>
+              <p class="mt-2 font-serif text-2xl tracking-[-0.03em]">{formatStoryDate(currentStory?.published_on)}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {takeaways.length > 0 && (
+        <section class="rounded-[2rem] border border-border/70 bg-white/[0.86] px-6 py-7 shadow-soft backdrop-blur-sm md:px-8 md:py-8">
+          <div class="flex flex-col gap-6 lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8">
+            <div class="space-y-3">
+              <span class="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-canopy/70">Why this matters</span>
+              <h2 class="font-serif text-[2rem] leading-tight tracking-[-0.04em] text-ink">Key takeaways</h2>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+              {takeaways.map((takeaway) => (
+                <article class="rounded-[1.4rem] border border-border/70 bg-sand/55 p-5 shadow-sm">
+                  <h3 class="font-semibold text-ink">{takeaway.title}</h3>
+                  {takeaway.detail && <p class="mt-2 text-sm leading-6 text-slate">{takeaway.detail}</p>}
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+        <article class="rounded-[2rem] border border-border/70 bg-white/[0.92] px-6 py-8 shadow-soft md:px-10 md:py-10">
+          <div class="story-prose" set:html={bodyHtml} />
+        </article>
+
+        <aside class="space-y-4 lg:sticky lg:top-28">
+          <div class="rounded-[1.6rem] border border-border/70 bg-white/[0.9] p-5 shadow-soft">
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-canopy/70">Story details</p>
+            <div class="mt-4 space-y-3">
+              <StoryMeta story={currentStory} />
+              {currentStory?.topic && (
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate/70">Topic</p>
+                  <p class="mt-1 text-sm font-medium text-ink">{currentStory.topic}</p>
+                </div>
+              )}
+              {currentStory?.summary && (
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate/70">Editorial note</p>
+                  <p class="mt-1 text-sm leading-6 text-slate">{currentStory.summary}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div class="rounded-[1.6rem] border border-canopy/10 bg-[linear-gradient(180deg,rgba(22,35,49,0.98),rgba(16,25,35,1))] p-5 text-white shadow-soft">
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-white/62">See it in context</p>
+            <h2 class="mt-3 font-serif text-2xl tracking-[-0.03em]">Bring this story into a real platform conversation.</h2>
+            <p class="mt-3 text-sm leading-6 text-white/72">
+              Use the article to create interest, then move the reader toward a live walkthrough of the platform.
+            </p>
+            <div class="mt-5 flex flex-col gap-3">
+              <a
+                href={primaryCTA.href}
+                class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white px-4 py-2.5 text-sm font-semibold text-[#101923] transition hover:-translate-y-0.5"
+              >
+                {primaryCTA.label}
+              </a>
+              <a
+                href={secondaryCTA.href}
+                class="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/[0.06] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.12]"
+              >
+                {secondaryCTA.label}
+              </a>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      {relatedStories.length > 0 && (
+        <section class="space-y-6">
+          <div class="space-y-2">
+            <span class="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-canopy/70">Continue reading</span>
+            <h2 class="font-serif text-[2rem] leading-tight tracking-[-0.04em] text-ink md:text-[2.35rem]">Related stories</h2>
+          </div>
+
+          <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {relatedStories.map((item) => <StoryCard story={item} compact />)}
+          </div>
+        </section>
+      )}
+
+      <StoryCTA
+        eyebrow="Next step"
+        title="Use the story to start the conversation, then show the product live."
+        body="Editorial trust matters most when it leads into a serious product conversation with the right audience."
+        primary={primaryCTA}
+        secondary={secondaryCTA}
+      />
+    </div>
+  ) : (
+    <div class="mx-auto max-w-3xl px-6 py-16 text-center">
+      <h1 class="font-serif text-4xl tracking-[-0.04em] text-ink">Story not found</h1>
+      <p class="mt-4 text-base leading-7 text-slate">
+        We could not find an insight at <code class="rounded bg-white/70 px-2 py-1 text-sm">{slug}</code>.
+      </p>
+      <a href="/insights/" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-canopy hover:text-leaf">
+        Back to insights <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  )}
+</SiteShell>

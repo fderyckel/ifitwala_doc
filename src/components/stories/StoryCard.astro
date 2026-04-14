@@ -1,0 +1,72 @@
+---
+import type { StorySummary } from '@/lib/siteClient'
+import StoryMeta from './StoryMeta.astro'
+import { storyHref } from './helpers'
+
+interface Props {
+  story: StorySummary
+  compact?: boolean
+}
+
+const { story, compact = false }: Props = Astro.props
+const href = storyHref(story?.slug)
+const eyebrow = story?.topic || story?.story_type || 'Insight'
+const title = story?.title || 'Untitled story'
+const summary = story?.summary || story?.hero_subtitle || ''
+const image = story?.cover_image || ''
+const imageAlt = story?.cover_image_alt || title
+---
+
+<a
+  href={href}
+  class={`group flex h-full flex-col overflow-hidden rounded-[1.8rem] border border-border/70 bg-white/[0.94] shadow-soft transition duration-200 hover:-translate-y-1 hover:shadow-strong ${compact ? 'min-h-[16rem]' : 'min-h-[22rem]'}`}
+>
+  {image ? (
+    <div class={`relative overflow-hidden ${compact ? 'aspect-[16/10]' : 'aspect-[16/11]'}`}>
+      <img
+        src={image}
+        alt={imageAlt}
+        class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+        loading="lazy"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-[#101923]/25 via-transparent to-transparent" />
+    </div>
+  ) : (
+    <div class={`relative overflow-hidden bg-[linear-gradient(135deg,rgba(18,86,58,0.12),rgba(255,252,248,0.96),rgba(166,214,177,0.24))] ${compact ? 'aspect-[16/10]' : 'aspect-[16/11]'}`}>
+      <div class="absolute inset-y-0 left-8 w-px bg-[#162331]/8" />
+      <div class="absolute right-8 top-8 h-28 w-28 rounded-full bg-leaf/10 blur-2xl" />
+      <div class="absolute bottom-8 left-8 max-w-[12rem]">
+        <span class="eyebrow-label">{eyebrow}</span>
+      </div>
+    </div>
+  )}
+
+  <div class="flex flex-1 flex-col gap-4 px-6 py-6 md:px-7">
+    <div class="flex items-center justify-between gap-3">
+      <span class="inline-flex rounded-full border border-canopy/10 bg-sand/70 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-canopy">
+        {eyebrow}
+      </span>
+      {story?.story_type && !story?.topic && (
+        <span class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate/70">
+          {story.story_type}
+        </span>
+      )}
+    </div>
+
+    <div class="space-y-3">
+      <h3 class="font-serif text-[1.5rem] leading-tight tracking-[-0.03em] text-ink transition group-hover:text-canopy">
+        {title}
+      </h3>
+      {summary && (
+        <p class="text-sm leading-6 text-slate md:text-[0.97rem]">{summary}</p>
+      )}
+    </div>
+
+    <div class="mt-auto space-y-4">
+      <StoryMeta story={story} />
+      <span class="inline-flex items-center gap-2 text-sm font-semibold text-canopy">
+        Read story <span aria-hidden="true">→</span>
+      </span>
+    </div>
+  </div>
+</a>

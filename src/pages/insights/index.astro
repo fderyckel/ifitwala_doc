@@ -1,0 +1,167 @@
+---
+import FeaturedStoryHero from '@/components/stories/FeaturedStoryHero.astro'
+import StoryCTA from '@/components/stories/StoryCTA.astro'
+import StoryCard from '@/components/stories/StoryCard.astro'
+import StoryRail from '@/components/stories/StoryRail.astro'
+import { isFeatured } from '@/components/stories/helpers'
+import SiteShell from '@/layouts/SiteShell.astro'
+import {
+  getNav,
+  getSiteSettings,
+  getStoryTopics,
+  listStories,
+  type StorySummary,
+} from '@/lib/siteClient'
+
+export const prerender = true
+
+const [stories, topics, settings, headerNav, footerNav] = await Promise.all([
+  listStories({ limit: 60 }),
+  getStoryTopics(),
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+])
+
+const allStories = (Array.isArray(stories) ? stories : []).filter(
+  (story): story is StorySummary => Boolean(story?.slug && story?.title)
+)
+const featuredStory = allStories.find((story) => isFeatured(story?.featured)) || allStories[0] || null
+const topTopics = (Array.isArray(topics) ? topics : []).slice(0, 6)
+const used = new Set<string>()
+if (featuredStory?.slug) {
+  used.add(featuredStory.slug)
+}
+
+const railSpecs = [
+  {
+    title: "What's New",
+    intro: 'Product releases, improvements, and sharper explanations of what changed.',
+    match: (story: StorySummary) => story?.story_type === "What's New",
+  },
+  {
+    title: 'Product Thinking',
+    intro: 'The product rationale, design choices, and institutional problems behind the work.',
+    match: (story: StorySummary) => story?.story_type === 'Product Insight',
+  },
+  {
+    title: 'Built for Schools',
+    intro: 'Operational insights for the teams running admissions, academics, finance, and communication.',
+    match: (story: StorySummary) =>
+      story?.story_type === 'School Operations' || story?.story_type === 'Implementation Story',
+  },
+  {
+    title: 'From Ifitwala',
+    intro: 'Company notes, milestones, launches, and the direction behind the platform.',
+    match: (story: StorySummary) => story?.story_type === 'Company Update',
+  },
+]
+
+function takeStories(predicate: (story: StorySummary) => boolean, count: number) {
+  const items: StorySummary[] = []
+  for (const story of allStories) {
+    if (!story?.slug || used.has(story.slug)) continue
+    if (!predicate(story)) continue
+    items.push(story)
+    used.add(story.slug)
+    if (items.length >= count) break
+  }
+  return items
+}
+
+const rails = railSpecs
+  .map((rail) => {
+    const exactMatches = takeStories(rail.match, 3)
+    const items = exactMatches.length > 0 ? exactMatches : takeStories(() => true, 3)
+    return { ...rail, items }
+  })
+  .filter((rail) => rail.items.length > 0)
+
+const archiveStories = allStories.filter((story) => story?.slug && !used.has(story.slug))
+const pageTitle = 'Insights | Ifitwala Ed'
+const pageDescription =
+  'Product updates, operational thinking, and premium editorial stories from the education platform built for modern institutions.'
+---
+
+<SiteShell
+  lang="en"
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/insights/"
+  settings={settings}
+  headerNav={headerNav}
+  footerNav={footerNav}
+>
+  <div class="mx-auto flex w-full max-w-7xl flex-col gap-14 px-6 py-14 md:gap-16 md:py-16">
+    <section class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
+      <div class="space-y-5">
+        <span class="eyebrow-label">Insights</span>
+        <div class="space-y-4">
+          <h1 class="max-w-4xl font-serif text-[3rem] leading-[0.98] tracking-[-0.06em] text-ink md:text-[4.5rem]">
+            A premium editorial layer for what’s new, what matters, and what sets Ifitwala apart.
+          </h1>
+          <p class="max-w-3xl text-base leading-7 text-slate md:text-lg">
+            This is where product updates, school-operations insight, and institutional product thinking meet.
+            The goal is not to publish “blog posts.” The goal is to make Ifitwala feel sharper, more trusted,
+            and more clearly built for serious education teams.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-[1.8rem] border border-border/70 bg-white/[0.78] p-5 shadow-soft backdrop-blur-sm">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-canopy/74">Topics in motion</p>
+        {topTopics.length > 0 ? (
+          <div class="mt-4 flex flex-wrap gap-2">
+            {topTopics.map((topic) => (
+              <span class="rounded-full border border-canopy/10 bg-sand/70 px-3 py-1 text-sm font-medium text-canopy">
+                {topic.topic}
+                <span class="ml-2 text-slate/70">{topic.count}</span>
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p class="mt-3 text-sm leading-6 text-slate">
+            Once stories are published, this surface can highlight topics such as admissions, implementation,
+            communication, analytics, and product releases.
+          </p>
+        )}
+      </div>
+    </section>
+
+    {featuredStory ? (
+      <FeaturedStoryHero story={featuredStory} />
+    ) : (
+      <section class="rounded-[2rem] border border-dashed border-border/80 bg-white/[0.76] px-6 py-14 text-center shadow-soft backdrop-blur-sm">
+        <h2 class="font-serif text-3xl tracking-[-0.04em] text-ink">Insights will appear here once the first story is published.</h2>
+        <p class="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate">
+          The publishing pipeline is in place. Add an `Ifitwala Story`, publish it, and this editorial surface will render it automatically.
+        </p>
+      </section>
+    )}
+
+    {rails.map((rail) => (
+      <StoryRail title={rail.title} intro={rail.intro} items={rail.items} />
+    ))}
+
+    <StoryCTA
+      eyebrow="Turn editorial attention into customer interest"
+      title="Use every story as a trust surface, not just a content artifact."
+      body="Every page in this section should make the platform feel more credible, more thought-through, and more obviously worth a closer look."
+      primary={{ label: 'Book a Demo', href: '/book-a-demo/' }}
+      secondary={{ label: 'Explore the Platform', href: '/platform/' }}
+    />
+
+    {archiveStories.length > 0 && (
+      <section class="space-y-6">
+        <div class="space-y-2">
+          <span class="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-canopy/70">Archive</span>
+          <h2 class="font-serif text-[2rem] leading-tight tracking-[-0.04em] text-ink md:text-[2.35rem]">More from Ifitwala</h2>
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {archiveStories.map((story) => <StoryCard story={story} compact />)}
+        </div>
+      </section>
+    )}
+  </div>
+</SiteShell>

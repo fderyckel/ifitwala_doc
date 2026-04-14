@@ -1,0 +1,72 @@
+---
+import type { StorySummary } from '@/lib/siteClient'
+import StoryMeta from './StoryMeta.astro'
+import { storyHref } from './helpers'
+
+interface Props {
+  story: StorySummary
+}
+
+const { story }: Props = Astro.props
+const href = storyHref(story?.slug)
+const title = story?.title || 'Untitled story'
+const eyebrow = story?.story_type || story?.topic || 'Featured insight'
+const subtitle = story?.hero_subtitle || story?.summary || ''
+const image = story?.cover_image || ''
+const imageAlt = story?.cover_image_alt || title
+---
+
+<section class="relative overflow-hidden rounded-[2.4rem] border border-border/70 bg-[linear-gradient(145deg,rgba(255,252,248,0.96),rgba(240,247,243,0.95),rgba(230,243,249,0.88))] shadow-strong">
+  <div class="absolute inset-y-0 right-0 hidden w-[28rem] bg-[radial-gradient(circle_at_center,rgba(47,133,90,0.14),transparent_68%)] lg:block" />
+  <div class="grid gap-10 px-6 py-7 md:px-8 md:py-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:px-10 lg:py-10">
+    <div class="relative z-10 flex flex-col gap-6">
+      <div class="space-y-4">
+        <span class="eyebrow-label">Featured story</span>
+        <div class="space-y-3">
+          <p class="text-[0.75rem] font-semibold uppercase tracking-[0.3em] text-canopy/78">{eyebrow}</p>
+          <h1 class="max-w-3xl font-serif text-[2.5rem] leading-[1.02] tracking-[-0.05em] text-ink md:text-[3.4rem]">
+            {title}
+          </h1>
+          {subtitle && (
+            <p class="max-w-2xl text-base leading-7 text-slate md:text-lg">{subtitle}</p>
+          )}
+        </div>
+      </div>
+
+      <StoryMeta story={story} />
+
+      <div class="flex flex-wrap items-center gap-3">
+        <a
+          href={href}
+          class="inline-flex items-center justify-center rounded-full border border-[#162331] bg-[#162331] px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-[#0f1722]"
+        >
+          Read the story
+        </a>
+        <a
+          href="/book-a-demo/"
+          class="inline-flex items-center justify-center rounded-full border border-canopy/20 bg-white/82 px-5 py-2.5 text-sm font-semibold text-canopy transition hover:border-canopy/35 hover:bg-white"
+        >
+          Book a demo
+        </a>
+      </div>
+    </div>
+
+    <a href={href} class="group relative block overflow-hidden rounded-[2rem] border border-white/70 bg-[#101923] shadow-soft">
+      {image ? (
+        <img
+          src={image}
+          alt={imageAlt}
+          class="aspect-[5/4] h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+          loading="eager"
+        />
+      ) : (
+        <div class="aspect-[5/4] bg-[linear-gradient(140deg,#162331_0%,#1f3a2d_45%,#f7f3ed_100%)]" />
+      )}
+      <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(16,25,35,0)_0%,rgba(16,25,35,0.64)_100%)]" />
+      <div class="absolute inset-x-0 bottom-0 p-6 text-white">
+        <p class="text-[0.73rem] font-semibold uppercase tracking-[0.26em] text-white/74">{eyebrow}</p>
+        <p class="mt-2 max-w-lg font-serif text-2xl leading-tight tracking-[-0.03em]">{title}</p>
+      </div>
+    </a>
+  </div>
+</section>

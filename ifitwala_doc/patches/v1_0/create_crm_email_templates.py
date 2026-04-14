@@ -3,7 +3,6 @@
 
 import frappe
 
-
 TEMPLATES = [
 	{
 		"name": "Ifitwala Lead - First Response",

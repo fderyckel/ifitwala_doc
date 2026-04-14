@@ -1,0 +1,29 @@
+---
+import type { StorySummary } from '@/lib/siteClient'
+import { formatStoryDate, readTimeLabel } from './helpers'
+
+interface Props {
+  story: StorySummary
+  invert?: boolean
+}
+
+const { story, invert = false }: Props = Astro.props
+const items = [
+  story?.author_name ? story.author_name : null,
+  story?.author_role ? story.author_role : null,
+  story?.published_on ? formatStoryDate(story.published_on) : null,
+  readTimeLabel(story?.estimated_read_minutes ?? null),
+].filter(Boolean)
+const toneClass = invert ? 'text-white/78' : 'text-slate/88'
+---
+
+{items.length > 0 && (
+  <div class={`flex flex-wrap items-center gap-x-3 gap-y-1 text-sm ${toneClass}`}>
+    {items.map((item, index) => (
+      <>
+        {index > 0 && <span aria-hidden="true" class="text-current/45">•</span>}
+        <span>{item}</span>
+      </>
+    ))}
+  </div>
+)}
