@@ -86,5 +86,6 @@ This dual‑architecture allows you to deliver zero‑JavaScript, SEO‑friendly
 * **Nginx Configuration:** Serve static assets via `.inc` snippets included in the SSL server block of your main `nginx.conf` to avoid conflicts.
 * **Environment Path:** Worker processes (e.g. Celery/Redis) run with restricted environment variables. Ensure your build scripts locate `node` and `yarn` executables explicitly.
 * **Colour Tokens:** If you introduce custom Tailwind colours, make sure they are accessible via `theme('colors.*')` syntax. When referencing nested values, quote the path (e.g. `theme('colors.blue.200')`) and provide a fallback if necessary.
+* **Frappe DocTypes:** Every new DocType, including child tables, must include the full package shape: `__init__.py`, `<doctype>.json`, and `<doctype>.py` with the matching PascalCase controller class extending `Document`. Do not leave child-table controller files as comments-only stubs; Frappe migrate/orphan cleanup may delete the DocType even when the JSON exists.
 
 ---
