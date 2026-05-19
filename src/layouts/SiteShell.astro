@@ -6,7 +6,7 @@ import type { NavItem, SiteSettings } from '@/lib/siteClient';
 
 const {
   lang = 'en',
-  title: titleProp = 'Ifitwala Ed',
+  title: titleProp = 'Ifitwala',
   description = '',
   canonical,
   headerNav = [],
@@ -44,7 +44,7 @@ const {
 const siteName =
   typeof settings?.site_name === 'string' && settings.site_name.trim()
     ? settings.site_name.trim()
-    : 'Ifitwala Ed';
+    : 'Ifitwala';
 const title =
   typeof titleProp === 'string' && titleProp.trim() ? titleProp : siteName;
 const resolvedDescription = description || settings?.tagline || '';
@@ -111,6 +111,21 @@ const headerLink = renderedSocialLinks.find(
 const headerIconKey = headerLink ? detectIconKey(headerLink) : '';
 const HeaderIconComponent = headerIconKey ? iconMap[headerIconKey] : null;
 const footerSocial = renderedSocialLinks.filter((link) => link !== headerLink);
+
+const rawPrimaryCtaLabel =
+  typeof settings?.primary_cta_label === 'string' && settings.primary_cta_label.trim()
+    ? settings.primary_cta_label.trim()
+    : 'Book a Call';
+const rawPrimaryCtaUrl =
+  typeof settings?.primary_cta_url === 'string' && settings.primary_cta_url.trim()
+    ? settings.primary_cta_url.trim()
+    : '/book-a-call/';
+const primaryCtaLooksProductOnly = rawPrimaryCtaLabel.toLowerCase().includes('demo');
+const primaryCtaLabel = primaryCtaLooksProductOnly ? 'Book a Call' : rawPrimaryCtaLabel;
+const primaryCtaUrl =
+  primaryCtaLooksProductOnly || rawPrimaryCtaUrl.replace(/\/+$/, '') === '/book-a-demo'
+    ? '/book-a-call/'
+    : rawPrimaryCtaUrl;
 
 function absoluteUrl(input?: string | null) {
   if (!input || typeof input !== 'string') {
@@ -229,12 +244,12 @@ if (noindex || nofollow) {
               </a>
             </div>
           ) : null}
-          {settings?.primary_cta_label && settings?.primary_cta_url ? (
+          {primaryCtaLabel && primaryCtaUrl ? (
             <a
-              href={settings.primary_cta_url}
-              class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-canopy via-leaf to-canopy px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/50"
+              href={primaryCtaUrl}
+              class="inline-flex items-center justify-center rounded-md bg-canopy px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/50"
             >
-              {settings.primary_cta_label}
+              {primaryCtaLabel}
             </a>
           ) : null}
         </div>

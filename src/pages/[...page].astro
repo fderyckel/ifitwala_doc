@@ -5,17 +5,31 @@ import { resolveSectionComponent } from '@/components/site/sections'
 
 export const prerender = true
 
+const RESERVED_STATIC_ROUTES = new Set([
+  '/book-a-call',
+  '/book-a-demo',
+  '/data-governance',
+  '/education',
+  '/ifitwala-ed',
+  '/services',
+  '/services/erp-implementation',
+])
+
 export async function getStaticPaths() {
   try {
     const pages = await listPages()
     return pages
-      .filter(
-        (page) =>
-          page?.slug &&
-          page.slug !== '/' &&
+      .filter((page) => {
+        if (!page?.slug || page.slug === '/') {
+          return false
+        }
+        const normalized = page.slug.replace(/\/+$/, '') || '/'
+        return (
+          !RESERVED_STATIC_ROUTES.has(normalized) &&
           !page.slug.startsWith('/docs') &&
           !page.slug.startsWith('/docs/')
-      )
+        )
+      })
       .map((page) => {
         const normalized = typeof page.slug === 'string' ? page.slug.trim() : ''
         const cleaned = normalized.replace(/^\/+/, '')
@@ -62,7 +76,7 @@ const take = (value: unknown): string => {
   return trimmed
 }
 
-const siteName = settings?.site_name || 'Ifitwala Ed'
+const siteName = settings?.site_name || 'Ifitwala'
 
 const seoTitle =
   take(pageSeo?.seo_title) ||

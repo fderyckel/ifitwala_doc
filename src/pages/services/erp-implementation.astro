@@ -1,0 +1,112 @@
+---
+import { ArrowRight, CheckCircle2, ClipboardList, Database, UsersRound } from '@lucide/astro'
+import SiteShell from '@/layouts/SiteShell.astro'
+import { getNav, getSiteSettings } from '@/lib/siteClient'
+
+export const prerender = true
+
+const [settings, headerNav, footerNav] = await Promise.all([
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+])
+
+const title = 'ERP Implementation | Ifitwala'
+const description =
+  'ERP implementation support for organizations that need clearer workflows, cleaner data, better permissions, and practical go-live support.'
+
+const steps = [
+  {
+    label: 'Workflow mapping',
+    body: 'Document how work happens today, where handoffs break, and which decisions need better visibility.',
+    Icon: ClipboardList,
+  },
+  {
+    label: 'Configuration and roles',
+    body: 'Translate processes into ERP records, permissions, approvals, dashboards, and reporting structures.',
+    Icon: Database,
+  },
+  {
+    label: 'Testing and adoption',
+    body: 'Support data migration, UAT, training, and the practical rhythm teams need before and after go-live.',
+    Icon: UsersRound,
+  },
+]
+
+const platforms = ['Frappe / ERPNext', 'Odoo', 'Moodle and LMS ecosystems', 'Existing ERP, SIS, and reporting tools']
+---
+
+<SiteShell
+  lang="en"
+  title={title}
+  description={description}
+  canonical="/services/erp-implementation/"
+  headerNav={headerNav}
+  footerNav={footerNav}
+  settings={settings}
+>
+  <section class="bg-sand/60">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16">
+      <div class="max-w-3xl">
+        <p class="text-sm font-semibold uppercase text-canopy">ERP Implementation</p>
+        <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
+          ERP work that starts with how your organization actually runs.
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-slate">
+          We help organizations map workflows, configure ERP platforms, migrate data carefully, design roles and permissions, and prepare teams for go-live.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/book-a-call/" class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]">
+            Discuss your systems
+            <ArrowRight class="h-4 w-4" aria-hidden="true" />
+          </a>
+          <a href="/services/" class="inline-flex items-center gap-2 rounded-md border border-canopy/30 bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf">
+            View all services
+            <ArrowRight class="h-4 w-4" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16">
+      <div class="grid gap-5 md:grid-cols-3">
+        {steps.map((step) => {
+          const Icon = step.Icon
+          return (
+            <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+              <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky text-canopy">
+                <Icon class="h-5 w-5" aria-hidden="true" />
+              </div>
+              <h2 class="mt-5 text-xl font-semibold text-ink">{step.label}</h2>
+              <p class="mt-3 text-sm leading-relaxed text-slate">{step.body}</p>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-sky/45">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.85fr_1.15fr]">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">Platforms</p>
+        <h2 class="mt-3 text-3xl font-semibold text-ink">Platforms are delivery vehicles, not the headline.</h2>
+      </div>
+      <div>
+        <p class="text-base leading-relaxed text-slate">
+          We can work with the platforms that fit the organization, but the implementation should be guided by workflow clarity, data quality, permissions, reporting needs, and team adoption.
+        </p>
+        <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+          {platforms.map((platform) => (
+            <li class="flex items-start gap-3 rounded-md bg-white p-4 text-sm text-slate shadow-soft">
+              <CheckCircle2 class="mt-0.5 h-4 w-4 flex-none text-canopy" aria-hidden="true" />
+              <span>{platform}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+</SiteShell>

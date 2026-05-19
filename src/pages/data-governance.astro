@@ -1,0 +1,108 @@
+---
+import { ArrowRight, FileSearch, KeyRound, Map, ShieldCheck } from '@lucide/astro'
+import SiteShell from '@/layouts/SiteShell.astro'
+import { getNav, getSiteSettings } from '@/lib/siteClient'
+
+export const prerender = true
+
+const [settings, headerNav, footerNav] = await Promise.all([
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+])
+
+const title = 'Data Governance | Ifitwala'
+const description =
+  'Data governance and privacy-readiness support for organizations handling sensitive operational and people data.'
+
+const auditItems = [
+  {
+    label: 'Map data locations',
+    body: 'Identify where applicant, student, staff, guardian, customer, finance, and operational data lives.',
+    Icon: Map,
+  },
+  {
+    label: 'Review access',
+    body: 'Check roles, permissions, exports, shared drives, reports, portals, and third-party tools.',
+    Icon: KeyRound,
+  },
+  {
+    label: 'Flag exposure risks',
+    body: 'Find excessive access, weak retention practices, unclear ownership, and risky data movement.',
+    Icon: FileSearch,
+  },
+  {
+    label: 'Plan remediation',
+    body: 'Create a practical roadmap for controls, cleanup, reporting changes, and team habits.',
+    Icon: ShieldCheck,
+  },
+]
+---
+
+<SiteShell
+  lang="en"
+  title={title}
+  description={description}
+  canonical="/data-governance/"
+  headerNav={headerNav}
+  footerNav={footerNav}
+  settings={settings}
+>
+  <section class="bg-sand/60">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.85fr)] lg:items-center">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">Data Governance</p>
+        <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
+          Sensitive data needs practical controls.
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-slate">
+          We help organizations understand where operational and people data lives, who can access it, how it moves, and where privacy or exposure risks need attention.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/book-a-call/" class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]">
+            Request a governance review
+            <ArrowRight class="h-4 w-4" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-border bg-white p-6 shadow-soft">
+        <h2 class="text-lg font-semibold text-ink">Privacy-readiness, not empty compliance claims.</h2>
+        <p class="mt-3 text-sm leading-relaxed text-slate">
+          We support GDPR and PDPA readiness by focusing on concrete system behaviors: access, retention, exports, ownership, reporting, and data movement.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16">
+      <div class="max-w-3xl">
+        <p class="text-sm font-semibold uppercase text-canopy">Concrete offer</p>
+        <h2 class="mt-3 text-3xl font-semibold text-ink">Data Exposure Audit</h2>
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          A focused review for organizations that need to understand sensitive data risk before, during, or after ERP and workflow changes.
+        </p>
+      </div>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        {auditItems.map((item) => {
+          const Icon = item.Icon
+          return (
+            <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+              <div class="flex items-start gap-4">
+                <span class="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-sky text-canopy">
+                  <Icon class="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 class="text-lg font-semibold text-ink">{item.label}</h3>
+                  <p class="mt-2 text-sm leading-relaxed text-slate">{item.body}</p>
+                </div>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+</SiteShell>

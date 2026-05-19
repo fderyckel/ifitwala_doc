@@ -1,0 +1,105 @@
+---
+import { ArrowRight, Database, GraduationCap, ShieldCheck } from '@lucide/astro'
+import SiteShell from '@/layouts/SiteShell.astro'
+import SystemsMap from '@/components/site/SystemsMap.astro'
+import { getNav, getSiteSettings } from '@/lib/siteClient'
+
+export const prerender = true
+
+const [settings, headerNav, footerNav] = await Promise.all([
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+])
+
+const title = 'Services | Ifitwala'
+const description =
+  'ERP implementation, workflow improvement, data governance, and education systems support from Ifitwala.'
+
+const pillars = [
+  {
+    label: 'ERP Implementation',
+    href: '/services/erp-implementation/',
+    Icon: Database,
+    body:
+      'We help organizations map current workflows, define better processes, configure ERP systems, manage data migration, design roles and permissions, support testing, and prepare teams for go-live.',
+  },
+  {
+    label: 'Data Governance',
+    href: '/data-governance/',
+    Icon: ShieldCheck,
+    body:
+      'We help organizations understand where data lives, who can access it, how it moves, where exposure risks exist, and what practical controls should be put in place.',
+  },
+  {
+    label: 'Education Systems',
+    href: '/education/',
+    Icon: GraduationCap,
+    body:
+      'We support schools and education organizations with ERP, SIS, LMS, admissions, reporting, data privacy, and workflow design.',
+  },
+]
+---
+
+<SiteShell
+  lang="en"
+  title={title}
+  description={description}
+  canonical="/services/"
+  headerNav={headerNav}
+  footerNav={footerNav}
+  settings={settings}
+>
+  <section class="bg-sand/60">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.9fr)] lg:items-center">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">Services</p>
+        <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
+          Better systems start with clearer work.
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-slate">
+          Ifitwala supports organizations that need practical help with ERP implementation, workflow clarity, and governance for sensitive operational data.
+        </p>
+      </div>
+      <SystemsMap title="Service work, from process to reporting" />
+    </div>
+  </section>
+
+  <section class="bg-white">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16">
+      <div class="grid gap-5 md:grid-cols-3">
+        {pillars.map((pillar) => {
+          const Icon = pillar.Icon
+          return (
+            <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+              <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky text-canopy">
+                <Icon class="h-5 w-5" aria-hidden="true" />
+              </div>
+              <h2 class="mt-5 text-xl font-semibold text-ink">{pillar.label}</h2>
+              <p class="mt-3 text-sm leading-relaxed text-slate">{pillar.body}</p>
+              <a href={pillar.href} class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-canopy hover:text-leaf">
+                Learn more
+                <ArrowRight class="h-4 w-4" aria-hidden="true" />
+              </a>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-sky/45">
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-14 md:flex-row md:items-center md:justify-between">
+      <div class="max-w-2xl">
+        <h2 class="text-2xl font-semibold text-ink">Not sure where your systems problem begins?</h2>
+        <p class="mt-3 text-sm leading-relaxed text-slate">
+          Start with a call. We can help separate workflow problems, data problems, platform problems, and adoption problems.
+        </p>
+      </div>
+      <a href="/book-a-call/" class="inline-flex items-center justify-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]">
+        Book a call
+        <ArrowRight class="h-4 w-4" aria-hidden="true" />
+      </a>
+    </div>
+  </section>
+</SiteShell>

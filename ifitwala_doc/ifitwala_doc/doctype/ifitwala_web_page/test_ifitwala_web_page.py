@@ -108,12 +108,20 @@ class TestIfitwalaWebPage(FrappeTestCase):
 						"item_order": 20,
 						"target_blank": 1,
 					},
+					{
+						"doctype": "Navigation Menu Item",
+						"label": "Book a Call",
+						"href": "/contact",
+						"item_order": 30,
+						"target_blank": 0,
+					},
 				],
 			}
 		).insert()
 
 		items = site_api.get_nav("Header")
-		self.assertEqual([item["label"] for item in items], ["Docs", "Book a Demo"])
+		self.assertEqual([item["label"] for item in items], ["Docs", "Book a Demo", "Book a Call"])
 		self.assertEqual(items[0]["href"], "/docs")
 		self.assertEqual(items[1]["href"], "/book-a-demo/")
 		self.assertEqual(items[1]["target_blank"], 1)
+		self.assertEqual(items[2]["href"], "/book-a-call/")

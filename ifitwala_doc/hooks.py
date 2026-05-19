@@ -1,7 +1,7 @@
 app_name = "ifitwala_doc"
-app_title = "Ifitwala Doc"
+app_title = "Ifitwala Website"
 app_publisher = "François de Ryckel"
-app_description = "Site and Docs for IFitwala Ed"
+app_description = "Company website, product showcase, and documentation hub for Ifitwala"
 app_email = "f.deryckel@gmail.com"
 app_license = "mit"
 

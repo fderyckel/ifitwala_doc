@@ -4,7 +4,7 @@
 import { Button } from 'frappe-ui';
 
 const props = defineProps({
-	title: { type: String, default: 'A campus where curiosity blooms.' },
+	title: { type: String, default: 'Systems that help organizations grow.' },
 	subtitle: { type: String, default: '' },
 	actions: {
 		type: Array,

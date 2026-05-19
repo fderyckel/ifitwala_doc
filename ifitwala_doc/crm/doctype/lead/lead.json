@@ -11,8 +11,12 @@
   "email",
   "phone",
   "column_break_organization",
+  "organization",
+  "organization_type",
   "school_name",
   "job_title",
+  "interest_area",
+  "current_system",
   "section_status",
   "status",
   "source",
@@ -55,6 +59,17 @@
    "fieldtype": "Column Break"
   },
   {
+   "fieldname": "organization",
+   "fieldtype": "Data",
+   "label": "Organization"
+  },
+  {
+   "fieldname": "organization_type",
+   "fieldtype": "Select",
+   "label": "Organization Type",
+   "options": "\nCompany\nSchool\nEducation group\nTraining organization\nNGO\nOther"
+  },
+  {
    "fieldname": "school_name",
    "fieldtype": "Data",
    "label": "School Name"
@@ -63,6 +78,17 @@
    "fieldname": "job_title",
    "fieldtype": "Data",
    "label": "Job Title"
+  },
+  {
+   "fieldname": "interest_area",
+   "fieldtype": "Select",
+   "label": "Interest Area",
+   "options": "\nERP implementation\nIfitwala Ed\nData governance / privacy\nEducation systems\nNot sure yet"
+  },
+  {
+   "fieldname": "current_system",
+   "fieldtype": "Data",
+   "label": "Current System"
   },
   {
    "fieldname": "section_status",
@@ -80,7 +106,7 @@
    "fieldname": "source",
    "fieldtype": "Select",
    "label": "Source",
-   "options": "Website\nReferral\nLinkedIn\nInstagram\nEvent\nOutbound",
+   "options": "Website\nWebsite - Book a Call\nWebsite - Ifitwala Ed Demo\nReferral\nLinkedIn\nInstagram\nEvent\nOutbound",
    "default": "Website"
   },
   {

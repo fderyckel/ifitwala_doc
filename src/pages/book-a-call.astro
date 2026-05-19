@@ -12,15 +12,15 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'Book an Ifitwala Ed Demo | Ifitwala'
+const title = 'Book a Call | Ifitwala'
 const description =
-  'Schedule a product demo of Ifitwala Ed, the flagship education ERP from Ifitwala.'
+  'Book a call with Ifitwala to discuss ERP implementation, workflow improvement, data governance, education systems, or Ifitwala Ed.'
 
-const demoTopics = [
-  'Admissions and student records',
-  'Academic and staff workflows',
-  'Parent, student, and staff portals',
-  'Reporting, permissions, and data quality',
+const topics = [
+  'ERP implementation or cleanup',
+  'Workflow and reporting problems',
+  'Data governance and privacy-readiness',
+  'Education systems or Ifitwala Ed',
 ]
 ---
 
@@ -28,7 +28,7 @@ const demoTopics = [
   lang="en"
   title={title}
   description={description}
-  canonical="/book-a-demo/"
+  canonical="/book-a-call/"
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
@@ -36,15 +36,15 @@ const demoTopics = [
   <section class="bg-sand/60">
     <div class="mx-auto grid w-full max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,1.05fr)] lg:items-start">
       <div>
-        <p class="text-sm font-semibold uppercase text-canopy">Ifitwala Ed demo</p>
+        <p class="text-sm font-semibold uppercase text-canopy">Book a call</p>
         <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
-          See the education ERP in context.
+          Bring the messy systems question.
         </h1>
         <p class="mt-6 text-lg leading-relaxed text-slate">
-          Ifitwala Ed is our flagship education ERP, built from direct international-school experience. Book a product demo focused on your school workflows, data, and reporting needs.
+          Use this call for ERP implementation, workflow clarity, data governance, privacy-readiness, education systems, or an early conversation about Ifitwala Ed.
         </p>
         <ul class="mt-8 grid gap-3">
-          {demoTopics.map((topic) => (
+          {topics.map((topic) => (
             <li class="flex items-start gap-3 rounded-md bg-white p-4 text-sm text-slate shadow-soft">
               <CheckCircle2 class="mt-0.5 h-4 w-4 flex-none text-canopy" aria-hidden="true" />
               <span>{topic}</span>
@@ -55,11 +55,11 @@ const demoTopics = [
 
       <LeadForm
         client:load
-        mode="ifitwala-ed"
-        source="Website - Ifitwala Ed Demo"
-        title="Book a Demo"
-        subtitle="Tell us about your school and what you want to see."
-        submitLabel="Book Demo"
+        mode="company"
+        source="Website - Book a Call"
+        title="Book a Call"
+        subtitle="Tell us what system, workflow, or data problem you want to discuss."
+        submitLabel="Send Inquiry"
       />
     </div>
   </section>
