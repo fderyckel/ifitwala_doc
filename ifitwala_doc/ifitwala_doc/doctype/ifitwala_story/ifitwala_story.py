@@ -9,7 +9,6 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint, nowdate
 
-
 SLUG_RE = re.compile(r"[^a-z0-9-]+")
 WORD_RE = re.compile(r"\b[\w'-]+\b")
 

@@ -6,7 +6,6 @@ from frappe.tests.utils import FrappeTestCase
 from ifitwala_doc.api import site as site_api
 
 
-
 def _unique(prefix: str) -> str:
     return f"{prefix}-{frappe.generate_hash(length=8).lower()}"
 
