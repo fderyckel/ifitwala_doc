@@ -8,8 +8,8 @@
  "icon_type": "Link",
  "idx": 2,
  "label": "Ifitwala CRM",
- "link_to": "Ifitwala CRM",
- "link_type": "Workspace Sidebar",
+ "link_to": "CRM",
+ "link_type": "Workspace",
  "name": "Ifitwala CRM",
  "restrict_removal": 0,
  "standard": 1
