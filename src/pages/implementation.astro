@@ -1,0 +1,151 @@
+---
+import SiteShell from '@/layouts/SiteShell.astro'
+import { getSiteSettings } from '@/lib/siteClient'
+import {
+  implementationPrinciples,
+  implementationResults,
+  implementationRoles,
+  implementationSteps,
+  marketingFooterNav,
+  marketingHeaderNav,
+  withMarketingDefaults,
+} from '@/lib/marketing'
+
+export const prerender = true
+
+const rawSettings = await getSiteSettings()
+const settings = withMarketingDefaults(rawSettings)
+
+const pageTitle = 'Implementation | Ifitwala Ed'
+const pageDescription =
+  'Understand the rollout approach behind Ifitwala Ed, from discovery and configuration to adoption and institutional ownership.'
+---
+
+<SiteShell
+  lang="en"
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/implementation/"
+  headerNav={marketingHeaderNav}
+  footerNav={marketingFooterNav}
+  settings={settings}
+  bodyClass="overflow-x-hidden"
+>
+  <div class="relative isolate overflow-hidden">
+    <div class="absolute inset-x-0 top-0 -z-20 h-[30rem] bg-[radial-gradient(circle_at_top,rgba(232,238,245,0.92),transparent_58%)]"></div>
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pb-20 pt-8 md:gap-10 md:pb-24 md:pt-12">
+      <section class="grid gap-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)] lg:items-center">
+        <div class="max-w-3xl">
+          <span class="eyebrow-label">Implementation</span>
+          <h1 class="mt-6 font-serif text-5xl font-semibold leading-[0.96] tracking-[-0.045em] text-ink md:text-6xl">
+            Roll out with structure, not improvisation.
+          </h1>
+          <p class="mt-6 max-w-2xl text-lg leading-8 text-slate md:text-xl">
+            Institutional software only creates confidence when the rollout model is credible. The implementation conversation should cover structure, ownership, adoption, and the workflows that matter first.
+          </p>
+        </div>
+
+        <div class="rounded-[2rem] border border-[rgba(22,35,49,0.08)] bg-[linear-gradient(180deg,#162331_0%,#101923_100%)] px-6 py-8 text-white shadow-strong md:px-8">
+          <p class="text-[0.7rem] font-semibold uppercase tracking-[0.32em] text-white/[0.56]">Phased rollout</p>
+          <div class="mt-6 space-y-4">
+            {implementationSteps.map((step) => (
+              <article class="rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-5">
+                <div class="flex items-center gap-4">
+                  <span class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/[0.15] text-sm font-semibold text-white">
+                    {step.number}
+                  </span>
+                  <h2 class="text-lg font-semibold text-white">{step.title}</h2>
+                </div>
+                <p class="mt-4 text-sm leading-7 text-white/[0.72]">{step.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="section-frame px-6 py-10 md:px-8 md:py-12">
+        <div class="max-w-3xl">
+          <span class="eyebrow-label">Implementation principles</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.5rem]">
+            A better rollout starts with the institution, not the software demo.
+          </h2>
+        </div>
+        <div class="mt-10 grid gap-4 md:grid-cols-2">
+          {implementationPrinciples.map((principle) => (
+            <article class="rounded-[1.5rem] border border-border/80 bg-white px-6 py-6 shadow-sm">
+              <h3 class="text-lg font-semibold text-ink">{principle.title}</h3>
+              <p class="mt-3 text-sm leading-7 text-slate">{principle.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <article class="section-frame px-6 py-10 md:px-8 md:py-12">
+          <span class="eyebrow-label">Who should be involved</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.45rem]">
+            The right rollout is cross-functional.
+          </h2>
+          <div class="mt-8 space-y-4">
+            {implementationRoles.map((role) => (
+              <article class="rounded-[1.4rem] border border-border/80 bg-white px-5 py-5 shadow-sm">
+                <h3 class="text-lg font-semibold text-ink">{role.title}</h3>
+                <p class="mt-3 text-sm leading-7 text-slate">{role.description}</p>
+              </article>
+            ))}
+          </div>
+        </article>
+
+        <article class="section-frame px-6 py-10 md:px-8 md:py-12">
+          <span class="eyebrow-label">What strong rollout produces</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.45rem]">
+            Outcomes leadership can trust.
+          </h2>
+          <div class="mt-8 space-y-3">
+            {implementationResults.map((result, index) => (
+              <div class="flex items-start gap-4 rounded-[1.35rem] border border-border/80 bg-white px-5 py-4 shadow-sm">
+                <span class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full border border-canopy/[0.12] bg-moss/[0.4] text-sm font-semibold text-canopy">
+                  {index + 1}
+                </span>
+                <p class="text-sm font-medium leading-7 text-ink">{result}</p>
+              </div>
+            ))}
+          </div>
+          <div class="mt-8 rounded-[1.6rem] border border-border/80 bg-panel/70 px-5 py-5">
+            <p class="text-sm leading-7 text-slate">
+              Use the demo process to review not only product breadth, but also how the rollout would be sequenced, who should participate, and what institutional ownership looks like after launch.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="rounded-[2rem] border border-[rgba(22,35,49,0.08)] bg-[linear-gradient(135deg,#f9f4ea_0%,#ffffff_42%,#e7efe7_100%)] px-6 py-12 shadow-soft md:px-8 md:py-14">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div class="max-w-3xl">
+            <span class="eyebrow-label">Next step</span>
+            <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.6rem]">
+              Review the rollout approach for your institution directly.
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate">
+              Book a walkthrough and use it to discuss structure, permissions, migration readiness, and the first workflows your teams would need live.
+            </p>
+          </div>
+          <div class="flex flex-col items-start gap-3">
+            <a
+              href="/book-a-demo/"
+              class="inline-flex items-center justify-center rounded-full border border-[#162331] bg-[#162331] px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-[#0f1722]"
+            >
+              Book a Demo
+            </a>
+            <a
+              href="/security/"
+              class="text-sm font-semibold text-canopy hover:text-ink"
+            >
+              Review trust and security →
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</SiteShell>

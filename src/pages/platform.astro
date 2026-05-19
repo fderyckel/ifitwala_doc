@@ -1,0 +1,161 @@
+---
+import SiteShell from '@/layouts/SiteShell.astro'
+import { getSiteSettings } from '@/lib/siteClient'
+import {
+  marketingFooterNav,
+  marketingHeaderNav,
+  platformOutcomes,
+  platformPillars,
+  teamSegments,
+  withMarketingDefaults,
+  workflowLanes,
+} from '@/lib/marketing'
+
+export const prerender = true
+
+const rawSettings = await getSiteSettings()
+const settings = withMarketingDefaults(rawSettings)
+
+const pageTitle = 'Platform | Ifitwala Ed'
+const pageDescription =
+  'Explore how Ifitwala Ed connects academics, operations, finance, communication, and institutional reporting in one platform.'
+---
+
+<SiteShell
+  lang="en"
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/platform/"
+  headerNav={marketingHeaderNav}
+  footerNav={marketingFooterNav}
+  settings={settings}
+  bodyClass="overflow-x-hidden"
+>
+  <div class="relative isolate overflow-hidden">
+    <div class="absolute inset-x-0 top-0 -z-20 h-[32rem] bg-[radial-gradient(circle_at_top,rgba(232,238,245,0.92),transparent_58%)]"></div>
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pb-20 pt-8 md:gap-10 md:pb-24 md:pt-12">
+      <section class="grid gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-center">
+        <div class="max-w-3xl">
+          <span class="eyebrow-label">Platform overview</span>
+          <h1 class="mt-6 font-serif text-5xl font-semibold leading-[0.96] tracking-[-0.045em] text-ink md:text-6xl">
+            A connected platform for running modern institutions.
+          </h1>
+          <p class="mt-6 max-w-2xl text-lg leading-8 text-slate md:text-xl">
+            Ifitwala Ed is designed to bring the workflows that usually live in disconnected systems into one calmer, more structured operating surface.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a
+              href="/book-a-demo/"
+              class="inline-flex items-center justify-center rounded-full border border-[#162331] bg-[#162331] px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-[#0f1722]"
+            >
+              Book a Demo
+            </a>
+            <a
+              href="/implementation/"
+              class="inline-flex items-center justify-center rounded-full border border-border bg-white/[0.85] px-6 py-3 text-sm font-semibold text-ink shadow-sm transition hover:-translate-y-0.5 hover:border-canopy/20 hover:bg-white"
+            >
+              See Implementation
+            </a>
+          </div>
+        </div>
+
+        <div class="rounded-[2rem] border border-[rgba(22,35,49,0.08)] bg-[linear-gradient(180deg,#162331_0%,#101923_100%)] p-6 text-white shadow-strong">
+          <p class="text-[0.7rem] font-semibold uppercase tracking-[0.32em] text-white/[0.56]">Why this matters</p>
+          <div class="mt-6 grid gap-4 sm:grid-cols-2">
+            {platformOutcomes.map((item) => (
+              <article class="rounded-[1.4rem] border border-white/10 bg-white/[0.06] p-5">
+                <h2 class="text-lg font-semibold text-white">{item.title}</h2>
+                <p class="mt-3 text-sm leading-7 text-white/[0.7]">{item.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="section-frame px-6 py-10 md:px-8 md:py-12">
+        <div class="max-w-3xl">
+          <span class="eyebrow-label">Core platform pillars</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.55rem]">
+            Everything your institution needs to run in sync.
+          </h2>
+          <p class="mt-4 text-base leading-7 text-slate">
+            The goal is not to add more software. It is to create a stronger operating system for the institution across the workflows that matter most.
+          </p>
+        </div>
+
+        <div class="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {platformPillars.map((pillar) => (
+            <article class="rounded-[1.55rem] border border-border/80 bg-white/[0.94] p-6 shadow-sm">
+              <p class="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-canopy/[0.68]">{pillar.number}</p>
+              <h3 class="mt-4 text-xl font-semibold tracking-[-0.02em] text-ink">{pillar.title}</h3>
+              <p class="mt-4 text-sm leading-7 text-slate">{pillar.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <article class="section-frame px-6 py-10 md:px-8 md:py-12">
+          <span class="eyebrow-label">How teams use it</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.45rem]">
+            Built for every team that keeps an institution moving.
+          </h2>
+          <div class="mt-8 space-y-4">
+            {teamSegments.map((segment) => (
+              <article class="rounded-[1.4rem] border border-border/75 bg-white px-5 py-5 shadow-sm">
+                <h3 class="text-lg font-semibold text-ink">{segment.title}</h3>
+                <p class="mt-3 text-sm leading-7 text-slate">{segment.description}</p>
+              </article>
+            ))}
+          </div>
+        </article>
+
+        <article class="section-frame px-6 py-10 md:px-8 md:py-12">
+          <span class="eyebrow-label">Workflow coverage</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.45rem]">
+            The operating areas institutions need to evaluate clearly.
+          </h2>
+          <div class="mt-8 space-y-4">
+            {workflowLanes.map((lane) => (
+              <article class="rounded-[1.45rem] border border-border/80 bg-white px-5 py-5 shadow-sm">
+                <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-ink">{lane.title}</h3>
+                    <p class="mt-3 text-sm leading-7 text-slate">{lane.description}</p>
+                  </div>
+                  <div class="flex flex-wrap gap-2 md:max-w-[16rem] md:justify-end">
+                    {lane.items.map((item) => (
+                      <span class="rounded-full border border-border/75 bg-panel/70 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section class="rounded-[2rem] border border-[rgba(22,35,49,0.08)] bg-[linear-gradient(135deg,#f9f4ea_0%,#ffffff_42%,#e7efe7_100%)] px-6 py-12 shadow-soft md:px-8 md:py-14">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div class="max-w-3xl">
+            <span class="eyebrow-label">Next step</span>
+            <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.6rem]">
+              See the platform in the context of your institution.
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate">
+              Book a tailored walkthrough focused on the workflows your leadership, academic, operations, finance, or technology teams need to review.
+            </p>
+          </div>
+          <a
+            href="/book-a-demo/"
+            class="inline-flex items-center justify-center rounded-full border border-[#162331] bg-[#162331] px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-[#0f1722]"
+          >
+            Book a Demo
+          </a>
+        </div>
+      </section>
+    </div>
+  </div>
+</SiteShell>

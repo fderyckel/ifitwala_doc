@@ -1,0 +1,147 @@
+---
+import SiteShell from '@/layouts/SiteShell.astro'
+import { getSiteSettings } from '@/lib/siteClient'
+import {
+  marketingFooterNav,
+  marketingHeaderNav,
+  securityAreas,
+  securityPageNotes,
+  securityReviewPoints,
+  withMarketingDefaults,
+} from '@/lib/marketing'
+
+export const prerender = true
+
+const rawSettings = await getSiteSettings()
+const settings = withMarketingDefaults(rawSettings)
+
+const pageTitle = 'Security and Trust | Ifitwala Ed'
+const pageDescription =
+  'Review the trust conversation institutions should have when evaluating Ifitwala Ed: permissions, operational continuity, ownership, and support.'
+---
+
+<SiteShell
+  lang="en"
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/security/"
+  headerNav={marketingHeaderNav}
+  footerNav={marketingFooterNav}
+  settings={settings}
+  bodyClass="overflow-x-hidden"
+>
+  <div class="relative isolate overflow-hidden">
+    <div class="absolute inset-x-0 top-0 -z-20 h-[30rem] bg-[radial-gradient(circle_at_top,rgba(232,238,245,0.9),transparent_58%)]"></div>
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pb-20 pt-8 md:gap-10 md:pb-24 md:pt-12">
+      <section class="grid gap-8 lg:grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)] lg:items-center">
+        <div class="max-w-3xl">
+          <span class="eyebrow-label">Security and trust</span>
+          <h1 class="mt-6 font-serif text-5xl font-semibold leading-[0.96] tracking-[-0.045em] text-ink md:text-6xl">
+            Trust is part of the product decision.
+          </h1>
+          <p class="mt-6 max-w-2xl text-lg leading-8 text-slate md:text-xl">
+            Institutions evaluating a platform should review more than features. The trust conversation should cover permissions, continuity, ownership, accountability, and operational support.
+          </p>
+        </div>
+
+        <div class="rounded-[2rem] border border-[rgba(22,35,49,0.08)] bg-[linear-gradient(180deg,#162331_0%,#101923_100%)] p-6 text-white shadow-strong md:p-8">
+          <p class="text-[0.7rem] font-semibold uppercase tracking-[0.32em] text-white/[0.56]">What this page covers</p>
+          <div class="mt-6 space-y-4">
+            {securityPageNotes.map((note) => (
+              <article class="rounded-[1.45rem] border border-white/10 bg-white/[0.06] px-5 py-5">
+                <p class="text-sm leading-7 text-white/[0.74]">{note}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="section-frame px-6 py-10 md:px-8 md:py-12">
+        <div class="max-w-3xl">
+          <span class="eyebrow-label">Trust conversation</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.5rem]">
+            The institutional review should cover these areas clearly.
+          </h2>
+        </div>
+        <div class="mt-10 grid gap-4 md:grid-cols-2">
+          {securityAreas.map((area) => (
+            <article class="rounded-[1.5rem] border border-border/80 bg-white px-6 py-6 shadow-sm">
+              <h3 class="text-lg font-semibold text-ink">{area.title}</h3>
+              <p class="mt-3 text-sm leading-7 text-slate">{area.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
+        <article class="section-frame px-6 py-10 md:px-8 md:py-12">
+          <span class="eyebrow-label">Evaluation checklist</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.45rem]">
+            Questions every institution should ask during review.
+          </h2>
+          <div class="mt-8 space-y-3">
+            {securityReviewPoints.map((point, index) => (
+              <div class="flex items-start gap-4 rounded-[1.35rem] border border-border/80 bg-white px-5 py-4 shadow-sm">
+                <span class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full border border-canopy/[0.12] bg-moss/[0.4] text-sm font-semibold text-canopy">
+                  {index + 1}
+                </span>
+                <p class="text-sm leading-7 text-ink">{point}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="section-frame px-6 py-10 md:px-8 md:py-12">
+          <span class="eyebrow-label">How to use this in the sales process</span>
+          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.45rem]">
+            Use the evaluation to test operational seriousness.
+          </h2>
+          <div class="mt-8 space-y-4 text-sm leading-7 text-slate">
+            <p>
+              Ask direct questions about how access is governed, how institutional ownership is handled, and what the support path looks like when workflows are live.
+            </p>
+            <p>
+              Review not only what the product can do, but also how the platform would fit your institution’s operating model, governance expectations, and rollout discipline.
+            </p>
+            <p>
+              Trust is strongest when the conversation is clear about responsibilities, escalation, continuity, and the practical realities of daily institutional use.
+            </p>
+          </div>
+          <div class="mt-8 rounded-[1.6rem] border border-border/80 bg-panel/70 px-5 py-5">
+            <p class="text-sm leading-7 text-slate">
+              This page intentionally frames the trust discussion areas institutions should review. Product-specific operating details should be confirmed during your evaluation process.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="rounded-[2rem] border border-[rgba(22,35,49,0.08)] bg-[linear-gradient(135deg,#f9f4ea_0%,#ffffff_42%,#e7efe7_100%)] px-6 py-12 shadow-soft md:px-8 md:py-14">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div class="max-w-3xl">
+            <span class="eyebrow-label">Next step</span>
+            <h2 class="mt-5 font-serif text-3xl font-semibold tracking-[-0.04em] text-ink md:text-[2.6rem]">
+              Review trust, permissions, and rollout expectations in a live walkthrough.
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate">
+              Use the demo to review the areas that matter most to your institution’s governance, operational continuity, and support model.
+            </p>
+          </div>
+          <div class="flex flex-col items-start gap-3">
+            <a
+              href="/book-a-demo/"
+              class="inline-flex items-center justify-center rounded-full border border-[#162331] bg-[#162331] px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-[#0f1722]"
+            >
+              Book a Demo
+            </a>
+            <a
+              href="/implementation/"
+              class="text-sm font-semibold text-canopy hover:text-ink"
+            >
+              Review implementation →
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</SiteShell>
