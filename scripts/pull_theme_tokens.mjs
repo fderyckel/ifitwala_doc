@@ -138,6 +138,8 @@ function buildCss(theme) {
   --sky: ${theme.sky_color};
   --sand: ${theme.sand_color};
   --border: ${theme.border_color};
+  --panel: #EEF2F6;
+  --paper: #FFFCF8;
   --ink-rgb: ${hexToRgbString(theme.ink_color)};
   --slate-rgb: ${hexToRgbString(theme.slate_color)};
   --canopy-rgb: ${hexToRgbString(theme.canopy_color)};
@@ -146,12 +148,15 @@ function buildCss(theme) {
   --sky-rgb: ${hexToRgbString(theme.sky_color)};
   --sand-rgb: ${hexToRgbString(theme.sand_color)};
   --border-rgb: ${hexToRgbString(theme.border_color)};
+  --panel-rgb: 238 242 246;
+  --paper-rgb: 255 252 248;
   
   /* Additional tokens mapped to CSS vars */
   --radius-lg: ${theme.radius_lg};
   --radius-xl: ${theme.radius_xl};
   --shadow-soft: ${theme.shadow_soft};
   --shadow-strong: ${theme.shadow_strong};
+  --focus-ring: ${theme.focus_ring};
 }
 `;
 }

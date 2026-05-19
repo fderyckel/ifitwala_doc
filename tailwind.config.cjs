@@ -55,6 +55,9 @@ module.exports = {
         moss:      color('moss'),
         sand:      color('sand'),
         border:    color('border'),
+        line:      color('border'),
+        panel:     color('panel'),
+        paper:     color('paper'),
 
         primary:   color('canopy'),
         secondary: color('leaf'),
