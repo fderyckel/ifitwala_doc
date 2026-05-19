@@ -1,5 +1,14 @@
 ---
-import { ArrowRight, CheckCircle2, Database, GraduationCap, ShieldCheck } from '@lucide/astro'
+import {
+  ArrowRight,
+  CheckCircle2,
+  ClipboardList,
+  Database,
+  GraduationCap,
+  Route,
+  ShieldCheck,
+  UsersRound,
+} from '@lucide/astro'
 import SiteShell from '@/layouts/SiteShell.astro'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
 
@@ -15,32 +24,53 @@ const title = 'About Ifitwala | ERP, Data Governance, and Education Systems'
 const description =
   'Ifitwala helps organizations implement ERP systems, improve workflows, strengthen data governance, and build reliable education operations platforms.'
 
-const areas = [
+const serviceAreas = [
   {
     label: 'ERP implementation',
-    body: 'Frappe Framework, ERPNext, Odoo, LMS platforms, migration planning, permissions, reporting, UAT, and go-live support.',
+    body:
+      'Frappe Framework, ERPNext, Odoo, Frappe HRMS, CRM, LMS, Moodle, migration planning, UAT, permissions, reporting, and go-live support.',
     Icon: Database,
   },
   {
     label: 'Data governance',
-    body: 'Practical reviews of where sensitive data lives, who can access it, how it moves, and which controls should come next.',
+    body:
+      'Practical reviews of where sensitive operational data lives, who can access it, how it moves, and which controls should come next.',
     Icon: ShieldCheck,
   },
   {
     label: 'Education systems',
-    body: 'Admissions, student records, staff workflows, LMS, portals, reporting, and privacy-aware school operations.',
+    body:
+      'Admissions, student records, staff workflows, LMS, reporting, portals, privacy-aware operations, and school data quality.',
     Icon: GraduationCap,
   },
 ]
 
 const proofPoints = [
   'Creator of Ifitwala_Ed, a unified education operations platform built on the Frappe Framework.',
-  'Product-level Frappe experience across data models, workflows, permissions, portals, reports, and dashboards.',
-  'Practical experience translating complex school and business operations into systems people can actually use.',
-  'Implementation discipline across workflow mapping, gap analysis, migration logic, UAT, training, and adoption.',
+  'Practical Frappe experience across data models, permissions, workflows, portals, reports, dashboards, and operational records.',
+  'Direct experience translating complex school and business operations into systems people can actually use.',
+  'Strong implementation discipline: workflow mapping, gap analysis, migration logic, UAT, training, and post-go-live adoption.',
 ]
 
-const platforms = [
+const method = [
+  {
+    label: 'Start with operational reality',
+    body: 'We map how work happens now: records, handoffs, approvals, data owners, exceptions, reporting needs, and pain points.',
+    Icon: ClipboardList,
+  },
+  {
+    label: 'Translate work into system structure',
+    body: 'We turn real processes into ERP records, roles, permissions, workflows, dashboards, reports, and integration decisions.',
+    Icon: Route,
+  },
+  {
+    label: 'Make adoption part of the build',
+    body: 'We treat UAT, training, migration cleanup, go-live support, and leadership visibility as part of implementation, not afterthoughts.',
+    Icon: UsersRound,
+  },
+]
+
+const platformGroups = [
   'Frappe Framework custom applications',
   'ERPNext implementation and configuration',
   'Frappe HRMS, CRM, LMS, Helpdesk, and related tools',
@@ -73,11 +103,17 @@ const platforms = [
           Our strongest proof is Ifitwala_Ed: a unified education operations platform we created on the Frappe Framework. Building it gives us practical credibility in how real operational complexity becomes usable ERP structure.
         </p>
         <div class="mt-8 flex flex-wrap gap-3">
-          <a href="/services/erp-implementation/" class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]">
+          <a
+            href="/services/erp-implementation/"
+            class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/60"
+          >
             ERP implementation
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
-          <a href="/book-a-call/" class="inline-flex items-center gap-2 rounded-md border border-canopy/30 bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf">
+          <a
+            href="/book-a-call/"
+            class="inline-flex items-center gap-2 rounded-md border border-canopy/30 bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/60"
+          >
             Book a call
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
@@ -90,7 +126,7 @@ const platforms = [
           ERP implementation, data governance, and education systems — grounded in product-building experience.
         </h2>
         <p class="mt-4 text-sm leading-relaxed text-slate">
-          We are not just advising from slide decks. We build Frappe-based systems and understand the friction that appears when real people, data, and permissions meet software.
+          We are not just advising from slide decks. We build Frappe-based systems, implement operational workflows, and understand the friction that appears when real people, data, and permissions meet software.
         </p>
       </div>
     </div>
@@ -101,9 +137,13 @@ const platforms = [
       <div class="max-w-3xl">
         <p class="text-sm font-semibold uppercase text-canopy">What we do</p>
         <h2 class="mt-3 text-3xl font-semibold text-ink">Implementation work with governance built in.</h2>
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          Most system problems are not only technical. They are also workflow problems, data ownership problems, access-control problems, reporting problems, and adoption problems.
+        </p>
       </div>
+
       <div class="mt-10 grid gap-5 md:grid-cols-3">
-        {areas.map((area) => {
+        {serviceAreas.map((area) => {
           const Icon = area.Icon
           return (
             <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
@@ -120,7 +160,7 @@ const platforms = [
   </section>
 
   <section class="bg-sky/45">
-    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.85fr_1.15fr]">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
       <div>
         <p class="text-sm font-semibold uppercase text-canopy">Why we are credible</p>
         <h2 class="mt-3 text-3xl font-semibold text-ink">
@@ -129,7 +169,7 @@ const platforms = [
       </div>
       <div class="rounded-xl border border-border bg-white p-6 shadow-soft">
         <p class="text-base leading-relaxed text-slate">
-          Ifitwala_Ed is a unified education operations platform built on the Frappe Framework. It connects school operations across admissions, student records, staff workflows, portals, reporting, permissions, and governance.
+          Ifitwala_Ed is a unified education operations platform built on the Frappe Framework. It connects the operational reality of schools — admissions, student records, staff workflows, portals, reporting, permissions, and governance — into one structured system.
         </p>
         <ul class="mt-6 grid gap-3">
           {proofPoints.map((point) => (
@@ -143,8 +183,40 @@ const platforms = [
     </div>
   </section>
 
+  <section class="bg-white">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">Implementation method</p>
+        <h2 class="mt-3 text-3xl font-semibold text-ink">
+          The platform matters. The translation work matters more.
+        </h2>
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          ERP projects fail when they are treated as software installation projects. We focus on translating operational reality into system behavior that teams can trust.
+        </p>
+      </div>
+      <div class="grid gap-5">
+        {method.map((item) => {
+          const Icon = item.Icon
+          return (
+            <article class="rounded-lg border border-border bg-sand/35 p-6">
+              <div class="flex items-start gap-4">
+                <span class="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-white text-canopy shadow-sm">
+                  <Icon class="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 class="text-lg font-semibold text-ink">{item.label}</h3>
+                  <p class="mt-2 text-sm leading-relaxed text-slate">{item.body}</p>
+                </div>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+
   <section class="bg-sand/50">
-    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.85fr_1.15fr]">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
       <div>
         <p class="text-sm font-semibold uppercase text-canopy">Platforms and systems</p>
         <h2 class="mt-3 text-3xl font-semibold text-ink">
@@ -153,10 +225,10 @@ const platforms = [
       </div>
       <div>
         <p class="text-base leading-relaxed text-slate">
-          Our deepest technical base is Frappe and ERPNext. We also support Odoo projects where strong project management, workflow mapping, migration planning, permissions design, testing, and adoption support are needed.
+          Our deepest technical base is Frappe and ERPNext. As we work with organizations in Europe, we also support Odoo implementation projects where strong project management, workflow mapping, migration planning, permissions design, testing, and adoption support are needed.
         </p>
         <ul class="mt-6 grid gap-3 sm:grid-cols-2">
-          {platforms.map((platform) => (
+          {platformGroups.map((platform) => (
             <li class="flex items-start gap-3 rounded-md bg-white p-4 text-sm text-slate shadow-soft">
               <CheckCircle2 class="mt-0.5 h-4 w-4 flex-none text-canopy" aria-hidden="true" />
               <span>{platform}</span>
@@ -164,6 +236,24 @@ const platforms = [
           ))}
         </ul>
       </div>
+    </div>
+  </section>
+
+  <section class="bg-canopy text-white">
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-14 md:flex-row md:items-center md:justify-between">
+      <div class="max-w-2xl">
+        <h2 class="text-2xl font-semibold">Need a system that matches how the organization really works?</h2>
+        <p class="mt-3 text-sm leading-relaxed text-white/80">
+          Bring the ERP, workflow, data governance, or education-platform question. We will help separate the real operational problem from the software noise.
+        </p>
+      </div>
+      <a
+        href="/book-a-call/"
+        class="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:bg-sand"
+      >
+        Book a call
+        <ArrowRight class="h-4 w-4" aria-hidden="true" />
+      </a>
     </div>
   </section>
 </SiteShell>
