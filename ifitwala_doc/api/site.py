@@ -55,10 +55,16 @@ THEME_DEFAULTS: Dict[str, str] = {
 }
 
 BOOK_A_DEMO_PATH = "/book-a-demo/"
+BOOK_A_CALL_PATH = "/book-a-call/"
 DEMO_LABEL_HINTS = {
     "demo",
     "book a demo",
     "see a live demo",
+}
+CALL_LABEL_HINTS = {
+    "book a call",
+    "discuss your systems",
+    "talk to us",
 }
 
 
@@ -71,6 +77,8 @@ def _normalize_demo_href(label: Any, href: Any) -> str:
     href_value = (href or "").strip()
 
     if not href_value:
+        if label_value in CALL_LABEL_HINTS:
+            return BOOK_A_CALL_PATH
         if label_value in DEMO_LABEL_HINTS:
             return BOOK_A_DEMO_PATH
         return href_value
@@ -81,8 +89,12 @@ def _normalize_demo_href(label: Any, href: Any) -> str:
     except Exception:
         parsed_path = href_value.strip().rstrip("/")
 
+    if label_value in CALL_LABEL_HINTS:
+        return BOOK_A_CALL_PATH
     if label_value in DEMO_LABEL_HINTS:
         return BOOK_A_DEMO_PATH
+    if parsed_path in {"/call", "/book-call", "/book-a-call", "/contact"}:
+        return BOOK_A_CALL_PATH
     if parsed_path in {"/demo", "/book-demo", "/book-a-demo"}:
         return BOOK_A_DEMO_PATH
 

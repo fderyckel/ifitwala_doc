@@ -1,0 +1,108 @@
+---
+import { ArrowRight, BookOpen, Database, GraduationCap, ShieldCheck } from '@lucide/astro'
+import SiteShell from '@/layouts/SiteShell.astro'
+import { getNav, getSiteSettings } from '@/lib/siteClient'
+
+export const prerender = true
+
+const [settings, headerNav, footerNav] = await Promise.all([
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+])
+
+const title = 'Education Systems | Ifitwala'
+const description =
+  'ERP, SIS, LMS, admissions, reporting, safeguarding workflows, and privacy-aware data operations for education organizations.'
+
+const areas = [
+  {
+    label: 'School operations',
+    body: 'Admissions, student records, attendance, finance, staff workflows, parent communication, and leadership reporting.',
+    Icon: GraduationCap,
+  },
+  {
+    label: 'LMS and learning ecosystems',
+    body: 'Moodle and LMS-adjacent workflows, data movement, reporting needs, and integration planning.',
+    Icon: BookOpen,
+  },
+  {
+    label: 'Sensitive people data',
+    body: 'Student, staff, guardian, health, wellbeing, safeguarding, admissions, and assessment data all need careful governance.',
+    Icon: ShieldCheck,
+  },
+  {
+    label: 'Education ERP',
+    body: 'Ifitwala Ed is our flagship product for schools that need one source of truth across daily operations.',
+    Icon: Database,
+  },
+]
+---
+
+<SiteShell
+  lang="en"
+  title={title}
+  description={description}
+  canonical="/education/"
+  headerNav={headerNav}
+  footerNav={footerNav}
+  settings={settings}
+>
+  <section class="bg-sand/60">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16">
+      <div class="max-w-3xl">
+        <p class="text-sm font-semibold uppercase text-canopy">Education expertise</p>
+        <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
+          Education is our deepest systems domain.
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-slate">
+          We understand schools and education organizations because we have worked inside the overlap of admissions, student records, reporting, safeguarding workflows, staff operations, LMS ecosystems, and privacy-aware data management.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16">
+      <div class="grid gap-5 md:grid-cols-2">
+        {areas.map((area) => {
+          const Icon = area.Icon
+          return (
+            <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+              <div class="flex items-start gap-4">
+                <span class="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-sky text-canopy">
+                  <Icon class="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <h2 class="text-lg font-semibold text-ink">{area.label}</h2>
+                  <p class="mt-2 text-sm leading-relaxed text-slate">{area.body}</p>
+                </div>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-sky/45">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr]">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">Why this matters</p>
+        <h2 class="mt-3 text-3xl font-semibold text-ink">Schools reveal the hardest parts of systems work.</h2>
+      </div>
+      <div class="space-y-5 text-base leading-relaxed text-slate">
+        <p>
+          Education data is personal, operational, time-sensitive, and distributed across many roles. A weak workflow can become a reporting issue, a privacy issue, or a student support issue.
+        </p>
+        <p>
+          That makes education a strong base for broader ERP and governance work: it forces attention to permissions, adoption, data quality, reporting, and practical controls.
+        </p>
+        <a href="/ifitwala-ed/" class="inline-flex items-center gap-2 text-sm font-semibold text-canopy hover:text-leaf">
+          See Ifitwala Ed
+          <ArrowRight class="h-4 w-4" aria-hidden="true" />
+        </a>
+      </div>
+    </div>
+  </section>
+</SiteShell>

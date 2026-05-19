@@ -250,9 +250,9 @@ def run_astro_build():
         run_yarn("--version")
         _run("node --version", cwd=proj_root, env=env)
 
-        # 2) Build via package.json script (runs 'astro build' and other steps)
+        # 2) Build via package.json script (runs marketing assets and Astro pages)
         try:
-            run_yarn("build:docs")
+            run_yarn("build")
         except Exception as build_error:
             error_text = str(build_error).lower()
             # Astro can fail when stale compile artifacts are present in dist/.astro.
@@ -272,7 +272,7 @@ def run_astro_build():
                 cwd="/",
                 env=env,
             )
-            run_yarn("build:docs")
+            run_yarn("build")
 
         # 3) Deploy built assets
         dist_root = os.path.join(proj_root, "dist")

@@ -1,6 +1,10 @@
-### Ifitwala Doc
+# Ifitwala Website and Documentation
 
-Site and Docs for IFitwala Ed
+Company website, product showcase, and documentation hub for Ifitwala.
+
+Ifitwala helps organizations grow better systems. We support ERP implementation, workflow improvement, and data governance for organizations that depend on accurate, sensitive, and operationally critical data.
+
+Our deepest expertise is in education: schools, education groups, LMS ecosystems, admissions, student records, reporting, safeguarding workflows, and privacy-aware data operations. Ifitwala Ed is our flagship education ERP, built from direct international-school experience.
 
 ### Installation
 

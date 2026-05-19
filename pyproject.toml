@@ -3,7 +3,7 @@ name = "ifitwala_doc"
 authors = [
     { name = "François de Ryckel", email = "f.deryckel@gmail.com"}
 ]
-description = "Site and Docs for IFitwala Ed"
+description = "Company website, product showcase, and documentation hub for Ifitwala"
 requires-python = ">=3.14,<3.15"
 readme = "README.md"
 dynamic = ["version"]

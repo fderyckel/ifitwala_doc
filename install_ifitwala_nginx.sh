@@ -46,8 +46,8 @@ location ^~ /features/ {
     try_files \$uri \$uri/ =404;
 }
 
-# ---- New root-level marketing pages (book-a-demo, pricing, etc.) ----
-location ~ ^/(book-a-demo|pricing|about) {
+# ---- Root-level marketing pages ----
+location ~ ^/(book-a-call|book-a-demo|pricing|about|services|data-governance|education|ifitwala-ed)(/|$) {
     root ${ASSETS_ROOT};
     try_files \$uri \$uri/index.html \$uri/ =404;
 }

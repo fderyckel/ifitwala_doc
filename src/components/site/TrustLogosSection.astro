@@ -12,7 +12,7 @@ interface Props {
   logos?: Logo[]
 }
 
-const { id, title = 'Trusted by schools worldwide', logos = [] }: Props = Astro.props
+const { id, title = 'Trusted by growing organizations', logos = [] }: Props = Astro.props
 const visible = logos
   .filter((logo) => typeof logo?.src === 'string' && logo.src.trim().length > 0)
   .sort((a, b) => {

@@ -232,15 +232,35 @@ export async function getPage(slug = '/', opts?: { includeDrafts?: boolean }): P
 }
 
 export async function getNav(location = 'Header'): Promise<NavItem[]> {
+  const fallbackNav = (): NavItem[] => {
+    if (location === 'Header') {
+      return [
+        { label: 'Services', href: '/services/', order: 10 },
+        { label: 'Ifitwala Ed', href: '/ifitwala-ed/', order: 20 },
+        { label: 'Data Governance', href: '/data-governance/', order: 30 },
+        { label: 'Docs', href: '/docs/', order: 40 },
+      ]
+    }
+    if (location === 'Footer') {
+      return [
+        { label: 'Services', href: '/services/', order: 10 },
+        { label: 'Education', href: '/education/', order: 20 },
+        { label: 'Ifitwala Ed', href: '/ifitwala-ed/', order: 30 },
+        { label: 'Docs', href: '/docs/', order: 40 },
+      ]
+    }
+    return []
+  }
+
   try {
     const qp = new URLSearchParams({ location })
     const url = normalizeUrl(`/api/method/ifitwala_doc.api.site.get_nav?${qp.toString()}`)
     const raw = await fetchJSON(url)
     const items = unwrap<NavItem[]>(raw)
-    return Array.isArray(items) ? items : []
+    return Array.isArray(items) && items.length ? items : fallbackNav()
   } catch (error) {
     warnOptionalFetchFailure(`nav:${location}`, error)
-    return []
+    return fallbackNav()
   }
 }
 

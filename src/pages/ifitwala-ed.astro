@@ -1,0 +1,126 @@
+---
+import { ArrowRight, ClipboardCheck, GraduationCap, LayoutDashboard, UsersRound } from '@lucide/astro'
+import SiteShell from '@/layouts/SiteShell.astro'
+import { getNav, getSiteSettings } from '@/lib/siteClient'
+
+export const prerender = true
+
+const [settings, headerNav, footerNav] = await Promise.all([
+  getSiteSettings(),
+  getNav('Header'),
+  getNav('Footer'),
+])
+
+const title = 'Ifitwala Ed | Flagship Education ERP'
+const description =
+  'Ifitwala Ed is the flagship education ERP from Ifitwala, built from direct international-school experience.'
+
+const capabilities = [
+  {
+    label: 'Student records',
+    body: 'Keep admissions, enrollment, student profiles, program data, and operational history connected.',
+    Icon: UsersRound,
+  },
+  {
+    label: 'Academic workflows',
+    body: 'Support attendance, assessment, gradebooks, reporting, and staff routines without duplicate data entry.',
+    Icon: ClipboardCheck,
+  },
+  {
+    label: 'Portals and communication',
+    body: 'Give staff, students, guardians, and leadership clearer access to the information they need.',
+    Icon: GraduationCap,
+  },
+  {
+    label: 'Operational reporting',
+    body: 'Build a more reliable base for leadership dashboards, exports, and day-to-day decision making.',
+    Icon: LayoutDashboard,
+  },
+]
+---
+
+<SiteShell
+  lang="en"
+  title={title}
+  description={description}
+  canonical="/ifitwala-ed/"
+  headerNav={headerNav}
+  footerNav={footerNav}
+  settings={settings}
+>
+  <section class="bg-sand/60">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.85fr)] lg:items-center">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">Flagship product</p>
+        <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
+          Ifitwala Ed is our education ERP.
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-slate">
+          Built from direct international-school experience, Ifitwala Ed helps schools create one source of truth across admissions, student records, academics, staff workflows, reporting, and communication.
+        </p>
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          It is also proof that we do not just advise on ERP and data governance - we build and operate the systems ourselves.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/book-a-demo/" class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]">
+            Book a demo
+            <ArrowRight class="h-4 w-4" aria-hidden="true" />
+          </a>
+          <a href="/docs/" class="inline-flex items-center gap-2 rounded-md border border-canopy/30 bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf">
+            Read the docs
+            <ArrowRight class="h-4 w-4" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-border bg-white p-6 shadow-soft">
+        <h2 class="text-lg font-semibold text-ink">Designed for school data reality</h2>
+        <p class="mt-3 text-sm leading-relaxed text-slate">
+          Students, guardians, staff, programs, attendance, assessment, finance, wellbeing notes, and reports all depend on clean structure and careful access.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16">
+      <div class="max-w-3xl">
+        <p class="text-sm font-semibold uppercase text-canopy">Capabilities</p>
+        <h2 class="mt-3 text-3xl font-semibold text-ink">A product shaped by daily school operations.</h2>
+      </div>
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        {capabilities.map((item) => {
+          const Icon = item.Icon
+          return (
+            <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+              <div class="flex items-start gap-4">
+                <span class="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-sky text-canopy">
+                  <Icon class="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 class="text-lg font-semibold text-ink">{item.label}</h3>
+                  <p class="mt-2 text-sm leading-relaxed text-slate">{item.body}</p>
+                </div>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-canopy text-white">
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-14 md:flex-row md:items-center md:justify-between">
+      <div class="max-w-2xl">
+        <h2 class="text-2xl font-semibold">Want to see Ifitwala Ed in context?</h2>
+        <p class="mt-3 text-sm leading-relaxed text-white/80">
+          Book a product demo focused on your school workflows, data, and reporting questions.
+        </p>
+      </div>
+      <a href="/book-a-demo/" class="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:bg-sand">
+        Book a demo
+        <ArrowRight class="h-4 w-4" aria-hidden="true" />
+      </a>
+    </div>
+  </section>
+</SiteShell>

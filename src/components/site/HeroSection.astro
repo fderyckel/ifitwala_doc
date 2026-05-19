@@ -17,7 +17,7 @@ interface Props {
 
 const {
   id,
-  title = 'A campus where curiosity blooms.',
+  title = 'Systems that help organizations grow.',
   subtitle = '',
   bgImage,
   align = 'left',
@@ -44,7 +44,7 @@ function actionClass(variant?: string) {
 
 <section
   id={id}
-  class="relative overflow-hidden rounded-[36px] border border-border/60 bg-gradient-to-br from-sky/70 via-white to-sand px-6 py-20 shadow-lg transition md:px-16"
+  class="relative overflow-hidden rounded-lg border border-border/60 bg-white px-6 py-20 shadow-soft transition md:px-16"
 >
   {hasBackground && (
     <div
@@ -53,15 +53,13 @@ function actionClass(variant?: string) {
       aria-hidden="true"
     ></div>
   )}
-  <div class="absolute inset-0 -z-10 bg-gradient-to-br from-white/80 via-white/60 to-moss/30"></div>
-  <div class="absolute -top-24 right-[-15%] h-72 w-72 rounded-full bg-moss/40 blur-3xl"></div>
-  <div class="absolute -bottom-32 left-[-10%] h-80 w-80 rounded-full bg-accent-500/20 blur-3xl"></div>
+  <div class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(18,86,58,0.08)_1px,transparent_1px),linear-gradient(0deg,rgba(71,85,105,0.08)_1px,transparent_1px)] bg-[size:42px_42px]"></div>
 
   <div class={`relative mx-auto flex max-w-3xl flex-col gap-7 ${alignClass}`}>
-    <p class="inline-flex w-min whitespace-nowrap rounded-full border border-leaf/50 bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-canopy shadow-sm backdrop-blur">
-      Growing schools
+    <p class="inline-flex w-min whitespace-nowrap rounded-md border border-leaf/50 bg-white/80 px-4 py-1 text-xs font-semibold uppercase text-canopy shadow-sm backdrop-blur">
+      Growing systems
     </p>
-    <h1 class="text-4xl font-semibold tracking-tight text-canopy md:text-5xl">
+    <h1 class="text-4xl font-semibold text-canopy md:text-5xl">
       {title}
     </h1>
     {subtitle && (
