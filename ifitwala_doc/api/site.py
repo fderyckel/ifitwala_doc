@@ -148,6 +148,7 @@ def _null_last_int_sort_key(value: Any) -> tuple[int, int]:
 
 def _hero_props(doc: Document) -> dict[str, Any]:
     return {
+        "eyebrow": getattr(doc, "eyebrow", None),
         "title": doc.heading,
         "subtitle": doc.subheading,
         "bgImage": doc.bg_image,

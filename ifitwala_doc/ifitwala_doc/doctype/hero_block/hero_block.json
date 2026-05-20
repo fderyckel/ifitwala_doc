@@ -6,6 +6,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "eyebrow",
   "heading",
   "subheading",
   "bg_image",
@@ -14,6 +15,11 @@
   "actions"
  ],
  "fields": [
+  {
+   "fieldname": "eyebrow",
+   "fieldtype": "Data",
+   "label": "Eyebrow"
+  },
   {
    "fieldname": "heading",
    "fieldtype": "Data",

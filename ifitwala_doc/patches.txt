@@ -6,3 +6,4 @@
 # Patches added in this section will be executed after doctypes are migrated
 ifitwala_doc.patches.v1_0.create_crm_email_templates
 ifitwala_doc.patches.v1_0.normalize_ifitwala_crm_desktop_icon
+ifitwala_doc.patches.v1_0.seed_admissions_pipeline_page

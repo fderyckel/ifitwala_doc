@@ -15,6 +15,7 @@ def _make_hero_block():
 	return frappe.get_doc(
 		{
 			"doctype": "Hero Block",
+			"eyebrow": "CMS Hero",
 			"heading": _unique("Hero"),
 			"subheading": "Smoke test hero",
 			"align": "left",
@@ -49,6 +50,7 @@ class TestIfitwalaWebPage(FrappeTestCase):
 		self.assertEqual(payload["name"], page.name)
 		self.assertEqual(payload["slug"], "/")
 		self.assertEqual(payload["sections"][0]["type"], "Hero")
+		self.assertEqual(payload["sections"][0]["props"]["eyebrow"], "CMS Hero")
 		self.assertEqual(payload["sections"][0]["block"]["doctype"], "Hero Block")
 		self.assertEqual(payload["sections"][0]["block"]["name"], hero.name)
 
