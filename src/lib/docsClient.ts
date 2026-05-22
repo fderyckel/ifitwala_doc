@@ -116,13 +116,11 @@ async function fetchJSON(url: string, attempt = 1): Promise<any> {
   const headers: Record<string, string> = {
     'User-Agent': 'ifitwala-docs/astro-build',
     'Accept': 'application/json',
+    'Cache-Control': 'no-cache, no-store',
+    'Pragma': 'no-cache',
   };
-  const targetUrl = attempt === 1 ? url : withCacheBust(url, `${Date.now()}_${attempt}`);
+  const targetUrl = withCacheBust(url, `${Date.now()}_${attempt}`);
   maybeAttachSiteHeader(targetUrl, headers);
-  if (attempt > 1) {
-    headers['Cache-Control'] = 'no-cache, no-store';
-    headers['Pragma'] = 'no-cache';
-  }
 
   let res: Response;
   try {

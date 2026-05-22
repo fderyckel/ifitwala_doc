@@ -17,6 +17,24 @@ frappe.ui.form.on('Documentation', {
 
     frm.add_custom_button('Rebuild Docs', async () => {
       try {
+        const hasUnsavedChanges = typeof frm.is_dirty === 'function'
+          ? frm.is_dirty()
+          : Boolean(frm.doc.__unsaved);
+
+        if (hasUnsavedChanges) {
+          frappe.show_alert({ message: 'Saving changes before rebuild...', indicator: 'blue' });
+          await frm.save();
+        }
+
+        if (frm.doc.status !== 'Published') {
+          frappe.msgprint({
+            title: 'Document is not published',
+            message: 'This document was saved, but static docs only include Published records. Use Preview for drafts, or publish the document before rebuilding.',
+            indicator: 'orange'
+          });
+          return;
+        }
+
         await frappe.call('ifitwala_doc.api.build.kick_build');
         frappe.show_alert({ message: 'Docs rebuild queued', indicator: 'green' });
       } catch (e) {
