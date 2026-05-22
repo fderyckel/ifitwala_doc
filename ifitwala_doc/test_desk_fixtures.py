@@ -27,5 +27,5 @@ def test_crm_workspace_sidebar_home_points_to_crm_workspace():
 	assert sidebar["name"] == "Ifitwala CRM"
 	assert sidebar["title"] == "Ifitwala CRM"
 	assert sidebar["items"][0]["label"] == "Home"
-	assert sidebar["items"][0]["link_type"] == "Workspace"
-	assert sidebar["items"][0]["link_to"] == "CRM"
+	assert sidebar["items"][0]["link_type"] == "URL"
+	assert sidebar["items"][0]["url"] == "/desk/crm"
