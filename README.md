@@ -32,13 +32,13 @@ Use `deploy_docs.sh` as the single command for file-based site deploys from `fra
 ./deploy_docs.sh
 ```
 
-This builds the Vue marketing bundle, builds Astro, and rsyncs `dist/` to `sites/assets/ifitwala_doc`.
+This builds the Vue marketing bundle, builds Astro, and rsyncs `dist/` to `sites/assets/ifitwala_doc`. Frappe serves the built pages through the `www/index.py` static-page bridge, so normal updates do not require custom Nginx edits.
 
 Use the Frappe Desk **Rebuild Docs** button on a `Documentation` record for normal documentation edits. That path saves/publishes content through Frappe, rebuilds the static docs, and deploys assets. It does not need to refresh Nginx.
 
 Editing an existing Astro page such as `src/pages/index.astro` only needs `./deploy_docs.sh`.
 
-Refresh Nginx only when route/static-serving configuration changes, such as adding a new top-level Astro page route that must be served directly by Nginx or editing `install_ifitwala_nginx.sh`:
+The Nginx installer is optional. Use it only if you deliberately want direct Nginx serving for selected static routes instead of the Frappe bridge:
 
 ```bash
 ./deploy_docs.sh --with-nginx

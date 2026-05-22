@@ -6,6 +6,8 @@ from tempfile import TemporaryDirectory
 from unittest import TestCase
 from unittest.mock import patch
 
+import frappe
+
 from ifitwala_doc.api import catch_all
 
 
@@ -54,6 +56,23 @@ class TestCatchAll(TestCase):
                 resolved = catch_all.resolve_loader_route("/")
 
         self.assertEqual(resolved, "index")
+
+    def test_resolve_loader_route_disables_frappe_page_cache_for_static_bridge(self):
+        previous_no_cache = getattr(frappe.local, "no_cache", None)
+        frappe.local.no_cache = False
+
+        try:
+            with TemporaryDirectory() as tmpdir:
+                assets_root = Path(tmpdir)
+                target = assets_root / "index.html"
+                target.write_text("<html>Home</html>", encoding="utf-8")
+
+                with patch("ifitwala_doc.api.catch_all._resolve_assets_root", return_value=assets_root):
+                    catch_all.resolve_loader_route("/")
+
+            self.assertTrue(frappe.local.no_cache)
+        finally:
+            frappe.local.no_cache = previous_no_cache
 
     def test_resolve_loader_route_ignores_missing_static_route(self):
         with TemporaryDirectory() as tmpdir:

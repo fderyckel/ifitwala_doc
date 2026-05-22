@@ -59,14 +59,15 @@ This dual‑architecture allows you to deliver zero‑JavaScript, SEO‑friendly
 
 1. **Documentation edits:** Use the `Documentation` DocType **Rebuild Docs** action for content changes. It rebuilds and deploys assets only; it should not refresh Nginx.
 2. **File-based site edits:** Run `./deploy_docs.sh` from the app root after changing Astro, Vue, CSS, or static site source files. Existing Astro page edits, including `src/pages/index.astro`, do not need Nginx refresh.
-3. **Nginx route changes:** Run `./deploy_docs.sh --with-nginx` only when static route serving changes, such as adding a new top-level Astro route that must be served directly by Nginx or editing `install_ifitwala_nginx.sh`.
-4. **Trigger:** A “Deploy Website” action in the Frappe Desk UI enqueues a build job (`api/build.py`).
-5. **Build Commands:**
+3. **Serving:** Built pages are served through Frappe’s normal routing via `ifitwala_doc/www/index.py`, which reads the generated HTML from `sites/assets/ifitwala_doc`. Custom Nginx static routes are optional and should not be required for normal updates.
+4. **Optional direct Nginx serving:** Run `./deploy_docs.sh --with-nginx` only when intentionally enabling or changing the optional Nginx static route snippet.
+5. **Trigger:** A “Deploy Website” action in the Frappe Desk UI enqueues a build job (`api/build.py`).
+6. **Build Commands:**
 
    * **Astro:** `yarn astro:build` generates static docs from `src/`.
    * **Vite:** `yarn build` compiles the Vue marketing bundle from `ifitwala_doc/src/`.
-6. **Deployment:** Artifacts from both builds are rsynced to `frappe-bench/sites/assets/ifitwala_doc/` for Nginx to serve.
-7. **Cleanup:** Build scripts remove any stale `dist/` and `.astro/` folders before building to avoid conflicts.
+7. **Deployment:** Artifacts from both builds are rsynced to `frappe-bench/sites/assets/ifitwala_doc/`.
+8. **Cleanup:** Build scripts remove any stale `dist/` and `.astro/` folders before building to avoid conflicts.
 
 ---
 

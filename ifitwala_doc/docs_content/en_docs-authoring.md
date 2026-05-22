@@ -92,4 +92,6 @@ This rebuild path deploys the generated static assets. It does not need to refre
 
 Use `./deploy_docs.sh` from the app root after changing file-based Astro, Vue, CSS, or other site source files. Editing an existing Astro page, including `src/pages/index.astro`, only needs this deploy command.
 
-Use `./deploy_docs.sh --with-nginx` only when static route serving changes, such as adding a new top-level Astro page that must be served directly by Nginx or editing `install_ifitwala_nginx.sh`.
+Built pages are served through Frappe's normal routing via `ifitwala_doc/www/index.py`, which reads the generated HTML from `sites/assets/ifitwala_doc`. Custom Nginx static routes are optional.
+
+Use `./deploy_docs.sh --with-nginx` only when intentionally enabling or changing the optional Nginx static route snippet.

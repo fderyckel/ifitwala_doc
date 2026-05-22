@@ -5,6 +5,7 @@ set -Eeuo pipefail
 BENCH_ROOT="${BENCH_ROOT:-$HOME/frappe-bench}"
 ASSETS_ROOT="${ASSETS_ROOT:-$BENCH_ROOT/sites/assets/ifitwala_doc}"
 OUT_CONF="${OUT_CONF:-/etc/nginx/conf.d/ifitwala_doc_static.inc}"
+STRICT_INCLUDE="${STRICT_INCLUDE:-0}"
 
 echo "==> Installing Ifitwala Doc nginx configuration"
 echo "   BENCH_ROOT  : $BENCH_ROOT"
@@ -71,11 +72,22 @@ sudo systemctl reload nginx
 echo
 echo "✅ Nginx static routes file created at: $OUT_CONF"
 echo
-echo "⚠️  IMPORTANT STEP REQUIRED ⚠️"
-echo "To enable these routes, you must EDIT your main Nginx configuration"
-echo "(usually /etc/nginx/conf.d/frappe-bench.conf) and add this line"
-echo "inside the 'server {' block for your site:"
-echo
-echo "    include $OUT_CONF;"
-echo
-echo "Then reload nginx: sudo service nginx reload"
+if sudo nginx -T 2>/dev/null | grep -Fq "include $OUT_CONF;"; then
+  echo "✅ Nginx include is active:"
+  echo "   include $OUT_CONF;"
+else
+  echo "⚠️  IMPORTANT STEP REQUIRED ⚠️"
+  echo "The route file exists, but Nginx is not using it yet."
+  echo "Edit your main site server block, usually /etc/nginx/conf.d/frappe-bench.conf,"
+  echo "and add this line inside the 'server {' block for ifitwala.com:"
+  echo
+  echo "    include $OUT_CONF;"
+  echo
+  echo "Then run:"
+  echo
+  echo "    sudo nginx -t && sudo systemctl reload nginx"
+  echo
+  if [[ "$STRICT_INCLUDE" == "1" ]]; then
+    exit 1
+  fi
+fi

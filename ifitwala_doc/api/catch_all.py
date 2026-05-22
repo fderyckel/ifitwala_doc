@@ -76,6 +76,8 @@ def _find_static_target(path: str | None, assets_root: Path | None = None) -> Pa
 def resolve_loader_route(path: str | None) -> str | None:
     normalized = _normalize_path(path)
     if _find_static_target(normalized) is not None:
+        # Avoid serving stale Frappe page-cache entries before index.py can read dist/.
+        frappe.local.no_cache = True
         return "index"
 
     # Frappe skips its default route resolution entirely when a custom

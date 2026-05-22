@@ -120,6 +120,7 @@ if [[ "$should_install_nginx" == "1" ]]; then
   BENCH_ROOT="$BENCH_ROOT" \
     ASSETS_ROOT="$DEST_ROOT" \
     OUT_CONF="$OUT_CONF" \
+    STRICT_INCLUDE=1 \
     "$APP_ROOT/install_ifitwala_nginx.sh"
 else
   echo "==> Nginx static routes unchanged."
