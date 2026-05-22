@@ -75,7 +75,7 @@ def _find_static_target(path: str | None, assets_root: Path | None = None) -> Pa
 
 def resolve_loader_route(path: str | None) -> str | None:
     normalized = _normalize_path(path)
-    if normalized != "/" and _find_static_target(normalized) is not None:
+    if _find_static_target(normalized) is not None:
         return "index"
 
     # Frappe skips its default route resolution entirely when a custom

@@ -40,6 +40,12 @@ location /docs/ {
     try_files \$uri \$uri/index.html \$uri/ /docs/index.html;
 }
 
+# ---- Astro homepage ----
+location = / {
+    root ${ASSETS_ROOT};
+    try_files /index.html =404;
+}
+
 # ---- Static marketing 'features' pages ----
 location ^~ /features/ {
     alias ${ASSETS_ROOT}/features/;

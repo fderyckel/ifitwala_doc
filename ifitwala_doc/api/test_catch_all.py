@@ -44,6 +44,17 @@ class TestCatchAll(TestCase):
 
         self.assertEqual(resolved, "index")
 
+    def test_resolve_loader_route_returns_index_for_built_homepage(self):
+        with TemporaryDirectory() as tmpdir:
+            assets_root = Path(tmpdir)
+            target = assets_root / "index.html"
+            target.write_text("<html>Home</html>", encoding="utf-8")
+
+            with patch("ifitwala_doc.api.catch_all._resolve_assets_root", return_value=assets_root):
+                resolved = catch_all.resolve_loader_route("/")
+
+        self.assertEqual(resolved, "index")
+
     def test_resolve_loader_route_ignores_missing_static_route(self):
         with TemporaryDirectory() as tmpdir:
             assets_root = Path(tmpdir)
