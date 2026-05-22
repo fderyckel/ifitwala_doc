@@ -62,6 +62,30 @@ class TestDocumentation(FrappeTestCase):
 		self.assertTrue(doc.published_on)
 		self.assertEqual(doc.last_edited_by, "Administrator")
 
+	def test_body_md_preserves_custom_authoring_blocks(self):
+		body_md = """# Inquiry
+
+<Callout type="info" title="Why Ifitwala Ed is different">
+Inquiry treats first contact as a real operational workflow, not just a form submission.
+</Callout>
+"""
+
+		with patch("frappe.enqueue"):
+			doc = frappe.get_doc(
+				{
+					"doctype": "Documentation",
+					"title": _unique("Authoring Blocks"),
+					"language": "en",
+					"status": "Published",
+					"body_md": body_md,
+					"author": "CI",
+				}
+			).insert()
+
+		saved_body = frappe.db.get_value("Documentation", doc.name, "body_md")
+		self.assertIn('<Callout type="info" title="Why Ifitwala Ed is different">', saved_body)
+		self.assertIn("</Callout>", saved_body)
+
 	def test_rejects_mismatched_subcategory(self):
 		category = _make_category(_unique("Docs Parent"))
 		other_category = _make_category(_unique("Wrong Parent"))

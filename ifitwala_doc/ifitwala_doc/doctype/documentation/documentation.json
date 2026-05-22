@@ -81,6 +81,7 @@
     {
       "fieldname": "body_md",
       "fieldtype": "Long Text",
+      "ignore_xss_filter": 1,
       "label": "Body MD"
     },
     {
