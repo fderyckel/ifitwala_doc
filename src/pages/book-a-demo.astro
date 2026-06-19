@@ -3,6 +3,7 @@ import { CheckCircle2 } from '@lucide/astro'
 import SiteShell from '@/layouts/SiteShell.astro'
 import LeadForm from '@/components/LeadForm.vue'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
+import { SEO_KEYWORDS, absoluteSiteUrl } from '@/lib/seo'
 
 export const prerender = true
 
@@ -12,9 +13,19 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'Book an Ifitwala Ed Demo | Ifitwala'
+const title = 'Book an Ifitwala Ed Education ERP Demo'
 const description =
-  'Schedule a product demo of Ifitwala Ed, the flagship education ERP from Ifitwala.'
+  'Schedule a product demo of Ifitwala Ed, the education ERP for admissions, student records, portals, workflows, reporting, and school data governance.'
+
+const structuredData = [
+  {
+    '@type': 'ContactPage',
+    '@id': `${absoluteSiteUrl('/en/book-a-demo/')}#contact`,
+    name: title,
+    url: absoluteSiteUrl('/en/book-a-demo/'),
+    description,
+  },
+]
 
 const demoTopics = [
   'Admissions and student records',
@@ -32,6 +43,9 @@ const demoTopics = [
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <section class="bg-sand/60">
     <div class="mx-auto grid w-full max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,1.05fr)] lg:items-start">

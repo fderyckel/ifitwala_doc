@@ -1,8 +1,16 @@
 ---
-import { ArrowRight, Database, GraduationCap, Route, ShieldCheck } from '@lucide/astro'
+import {
+  ArrowRight,
+  ClipboardList,
+  Database,
+  FileSearch,
+  Route,
+  ShieldCheck,
+} from '@lucide/astro'
 import SiteShell from '@/layouts/SiteShell.astro'
 import SystemsMap from '@/components/site/SystemsMap.astro'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
+import { SEO_KEYWORDS, serviceSchema } from '@/lib/seo'
 
 export const prerender = true
 
@@ -12,32 +20,47 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'Ifitwala | Systems that help organizations grow'
+const title = 'ERP Implementation for Schools and SMEs | Ifitwala'
 const description =
-  'Ifitwala helps organizations implement ERP systems, improve workflows, and strengthen data governance, with deep expertise in education.'
+  'Practical ERP implementation for SMEs and schools using Frappe, ERPNext, Odoo, workflow mapping, reporting, permissions, and data governance.'
+
+const structuredData = [
+  serviceSchema({
+    name: 'ERP implementation and data governance for schools and SMEs',
+    description,
+    url: '/en/',
+    serviceType: 'SME ERP implementation, school ERP implementation, ERP discovery sprint, Frappe consulting, ERPNext consulting, Odoo implementation, data exposure audit',
+  }),
+]
 
 const services = [
+  {
+    label: 'ERP Discovery Sprint',
+    href: '/services/#erp-discovery-sprint',
+    Icon: ClipboardList,
+    body:
+      'Map processes, identify risks, compare platform options, and leave with a realistic implementation roadmap before committing to a larger ERP project.',
+  },
   {
     label: 'ERP Implementation',
     href: '/services/erp-implementation/',
     Icon: Database,
     body:
-      'Workflow mapping, ERP configuration, migration planning, roles, permissions, UAT, reporting, and go-live support.',
+      'Deploy ERPNext, Frappe, or Odoo around the workflows that matter first: admissions, finance, operations, reporting, roles, and adoption.',
   },
   {
-    label: 'Data Governance',
+    label: 'Data Exposure Audit',
     href: '/data-governance/',
-    Icon: ShieldCheck,
+    Icon: FileSearch,
     body:
-      'Practical reviews of where data lives, who can access it, how it moves, and which controls should come next.',
+      'Review permissions, exports, reporting access, ownership, and data handling practices so sensitive operational data is easier to control.',
   },
-  {
-    label: 'Education Systems',
-    href: '/education/',
-    Icon: GraduationCap,
-    body:
-      'ERP, SIS, LMS, admissions, reporting, safeguarding workflows, and privacy-aware school data operations.',
-  },
+]
+
+const audienceSignals = [
+  'School operations, admissions, and reporting',
+  'ERPNext, Frappe, and practical Odoo support',
+  'Role-based access and GDPR-aware controls',
 ]
 ---
 
@@ -49,32 +72,49 @@ const services = [
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <section class="bg-sand/60">
     <div class="mx-auto grid w-full max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center lg:py-24">
       <div class="max-w-3xl">
-        <p class="text-sm font-semibold uppercase text-canopy">Growth through better systems</p>
-        <h1 class="mt-5 text-4xl font-semibold leading-tight text-ink md:text-5xl">
-          Systems that help organizations grow.
-        </h1>
-        <p class="mt-6 text-lg leading-relaxed text-slate md:text-xl">
-          Ifitwala helps teams implement ERP systems, improve workflows, and govern sensitive operational data. Our deepest expertise is in education, where complex people data, compliance, reporting, and daily operations meet.
+        <p class="text-sm font-semibold uppercase text-canopy">
+          School ERP, implementation clarity, and operational control
         </p>
+
+        <h1 class="mt-5 text-4xl font-semibold leading-tight text-ink md:text-5xl">
+          Practical ERP implementation for schools and organizations handling sensitive data.
+        </h1>
+
+        <p class="mt-6 text-lg leading-relaxed text-slate md:text-xl">
+          We help teams replace spreadsheets and disconnected systems with ERPNext or Odoo, while improving reporting, permissions, and operational control.
+        </p>
+
         <div class="mt-8 flex flex-wrap gap-3">
           <a
-            href="/services/"
+            href="/book-a-call/"
             class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/60"
           >
-            Explore our services
+            Book a 15-minute fit call
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
+
           <a
-            href="/ifitwala-ed/"
+            href="#erp-discovery-sprint"
             class="inline-flex items-center gap-2 rounded-md border border-canopy/30 bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/60"
           >
-            See Ifitwala Ed
+            Explore the discovery sprint
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
+        </div>
+
+        <div class="mt-8 grid gap-3 text-sm leading-relaxed text-slate sm:grid-cols-3">
+          {audienceSignals.map((signal) => (
+            <div class="rounded-md border border-border bg-white/75 p-3 shadow-sm">
+              {signal}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -82,13 +122,19 @@ const services = [
     </div>
   </section>
 
-  <section class="bg-white">
+  <section id="erp-discovery-sprint" class="bg-white scroll-mt-24">
     <div class="mx-auto w-full max-w-6xl px-6 py-16">
       <div class="max-w-3xl">
-        <p class="text-sm font-semibold uppercase text-canopy">What we do</p>
-        <h2 class="mt-3 text-3xl font-semibold text-ink">ERP, workflows, and trustworthy data.</h2>
+        <p class="text-sm font-semibold uppercase text-canopy">
+          Start with the wedge
+        </p>
+
+        <h2 class="mt-3 text-3xl font-semibold text-ink">
+          Clarity before implementation.
+        </h2>
+
         <p class="mt-4 text-base leading-relaxed text-slate">
-          We work where operations, systems, and sensitive data overlap. Platforms matter, but the real work is helping people move from scattered processes to reliable ways of working.
+          Buyers rarely start by asking for GDPR or a full ERP rollout. They start with admissions chaos, unreliable reports, duplicated data, unclear ownership, and too many spreadsheets. The first offer should make the problem legible.
         </p>
       </div>
 
@@ -100,9 +146,19 @@ const services = [
               <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky text-canopy">
                 <Icon class="h-5 w-5" aria-hidden="true" />
               </div>
-              <h3 class="mt-5 text-lg font-semibold text-ink">{item.label}</h3>
-              <p class="mt-3 text-sm leading-relaxed text-slate">{item.body}</p>
-              <a href={item.href} class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-canopy hover:text-leaf">
+
+              <h3 class="mt-5 text-lg font-semibold text-ink">
+                {item.label}
+              </h3>
+
+              <p class="mt-3 text-sm leading-relaxed text-slate">
+                {item.body}
+              </p>
+
+              <a
+                href={item.href}
+                class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-canopy hover:text-leaf"
+              >
                 Learn more
                 <ArrowRight class="h-4 w-4" aria-hidden="true" />
               </a>
@@ -116,15 +172,26 @@ const services = [
   <section class="bg-sky/45">
     <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
       <div>
-        <p class="text-sm font-semibold uppercase text-canopy">Deepest domain</p>
-        <h2 class="mt-3 text-3xl font-semibold text-ink">Education is where our systems thinking was forged.</h2>
+        <p class="text-sm font-semibold uppercase text-canopy">
+          Strongest unfair advantage
+        </p>
+
+        <h2 class="mt-3 text-3xl font-semibold text-ink">
+          Start with school operations, then expand where the fit is clear.
+        </h2>
       </div>
+
       <div class="space-y-5 text-base leading-relaxed text-slate">
         <p>
-          Schools and education groups carry dense operational data: applicants, students, guardians, staff, attendance, assessment, finance, learning platforms, wellbeing notes, and leadership reporting.
+          Schools and education groups carry dense operational data: applicants, students, guardians, staff, admissions, attendance, assessment, finance, learning platforms, wellbeing records, and leadership reporting.
         </p>
+
         <p>
-          That experience makes Ifitwala practical about permissions, privacy, workflow adoption, data quality, and reporting. It also gives us a strong base for organizations outside education that face similar people-process-data complexity.
+          That environment demands more than software configuration. It requires clean workflows, reliable records, role-based access, reporting controls, and privacy-aware processes that staff can actually follow.
+        </p>
+
+        <p>
+          That is the wedge: Ifitwala can speak the language of school leadership, admissions, operations, and data ownership in a way generic ERP implementers usually cannot.
         </p>
       </div>
     </div>
@@ -133,11 +200,18 @@ const services = [
   <section class="bg-white">
     <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-2 lg:items-center">
       <div>
-        <p class="text-sm font-semibold uppercase text-canopy">Flagship product</p>
-        <h2 class="mt-3 text-3xl font-semibold text-ink">Ifitwala Ed proves the work.</h2>
-        <p class="mt-4 text-base leading-relaxed text-slate">
-          Ifitwala Ed is our flagship education ERP, built from direct international-school experience. It is also proof that we do not just advise on ERP and data governance - we build and operate the systems ourselves.
+        <p class="text-sm font-semibold uppercase text-canopy">
+          Flagship product
         </p>
+
+        <h2 class="mt-3 text-3xl font-semibold text-ink">
+          Ifitwala Ed keeps the positioning grounded.
+        </h2>
+
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          Ifitwala Ed is our education ERP, built from direct international-school experience. It gives the service business practical credibility without forcing Ifitwala to compete as just another Odoo partner.
+        </p>
+
         <div class="mt-7 flex flex-wrap gap-3">
           <a
             href="/ifitwala-ed/"
@@ -146,6 +220,7 @@ const services = [
             Explore Ifitwala Ed
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
+
           <a
             href="/book-a-demo/"
             class="inline-flex items-center gap-2 rounded-md border border-canopy/30 px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf"
@@ -161,13 +236,17 @@ const services = [
           <span class="flex h-11 w-11 items-center justify-center rounded-md bg-white text-canopy shadow-sm">
             <Route class="h-5 w-5" aria-hidden="true" />
           </span>
-          <h3 class="text-lg font-semibold text-ink">From school reality to system design</h3>
+
+          <h3 class="text-lg font-semibold text-ink">
+            From school reality to ERP design
+          </h3>
         </div>
+
         <ul class="mt-6 grid gap-3 text-sm leading-relaxed text-slate sm:grid-cols-2">
-          <li class="rounded-md bg-white p-4">Admissions and student records</li>
-          <li class="rounded-md bg-white p-4">Staff workflows and permissions</li>
-          <li class="rounded-md bg-white p-4">Parent, student, and staff portals</li>
-          <li class="rounded-md bg-white p-4">Reporting and data quality</li>
+          <li class="rounded-md bg-white p-4">Admissions and enrolment workflows</li>
+          <li class="rounded-md bg-white p-4">Student, guardian, and staff records</li>
+          <li class="rounded-md bg-white p-4">Role-based access and permissions</li>
+          <li class="rounded-md bg-white p-4">Reporting, data quality, and governance</li>
         </ul>
       </div>
     </div>
@@ -176,16 +255,20 @@ const services = [
   <section class="bg-canopy text-white">
     <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-14 md:flex-row md:items-center md:justify-between">
       <div class="max-w-2xl">
-        <h2 class="text-2xl font-semibold">Need clearer systems before the next stage of growth?</h2>
+        <h2 class="text-2xl font-semibold">
+          Not sure whether this is an ERP, data, or workflow problem?
+        </h2>
+
         <p class="mt-3 text-sm leading-relaxed text-white/80">
-          Bring the messy workflow, scattered data, or uncertain ERP question. We will help you find the next practical step.
+          Bring the messy workflow, scattered data, uncertain platform decision, or stalled implementation. The first call is about finding the smallest credible next step.
         </p>
       </div>
+
       <a
         href="/book-a-call/"
         class="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:bg-sand"
       >
-        Book a call
+        Book a 15-minute fit call
         <ArrowRight class="h-4 w-4" aria-hidden="true" />
       </a>
     </div>

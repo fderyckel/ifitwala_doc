@@ -3,6 +3,7 @@ import { CheckCircle2 } from '@lucide/astro'
 import SiteShell from '@/layouts/SiteShell.astro'
 import LeadForm from '@/components/LeadForm.vue'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
+import { SEO_KEYWORDS, absoluteSiteUrl } from '@/lib/seo'
 
 export const prerender = true
 
@@ -12,15 +13,25 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'Book a Call | Ifitwala'
+const title = 'Book an ERP Implementation Call | Ifitwala'
 const description =
-  'Book a call with Ifitwala to discuss ERP implementation, workflow improvement, data governance, education systems, or Ifitwala Ed.'
+  'Book a 15-minute fit call with Ifitwala to discuss school ERP, ERP discovery, ERPNext, Odoo, workflow improvement, or data exposure risks.'
+
+const structuredData = [
+  {
+    '@type': 'ContactPage',
+    '@id': `${absoluteSiteUrl('/en/book-a-call/')}#contact`,
+    name: title,
+    url: absoluteSiteUrl('/en/book-a-call/'),
+    description,
+  },
+]
 
 const topics = [
-  'ERP implementation or cleanup',
-  'Workflow and reporting problems',
-  'Data governance and privacy-readiness',
-  'Education systems or Ifitwala Ed',
+  'Admissions, operations, or reporting spread across spreadsheets',
+  'ERP discovery before a larger implementation commitment',
+  'ERPNext, Frappe, or Odoo implementation questions',
+  'Sensitive data access, exports, and reporting risks',
 ]
 ---
 
@@ -32,16 +43,19 @@ const topics = [
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <section class="bg-sand/60">
     <div class="mx-auto grid w-full max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,1.05fr)] lg:items-start">
       <div>
-        <p class="text-sm font-semibold uppercase text-canopy">Book a call</p>
+        <p class="text-sm font-semibold uppercase text-canopy">Book a fit call</p>
         <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
-          Bring the messy systems question.
+          Bring the messy systems question. Leave with a clearer next step.
         </h1>
         <p class="mt-6 text-lg leading-relaxed text-slate">
-          Use this call for ERP implementation, workflow clarity, data governance, privacy-readiness, education systems, or an early conversation about Ifitwala Ed.
+          Use this 15-minute call to decide whether the next move is discovery, ERP implementation, a data exposure audit, or simply a better way to frame the problem.
         </p>
         <ul class="mt-8 grid gap-3">
           {topics.map((topic) => (
@@ -56,10 +70,11 @@ const topics = [
       <LeadForm
         client:load
         mode="company"
+        variant="compact"
         source="Website - Book a Call"
-        title="Book a Call"
-        subtitle="Tell us what system, workflow, or data problem you want to discuss."
-        submitLabel="Send Inquiry"
+        title="Book a 15-minute fit call"
+        subtitle="Three fields, two selectors, then we can decide whether there is a fit."
+        submitLabel="Request fit call"
       />
     </div>
   </section>

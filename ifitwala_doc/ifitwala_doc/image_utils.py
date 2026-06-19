@@ -3,15 +3,17 @@
 
 import os
 import re
+
 import frappe
 from frappe import _
 from PIL import Image
+
 
 # ────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ────────────────────────────────────────────────────────────────────────────
 def slugify(text):
-    """lowercase, replace non‑alphanums with '_', strip extra."""
+    """lowercase, replace non-alphanums with '_', strip extra."""
     return re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")
 
 
@@ -26,7 +28,7 @@ def resize_and_save(
     width,
     quality=75,
 ):
-    """Create a single WebP variant if it doesn’t already exist."""
+    """Create a single WebP variant if it doesn't already exist."""
     slug_base = slugify(base_filename)
     resized_filename = f"{size_label}_{slug_base}.webp"
     resized_rel = f"files/gallery_resized/{doctype_folder}/{resized_filename}"
@@ -44,7 +46,7 @@ def resize_and_save(
             os.makedirs(os.path.dirname(resized_path), exist_ok=True)
             img.save(resized_path, "WEBP", optimize=True, quality=quality)
     except Exception as e:
-        frappe.log_error(f"Error resizing image: {e}", "File Auto‑Resize")
+        frappe.log_error(f"Error resizing image: {e}", "File Auto-Resize")
         return
 
     # ── Register new File row if not present ───────────────────────────────
@@ -93,7 +95,7 @@ def resize_and_save(
                 }
             ).insert(ignore_permissions=True)
     except Exception as e:
-        frappe.log_error(f"Error registering resized image: {e}", "File Auto‑Resize")
+        frappe.log_error(f"Error registering resized image: {e}", "File Auto-Resize")
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -109,11 +111,19 @@ def handle_file_after_insert(doc, method=None):
     if not (doc.file_url and doc.attached_to_doctype):
         return
 
-    allowed_doctypes = ["Employee", "Student", "School", "Course", "Program", "Blog Post"]
+    allowed_doctypes = [
+        "Employee",
+        "Student",
+        "School",
+        "Course",
+        "Program",
+        "Blog Post",
+        "Ifitwala Story",
+    ]
     if doc.attached_to_doctype not in allowed_doctypes:
         return
 
-    # Ignore already‑generated variants
+    # Ignore already-generated variants
     filename = os.path.basename(doc.file_url)
     if filename.startswith(("hero_", "medium_", "card_", "thumb_")):
         return
@@ -137,7 +147,7 @@ def handle_file_after_insert(doc, method=None):
 
 
 def handle_file_on_update(doc, method=None):
-    """Hook: same logic for updates (but Student may still be mid‑rename)."""
+    """Hook: same logic for updates (but Student may still be mid-rename)."""
     handle_file_after_insert(doc, method)
 
 
@@ -186,7 +196,7 @@ def process_single_file(file_doc):
     if not file_doc.file_url:
         return
 
-    # skip generated variants & non‑images
+    # skip generated variants & non-images
     filename = os.path.basename(file_doc.file_url)
     if filename.startswith(("hero_", "medium_", "card_", "thumb_")):
         return

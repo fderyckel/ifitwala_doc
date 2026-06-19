@@ -1,0 +1,161 @@
+{
+ "app": "ifitwala_doc",
+ "charts": [],
+ "content": "[{\"id\":\"crm-header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Ifitwala CRM</span>\",\"col\":12}},{\"id\":\"crm-shortcut-leads\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Leads\",\"col\":3}},{\"id\":\"crm-shortcut-todos\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Follow-Up Tasks\",\"col\":3}},{\"id\":\"crm-shortcut-email-templates\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Email Templates\",\"col\":3}},{\"id\":\"crm-shortcut-settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"CRM Settings\",\"col\":3}},{\"id\":\"crm-spacer\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"crm-queue-header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Daily Lead Queue</span>\",\"col\":12}},{\"id\":\"crm-shortcut-overdue-leads\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Overdue Leads\",\"col\":4}},{\"id\":\"crm-shortcut-due-today-leads\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Due Today Leads\",\"col\":4}},{\"id\":\"crm-shortcut-unassigned-leads\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Unassigned Leads\",\"col\":4}},{\"id\":\"crm-spacer-2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"crm-card-lead-management\",\"type\":\"card\",\"data\":{\"card_name\":\"Lead Management\",\"col\":3}},{\"id\":\"crm-card-follow-up\",\"type\":\"card\",\"data\":{\"card_name\":\"Follow-Up\",\"col\":3}},{\"id\":\"crm-card-outreach\",\"type\":\"card\",\"data\":{\"card_name\":\"Outreach\",\"col\":3}},{\"id\":\"crm-card-configuration\",\"type\":\"card\",\"data\":{\"card_name\":\"Configuration\",\"col\":3}}]",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "users",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Ifitwala CRM",
+ "links": [
+ {
+  "hidden": 0,
+  "is_query_report": 0,
+  "label": "Lead Management",
+  "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Lead",
+   "link_count": 0,
+   "link_to": "Lead",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Follow-Up",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "ToDo",
+   "link_count": 0,
+   "link_to": "ToDo",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Outreach",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Email Template",
+   "link_count": 0,
+   "link_to": "Email Template",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Configuration",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ifitwala CRM Settings",
+   "link_count": 0,
+   "link_to": "Ifitwala CRM Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "module": "CRM",
+ "name": "CRM",
+ "number_cards": [],
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "sequence_id": 1.0,
+ "shortcuts": [
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Leads",
+   "link_to": "Lead",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "label": "Overdue Leads",
+   "link_to": "Lead",
+   "stats_filter": "[[\"Lead\",\"follow_up_status\",\"=\",\"Overdue\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Due Today Leads",
+   "link_to": "Lead",
+   "stats_filter": "[[\"Lead\",\"follow_up_status\",\"=\",\"Due Today\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "doc_view": "List",
+   "label": "Unassigned Leads",
+   "link_to": "Lead",
+   "stats_filter": "[[\"Lead\",\"lead_owner\",\"is\",\"not set\",false],[\"Lead\",\"status\",\"not in\",[\"Converted\",\"Lost\"],false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Follow-Up Tasks",
+   "link_to": "ToDo",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Email Templates",
+   "link_to": "Email Template",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "CRM Settings",
+   "link_to": "Ifitwala CRM Settings",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Ifitwala CRM",
+ "type": "Workspace"
+}

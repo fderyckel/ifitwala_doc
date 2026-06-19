@@ -9,6 +9,8 @@
   --sky: #E6F3F9;
   --sand: #F4EFE7;
   --border: #E2E8F0;
+  --panel: #EEF2F6;
+  --paper: #FFFCF8;
   --ink-rgb: 15 23 42;
   --slate-rgb: 71 85 105;
   --canopy-rgb: 18 86 58;
@@ -17,10 +19,13 @@
   --sky-rgb: 230 243 249;
   --sand-rgb: 244 239 231;
   --border-rgb: 226 232 240;
+  --panel-rgb: 238 242 246;
+  --paper-rgb: 255 252 248;
   
   /* Additional tokens mapped to CSS vars */
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
   --shadow-soft: 0 6px 20px rgba(15, 23, 42, 0.06);
   --shadow-strong: 0 12px 32px rgba(15, 23, 42, 0.1);
+  --focus-ring: 0 0 0 3px rgba(47, 133, 90, 0.35);
 }

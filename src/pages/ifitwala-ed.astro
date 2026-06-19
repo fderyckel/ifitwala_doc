@@ -1,7 +1,19 @@
 ---
-import { ArrowRight, ClipboardCheck, GraduationCap, LayoutDashboard, UsersRound } from '@lucide/astro'
+import {
+  ArrowRight,
+  CheckCircle2,
+  ClipboardCheck,
+  Database,
+  FileSearch,
+  GraduationCap,
+  LayoutDashboard,
+  ShieldCheck,
+  UsersRound,
+} from '@lucide/astro'
 import SiteShell from '@/layouts/SiteShell.astro'
+import FeatureHighlightsSection from '@/components/site/FeatureHighlightsSection.astro'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
+import { SEO_KEYWORDS, softwareApplicationSchema } from '@/lib/seo'
 
 export const prerender = true
 
@@ -11,31 +23,97 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'Ifitwala Ed | Flagship Education ERP'
+const title = 'Ifitwala Ed | Education ERP for School Operations'
 const description =
-  'Ifitwala Ed is the flagship education ERP from Ifitwala, built from direct international-school experience.'
+  'Ifitwala Ed is an education ERP for school operations, admissions, student records, portals, workflows, reporting, and governed school data.'
 
-const capabilities = [
+const structuredData = [
+  softwareApplicationSchema({
+    name: 'Ifitwala Ed',
+    description,
+    url: '/en/ifitwala-ed/',
+    keywords: [...SEO_KEYWORDS, 'education ERP', 'school ERP', 'student records', 'admissions management'],
+  }),
+]
+
+const featureItems = [
   {
-    label: 'Student records',
-    body: 'Keep admissions, enrollment, student profiles, program data, and operational history connected.',
-    Icon: UsersRound,
+    order: 1,
+    icon: 'clipboard-check',
+    label: 'Admissions and enrolment',
+    description:
+      'Manage enquiries, applications, document checklists, reviews, visits, offers, deposits, and handover into the student record.',
   },
   {
+    order: 2,
+    icon: 'users-round',
+    label: 'Student and family records',
+    description:
+      'Keep student profiles, guardians, programmes, documents, operational history, and key relationships connected in one place.',
+  },
+  {
+    order: 3,
+    icon: 'graduation-cap',
     label: 'Academic workflows',
-    body: 'Support attendance, assessment, gradebooks, reporting, and staff routines without duplicate data entry.',
+    description:
+      'Support attendance, assessment, gradebooks, reporting routines, and staff follow-up without pushing teams back into duplicate entry.',
+  },
+  {
+    order: 4,
+    icon: 'layout-dashboard',
+    label: 'Leadership visibility',
+    description:
+      'Give leaders clearer visibility into admissions movement, incomplete records, overdue actions, reporting needs, and operational bottlenecks.',
+  },
+  {
+    order: 5,
+    icon: 'shield-check',
+    label: 'Governed access',
+    description:
+      'Structure sensitive student, guardian, staff, wellbeing, and operational data around roles, permissions, auditability, and practical controls.',
+  },
+  {
+    order: 6,
+    icon: 'database',
+    label: 'Unified operational core',
+    description:
+      'Reduce fragmented spreadsheets, disconnected tools, manual chasing, and fragile data handoffs across daily school operations.',
+  },
+]
+
+const startPoints = [
+  {
+    label: 'Capture every enquiry',
+    body:
+      'Give admissions teams one place to track source, status, owner, next action, family context, and follow-up history.',
     Icon: ClipboardCheck,
   },
   {
-    label: 'Portals and communication',
-    body: 'Give staff, students, guardians, and leadership clearer access to the information they need.',
-    Icon: GraduationCap,
+    label: 'Move applications forward',
+    body:
+      'Use checklists, document collection, review steps, and clear ownership so applications do not stall silently.',
+    Icon: FileSearch,
   },
   {
-    label: 'Operational reporting',
-    body: 'Build a more reliable base for leadership dashboards, exports, and day-to-day decision making.',
-    Icon: LayoutDashboard,
+    label: 'Create cleaner records',
+    body:
+      'Turn accepted applicants into structured student, guardian, programme, and operational records without rebuilding the same data later.',
+    Icon: Database,
   },
+]
+
+const operatingGains = [
+  'One source of truth across admissions, records, portals, workflows, and reporting.',
+  'Clearer ownership of next actions, incomplete records, reviews, and follow-ups.',
+  'Less dependence on spreadsheets, inboxes, shared drives, and disconnected point tools.',
+  'Better control over sensitive student, guardian, staff, health, wellbeing, and operational data.',
+]
+
+const audienceSignals = [
+  'Admissions follow-up depends on inboxes, spreadsheets, or personal memory.',
+  'Student and guardian records are duplicated across several tools.',
+  'Leadership reporting takes too long because the source data is fragmented.',
+  'Staff need access to information, but permissions and data exposure are hard to control.',
 ]
 ---
 
@@ -47,61 +125,102 @@ const capabilities = [
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <section class="bg-sand/60">
-    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.85fr)] lg:items-center">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.85fr)] lg:items-center lg:py-20">
       <div>
-        <p class="text-sm font-semibold uppercase text-canopy">Flagship product</p>
+        <p class="text-sm font-semibold uppercase text-canopy">
+          Education operations platform
+        </p>
+
         <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
-          Ifitwala Ed is our education ERP.
+          One operational core for admissions, records, workflows, and school data.
         </h1>
+
         <p class="mt-6 text-lg leading-relaxed text-slate">
-          Built from direct international-school experience, Ifitwala Ed helps schools create one source of truth across admissions, student records, academics, staff workflows, reporting, and communication.
+          Ifitwala Ed brings admissions, enrolment, student records, guardian and staff portals, documents, academic workflows, reporting, and data governance into one coherent platform for schools.
         </p>
+
         <p class="mt-4 text-base leading-relaxed text-slate">
-          It is also proof that we do not just advise on ERP and data governance - we build and operate the systems ourselves.
+          It is built for the daily reality of school operations: scattered enquiries, incomplete applications, sensitive people data, manual follow-ups, duplicate records, and leadership reporting that depends on too many disconnected tools.
         </p>
+
         <div class="mt-8 flex flex-wrap gap-3">
-          <a href="/book-a-demo/" class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]">
+          <a
+            href="/book-a-demo/"
+            class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]"
+          >
             Book a demo
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
-          <a href="/docs/" class="inline-flex items-center gap-2 rounded-md border border-canopy/30 bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf">
-            Read the docs
+
+          <a
+            href="#platform-capabilities"
+            class="inline-flex items-center gap-2 rounded-md border border-canopy/30 bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf"
+          >
+            Explore capabilities
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
         </div>
       </div>
 
-      <div class="rounded-lg border border-border bg-white p-6 shadow-soft">
-        <h2 class="text-lg font-semibold text-ink">Designed for school data reality</h2>
+      <aside class="rounded-lg border border-border bg-white p-6 shadow-soft">
+        <h2 class="text-lg font-semibold text-ink">
+          Designed for school data reality
+        </h2>
+
         <p class="mt-3 text-sm leading-relaxed text-slate">
-          Students, guardians, staff, programs, attendance, assessment, finance, wellbeing notes, and reports all depend on clean structure and careful access.
+          Schools run on dense people data: applicants, students, guardians, staff, programmes, attendance, assessment, finance, wellbeing notes, documents, and reports.
         </p>
-      </div>
+
+        <ul class="mt-6 grid gap-3">
+          {operatingGains.map((gain) => (
+            <li class="flex items-start gap-3 rounded-md bg-sky/35 p-3 text-sm leading-relaxed text-slate">
+              <CheckCircle2 class="mt-0.5 h-4 w-4 flex-none text-canopy" aria-hidden="true" />
+              <span>{gain}</span>
+            </li>
+          ))}
+        </ul>
+      </aside>
     </div>
   </section>
 
   <section class="bg-white">
-    <div class="mx-auto w-full max-w-6xl px-6 py-16">
-      <div class="max-w-3xl">
-        <p class="text-sm font-semibold uppercase text-canopy">Capabilities</p>
-        <h2 class="mt-3 text-3xl font-semibold text-ink">A product shaped by daily school operations.</h2>
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">
+          Start where the pain is sharpest
+        </p>
+
+        <h2 class="mt-3 text-3xl font-semibold text-ink">
+          Admissions-to-enrolment is the first operational leak to close.
+        </h2>
+
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          Many schools lose time, confidence, and sometimes families because enquiries, applications, documents, reviews, offers, and deposits are spread across too many places. Ifitwala Ed gives that work a structured pipeline.
+        </p>
       </div>
-      <div class="mt-10 grid gap-5 md:grid-cols-2">
-        {capabilities.map((item) => {
+
+      <div class="grid gap-5 md:grid-cols-3">
+        {startPoints.map((item) => {
           const Icon = item.Icon
+
           return (
             <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
-              <div class="flex items-start gap-4">
-                <span class="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-sky text-canopy">
-                  <Icon class="h-5 w-5" aria-hidden="true" />
-                </span>
-                <div>
-                  <h3 class="text-lg font-semibold text-ink">{item.label}</h3>
-                  <p class="mt-2 text-sm leading-relaxed text-slate">{item.body}</p>
-                </div>
+              <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky text-canopy">
+                <Icon class="h-5 w-5" aria-hidden="true" />
               </div>
+
+              <h3 class="mt-5 text-lg font-semibold text-ink">
+                {item.label}
+              </h3>
+
+              <p class="mt-3 text-sm leading-relaxed text-slate">
+                {item.body}
+              </p>
             </article>
           )
         })}
@@ -109,15 +228,142 @@ const capabilities = [
     </div>
   </section>
 
+  <div class="bg-sky/35">
+    <div class="mx-auto w-full max-w-6xl px-6 py-16">
+      <FeatureHighlightsSection
+        id="platform-capabilities"
+        eyebrow="Platform capabilities"
+        intro="A unified operational platform for the work schools run every day: admissions, records, portals, documents, workflows, reporting, and governed access to sensitive data."
+        items={featureItems}
+      />
+    </div>
+  </div>
+
+  <section class="bg-white">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">
+          Who it is for
+        </p>
+
+        <h2 class="mt-3 text-3xl font-semibold text-ink">
+          Built for schools that need more than another disconnected tool.
+        </h2>
+
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          Ifitwala Ed is strongest where operational work, sensitive people data, school communication, reporting, and accountability meet. That is where generic tools start to break down.
+        </p>
+      </div>
+
+      <div class="rounded-lg border border-border bg-sand/45 p-6">
+        <h3 class="text-lg font-semibold text-ink">
+          It is worth a demo if:
+        </h3>
+
+        <ul class="mt-6 grid gap-3">
+          {audienceSignals.map((signal) => (
+            <li class="flex items-start gap-3 rounded-md bg-white p-4 text-sm leading-relaxed text-slate shadow-soft">
+              <CheckCircle2 class="mt-0.5 h-4 w-4 flex-none text-canopy" aria-hidden="true" />
+              <span>{signal}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-sky/45">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-2 lg:items-center">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">
+          Operational power
+        </p>
+
+        <h2 class="mt-3 text-3xl font-semibold text-ink">
+          From daily admin work to reliable leadership visibility.
+        </h2>
+
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          Ifitwala Ed is not only a record store. It is a working operational layer: it helps teams know what is complete, what is missing, who owns the next step, and which workflows need attention.
+        </p>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+          <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky text-canopy">
+            <UsersRound class="h-5 w-5" aria-hidden="true" />
+          </div>
+
+          <h3 class="mt-5 text-lg font-semibold text-ink">
+            Better coordination
+          </h3>
+
+          <p class="mt-3 text-sm leading-relaxed text-slate">
+            Admissions, academic, leadership, and support teams work from cleaner shared records instead of fragmented local copies.
+          </p>
+        </article>
+
+        <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+          <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky text-canopy">
+            <ShieldCheck class="h-5 w-5" aria-hidden="true" />
+          </div>
+
+          <h3 class="mt-5 text-lg font-semibold text-ink">
+            Stronger controls
+          </h3>
+
+          <p class="mt-3 text-sm leading-relaxed text-slate">
+            Sensitive data is easier to govern when records, roles, workflows, documents, and reporting are designed together.
+          </p>
+        </article>
+
+        <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+          <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky text-canopy">
+            <LayoutDashboard class="h-5 w-5" aria-hidden="true" />
+          </div>
+
+          <h3 class="mt-5 text-lg font-semibold text-ink">
+            Better reporting base
+          </h3>
+
+          <p class="mt-3 text-sm leading-relaxed text-slate">
+            Leadership dashboards and exports become more useful when they are fed by structured workflows and reliable records.
+          </p>
+        </article>
+
+        <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+          <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky text-canopy">
+            <GraduationCap class="h-5 w-5" aria-hidden="true" />
+          </div>
+
+          <h3 class="mt-5 text-lg font-semibold text-ink">
+            School-specific design
+          </h3>
+
+          <p class="mt-3 text-sm leading-relaxed text-slate">
+            The platform is shaped around the operational complexity of schools, not forced into a generic business-software model.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <section class="bg-canopy text-white">
     <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-14 md:flex-row md:items-center md:justify-between">
       <div class="max-w-2xl">
-        <h2 class="text-2xl font-semibold">Want to see Ifitwala Ed in context?</h2>
+        <h2 class="text-2xl font-semibold">
+          See Ifitwala Ed against your school’s real workflows.
+        </h2>
+
         <p class="mt-3 text-sm leading-relaxed text-white/80">
-          Book a product demo focused on your school workflows, data, and reporting questions.
+          Book a product demo focused on admissions, records, portals, reporting, and the operational data problems your team is dealing with now.
         </p>
       </div>
-      <a href="/book-a-demo/" class="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:bg-sand">
+
+      <a
+        href="/book-a-demo/"
+        class="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:bg-sand"
+      >
         Book a demo
         <ArrowRight class="h-4 w-4" aria-hidden="true" />
       </a>

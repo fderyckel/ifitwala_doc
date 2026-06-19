@@ -11,9 +11,27 @@ This page documents the supported custom blocks for `Documentation.body_md` and 
 
 ## Supported Custom Blocks
 
+- `Callout`: highlighted notes, tips, warnings, and information blocks
 - `Steps`: numbered step cards
 - `DoDont`: side-by-side Do and Don't guidance
 - `RelatedDocs`: related-document cards resolved from published metadata
+
+## Callout Block
+
+Use `Callout` for short guidance that should stand apart from normal body copy.
+
+Supported `type` values:
+
+- `info`
+- `tip`
+- `warning`
+- `note`
+
+An optional `title` attribute adds a heading inside the callout.
+
+<Callout type="info" title="Authoring note">
+Custom authoring blocks must be saved in `Documentation.body_md`. The field is configured to preserve these tags so the Astro renderer can transform them during rebuild.
+</Callout>
 
 ## Steps Block
 
@@ -56,6 +74,24 @@ The docs TOC now tracks the active section while scrolling and shows a slim read
 
 Preview rendering (`/docs/preview/<language>/<slug>`) supports the same custom tags as Astro docs pages:
 
+- `Callout`
 - `Steps`
 - `DoDont`
 - `RelatedDocs`
+
+## Publishing and Rebuild Flow
+
+For normal documentation edits in the `Documentation` DocType:
+
+1. Edit `Body MD`.
+2. Save the document.
+3. Keep the document `Published` if it should appear on the static site.
+4. Use **Rebuild Docs**.
+
+This rebuild path deploys the generated static assets. It does not need to refresh Nginx.
+
+Use `./deploy_docs.sh` from the app root after changing file-based Astro, Vue, CSS, or other site source files. Editing an existing Astro page, including `src/pages/index.astro`, only needs this deploy command.
+
+Built pages are served through Frappe's normal routing via `ifitwala_doc/www/index.py`, which reads the generated HTML from `sites/assets/ifitwala_doc`. Custom Nginx static routes are optional.
+
+Use `./deploy_docs.sh --with-nginx` only when intentionally enabling or changing the optional Nginx static route snippet.

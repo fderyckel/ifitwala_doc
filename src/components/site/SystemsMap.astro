@@ -1,28 +1,28 @@
 ---
-import { ClipboardList, Database, LineChart, ShieldCheck } from '@lucide/astro'
+import { ClipboardList, Database, ShieldCheck, Target } from '@lucide/astro'
 
 const {
   title = 'From scattered work to trustworthy systems',
   items = [
     {
-      label: 'Workflows',
-      text: 'Map how work actually happens.',
+      label: 'Business Analysis',
+      text: 'Map real operations, gaps, owners, and end-to-end processes.',
       Icon: ClipboardList,
     },
     {
-      label: 'ERP',
-      text: 'Configure roles, records, and approvals.',
+      label: 'ERP Implementation',
+      text: 'Implement Frappe, ERPNext, Odoo, roles, workflows, approvals, and reporting.',
       Icon: Database,
     },
     {
-      label: 'Governance',
-      text: 'Control access to sensitive data.',
-      Icon: ShieldCheck,
+      label: 'Project Management',
+      text: 'Control scope, milestones, risks, UAT, governance, and go-live.',
+      Icon: Target,
     },
     {
-      label: 'Reporting',
-      text: 'Make decisions from reliable data.',
-      Icon: LineChart,
+      label: 'Data Governance',
+      text: 'Protect sensitive operational data through access control and GDPR/PDPA-aware workflows.',
+      Icon: ShieldCheck,
     },
   ],
 } = Astro.props
@@ -30,17 +30,21 @@ const {
 
 <figure class="rounded-lg border border-border bg-white p-4 shadow-soft">
   <figcaption class="mb-4 text-sm font-semibold text-canopy">{title}</figcaption>
+
   <div class="grid gap-3 sm:grid-cols-2">
     {items.map((item) => {
       const Icon = item.Icon
+
       return (
         <div class="rounded-lg border border-border/70 bg-sky/25 p-4">
           <div class="flex items-center gap-3">
             <span class="flex h-10 w-10 items-center justify-center rounded-md bg-white text-canopy shadow-sm">
               <Icon class="h-5 w-5" aria-hidden="true" />
             </span>
+
             <h3 class="text-sm font-semibold text-ink">{item.label}</h3>
           </div>
+
           <p class="mt-3 text-sm leading-relaxed text-slate">{item.text}</p>
         </div>
       )

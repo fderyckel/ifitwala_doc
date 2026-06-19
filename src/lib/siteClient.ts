@@ -1,3 +1,6 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 type Section = {
   type: string
   props: Record<string, any>
@@ -84,6 +87,54 @@ export type ThemeTokens = {
   focus_ring: string
 }
 
+export type StorySummary = {
+  name?: string
+  slug: string
+  title: string
+  hero_subtitle?: string | null
+  summary?: string | null
+  story_type?: string | null
+  topic?: string | null
+  author_name?: string | null
+  author_role?: string | null
+  published_on?: string | null
+  estimated_read_minutes?: number | null
+  cover_image?: string | null
+  cover_image_alt?: string | null
+  featured?: number | boolean
+  featured_priority?: number | null
+}
+
+export type StoryCTA = {
+  label: string
+  href: string
+}
+
+export type StoryTakeaway = {
+  title?: string
+  detail?: string
+  order?: number
+}
+
+export type StoryPayload = StorySummary & {
+  status?: string | null
+  body_md?: string | null
+  seo_title?: string | null
+  seo_description?: string | null
+  canonical_url?: string | null
+  og_image?: string | null
+  noindex?: number | boolean
+  key_takeaways?: StoryTakeaway[]
+  primary_cta?: StoryCTA | null
+  secondary_cta?: StoryCTA | null
+  related_stories?: StorySummary[]
+}
+
+export type StoryTopic = {
+  topic: string
+  count: number
+}
+
 const DEFAULT_THEME: ThemeTokens = {
   ink_color: '#0F172A',
   slate_color: '#475569',
@@ -103,16 +154,84 @@ const DEFAULT_THEME: ThemeTokens = {
 const BASE =
   (typeof import.meta !== 'undefined' &&
     (import.meta as any).env &&
-    (import.meta as any).env.PUBLIC_SITE_API) ||
+    ((import.meta as any).env.PUBLIC_SITE_API ||
+      (import.meta as any).env.PUBLIC_DOCS_API)) ||
   process.env.SITE_API_BASE ||
+  process.env.DOCS_API_BASE ||
   'http://127.0.0.1:8000'
 
+const LOCAL_API_HOSTS = new Set(['127.0.0.1', 'localhost'])
 const warnedFallbacks = new Set<string>()
+const SITE_NAME_HEADER = resolveBenchSiteName()
 
 function normalizeUrl(path: string) {
   const root = BASE.replace(/\/$/, '')
   const target = path.startsWith('/') ? path : `/${path}`
   return `${root}${target}`
+}
+
+function resolveBenchSiteName(): string | undefined {
+  const explicitCandidates = [
+    process.env.IFITWALA_DOC_SITE_NAME,
+    process.env.FRAPPE_SITE,
+    process.env.SITE_NAME,
+  ]
+  for (const candidate of explicitCandidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim()
+    }
+  }
+
+  let currentDir = process.cwd()
+  for (let depth = 0; depth < 6; depth += 1) {
+    const sitesDir = path.join(currentDir, 'sites')
+    const commonConfig = path.join(sitesDir, 'common_site_config.json')
+    if (fs.existsSync(commonConfig)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(commonConfig, 'utf8'))
+        if (typeof parsed?.default_site === 'string' && parsed.default_site.trim()) {
+          return parsed.default_site.trim()
+        }
+      } catch {
+        // Ignore malformed local config and continue searching.
+      }
+    }
+
+    const currentSiteFile = path.join(sitesDir, 'currentsite.txt')
+    if (fs.existsSync(currentSiteFile)) {
+      try {
+        const siteName = fs.readFileSync(currentSiteFile, 'utf8').trim()
+        if (siteName) {
+          return siteName
+        }
+      } catch {
+        // Ignore unreadable fallback files and continue searching.
+      }
+    }
+
+    const parentDir = path.dirname(currentDir)
+    if (parentDir === currentDir) {
+      break
+    }
+    currentDir = parentDir
+  }
+
+  return undefined
+}
+
+function maybeAttachSiteHeader(targetUrl: string, headers: Record<string, string>) {
+  if (!SITE_NAME_HEADER) {
+    return
+  }
+
+  try {
+    const hostname = new URL(targetUrl).hostname.toLowerCase()
+    if (LOCAL_API_HOSTS.has(hostname)) {
+      headers['X-Frappe-Site-Name'] = SITE_NAME_HEADER
+    }
+  } catch {
+    // Ignore invalid URLs and fall back to plain headers.
+  }
 }
 
 function withCacheBust(url: string, token?: string) {
@@ -127,6 +246,7 @@ async function fetchJSON(url: string, attempt = 1): Promise<any> {
     Accept: 'application/json',
   }
   const targetUrl = attempt === 1 ? url : withCacheBust(url, `${Date.now()}_${attempt}`)
+  maybeAttachSiteHeader(targetUrl, headers)
   if (attempt > 1) {
     headers['Cache-Control'] = 'no-cache, no-store'
     headers.Pragma = 'no-cache'
@@ -202,6 +322,13 @@ function normalizeSlug(value: unknown): string {
     return '/'
   }
   return `/${normalized}`
+}
+
+function normalizeStorySlug(value: unknown): string {
+  if (typeof value !== 'string') {
+    return ''
+  }
+  return value.trim().replace(/^\/+|\/+$/g, '').toLowerCase()
 }
 
 export function slugToSegments(slug: string): string[] {
@@ -283,5 +410,73 @@ export async function getThemeTokens(): Promise<ThemeTokens> {
     return { ...DEFAULT_THEME, ...(theme || {}) }
   } catch (error) {
     return { ...DEFAULT_THEME }
+  }
+}
+
+export async function listStories(opts?: {
+  includeDrafts?: boolean
+  topic?: string
+  storyType?: string
+  limit?: number
+}): Promise<StorySummary[]> {
+  try {
+    const params = new URLSearchParams()
+    if (opts?.includeDrafts) {
+      params.set('include_unpublished', '1')
+    }
+    if (opts?.topic) {
+      params.set('topic', opts.topic)
+    }
+    if (opts?.storyType) {
+      params.set('story_type', opts.storyType)
+    }
+    if (typeof opts?.limit === 'number' && Number.isFinite(opts.limit) && opts.limit > 0) {
+      params.set('limit', String(Math.floor(opts.limit)))
+    }
+    const suffix = params.toString() ? `?${params.toString()}` : ''
+    const raw = await fetchJSON(normalizeUrl(`/api/method/ifitwala_doc.api.site.list_stories${suffix}`))
+    const items = unwrap<StorySummary[]>(raw)
+    return Array.isArray(items) ? items : []
+  } catch (error) {
+    warnOptionalFetchFailure('stories:list', error)
+    return []
+  }
+}
+
+export async function getStory(
+  slug: string,
+  opts?: { includeDrafts?: boolean }
+): Promise<StoryPayload> {
+  const normalizedSlug = normalizeStorySlug(slug)
+  try {
+    const params = new URLSearchParams({ slug: normalizedSlug })
+    if (opts?.includeDrafts) {
+      params.set('include_unpublished', '1')
+    }
+    const raw = await fetchJSON(
+      normalizeUrl(`/api/method/ifitwala_doc.api.site.get_story?${params.toString()}`)
+    )
+    return unwrap<StoryPayload>(raw) || { slug: normalizedSlug, title: '' }
+  } catch (error) {
+    warnOptionalFetchFailure(`story:${normalizedSlug || 'unknown'}`, error)
+    return { slug: normalizedSlug, title: '' }
+  }
+}
+
+export async function getStoryTopics(opts?: { includeDrafts?: boolean }): Promise<StoryTopic[]> {
+  try {
+    const params = new URLSearchParams()
+    if (opts?.includeDrafts) {
+      params.set('include_unpublished', '1')
+    }
+    const suffix = params.toString() ? `?${params.toString()}` : ''
+    const raw = await fetchJSON(
+      normalizeUrl(`/api/method/ifitwala_doc.api.site.get_story_topics${suffix}`)
+    )
+    const items = unwrap<StoryTopic[]>(raw)
+    return Array.isArray(items) ? items : []
+  } catch (error) {
+    warnOptionalFetchFailure('stories:topics', error)
+    return []
   }
 }

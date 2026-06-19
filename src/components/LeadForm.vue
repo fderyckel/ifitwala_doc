@@ -7,9 +7,11 @@ const props = defineProps({
   title: { type: String, default: '' },
   subtitle: { type: String, default: '' },
   submitLabel: { type: String, default: '' },
+  variant: { type: String, default: 'full' },
 });
 
 const isProductDemo = computed(() => props.mode === 'ifitwala-ed');
+const isCompact = computed(() => props.variant === 'compact');
 
 const resolvedTitle = computed(() =>
   props.title || (isProductDemo.value ? 'Book a Demo' : 'Book a Call')
@@ -25,10 +27,13 @@ const resolvedSubmitLabel = computed(() =>
 );
 
 const interestOptions = [
+  'ERP discovery sprint',
   'ERP implementation',
+  'Admissions / school operations',
+  'Reporting is unreliable',
+  'Too many spreadsheets',
   'Ifitwala Ed',
-  'Data governance / privacy',
-  'Education systems',
+  'Data exposure audit',
   'Not sure yet',
 ];
 
@@ -41,6 +46,13 @@ const organizationTypes = [
   'Other',
 ];
 
+const timelineOptions = [
+  'This month',
+  'Next 1-3 months',
+  'This school year',
+  'Exploring options',
+];
+
 const emptyForm = () => ({
   first_name: '',
   last_name: '',
@@ -51,6 +63,7 @@ const emptyForm = () => ({
   job_title: '',
   interest_area: isProductDemo.value ? 'Ifitwala Ed' : '',
   current_system: '',
+  timeline: '',
   message: '',
 });
 
@@ -64,6 +77,7 @@ const buildNotes = () => {
   if (form.value.interest_area) lines.push(`Interest: ${form.value.interest_area}`);
   if (form.value.organization_type) lines.push(`Organization type: ${form.value.organization_type}`);
   if (form.value.current_system) lines.push(`Current system: ${form.value.current_system}`);
+  if (form.value.timeline) lines.push(`Preferred timeline: ${form.value.timeline}`);
   if (form.value.message) lines.push(`Message: ${form.value.message}`);
   return lines.join('\n');
 };
@@ -80,7 +94,15 @@ const submitForm = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        ...form.value,
+        first_name: form.value.first_name,
+        last_name: form.value.last_name,
+        email: form.value.email,
+        phone: form.value.phone,
+        organization: form.value.organization,
+        organization_type: form.value.organization_type,
+        job_title: form.value.job_title,
+        interest_area: form.value.interest_area,
+        current_system: form.value.current_system,
         school_name: isProductDemo.value ? form.value.organization : '',
         source: props.source,
         notes: buildNotes(),
@@ -125,6 +147,68 @@ const submitForm = async () => {
         <p class="mt-1 text-sm text-slate">{{ resolvedSubtitle }}</p>
       </div>
 
+      <template v-if="isCompact">
+        <div>
+          <label class="mb-1 block text-xs font-semibold uppercase text-slate">Your name</label>
+          <input
+            v-model="form.first_name"
+            type="text"
+            required
+            class="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder-slate/50 focus:border-leaf focus:outline-none focus:ring-1 focus:ring-leaf"
+            placeholder="Jane Doe"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-xs font-semibold uppercase text-slate">Work email</label>
+          <input
+            v-model="form.email"
+            type="email"
+            required
+            class="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder-slate/50 focus:border-leaf focus:outline-none focus:ring-1 focus:ring-leaf"
+            placeholder="jane@example.org"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-xs font-semibold uppercase text-slate">Organization or school</label>
+          <input
+            v-model="form.organization"
+            type="text"
+            required
+            class="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder-slate/50 focus:border-leaf focus:outline-none focus:ring-1 focus:ring-leaf"
+            placeholder="Organization name"
+          />
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase text-slate">Main issue</label>
+            <select
+              v-model="form.interest_area"
+              required
+              class="w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-ink focus:border-leaf focus:outline-none focus:ring-1 focus:ring-leaf"
+            >
+              <option value="">Select one</option>
+              <option v-for="option in interestOptions" :key="option" :value="option">{{ option }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase text-slate">Timeline</label>
+            <select
+              v-model="form.timeline"
+              required
+              class="w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-ink focus:border-leaf focus:outline-none focus:ring-1 focus:ring-leaf"
+            >
+              <option value="">Select one</option>
+              <option v-for="option in timelineOptions" :key="option" :value="option">{{ option }}</option>
+            </select>
+          </div>
+        </div>
+      </template>
+
+      <template v-else>
       <div class="grid gap-4 md:grid-cols-2">
         <div>
           <label class="mb-1 block text-xs font-semibold uppercase text-slate">First name</label>
@@ -235,6 +319,7 @@ const submitForm = async () => {
           placeholder="Tell us what you are trying to improve..."
         ></textarea>
       </div>
+      </template>
 
       <div v-if="error" class="rounded-md border border-red-100 bg-red-50 p-3 text-sm text-red-600">
         {{ error }}

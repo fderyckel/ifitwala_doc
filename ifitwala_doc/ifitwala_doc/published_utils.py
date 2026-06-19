@@ -1,5 +1,7 @@
 # ifitwala_doc/ifitwala_doc/published_utils.py
-import requests, frappe
+import frappe
+import requests
+
 
 def ping_build():
     url = f"{frappe.utils.get_url()}/api/method/ifitwala_doc.api.build.trigger"

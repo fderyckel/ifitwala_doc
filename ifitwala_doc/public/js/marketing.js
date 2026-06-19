@@ -1,4 +1,4 @@
-// ifitwala_doc/public/js/marketing.js
+// public/js/marketing.js
 async function getNav(location = "Header") {
   const res = await fetch(
     `/api/method/ifitwala_doc.api.site.get_nav?location=${encodeURIComponent(location)}`
@@ -40,4 +40,3 @@ if (document.readyState === "loading") {
 } else {
   renderNav();
 }
-

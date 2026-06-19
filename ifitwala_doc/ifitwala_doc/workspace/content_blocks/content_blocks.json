@@ -1,0 +1,119 @@
+{
+ "app": "ifitwala_doc",
+ "charts": [],
+ "content": "[{\"id\":\"blocks-header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Content Blocks</span>\",\"col\":12}},{\"id\":\"blocks-shortcut-longform\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Longform Blocks\",\"col\":3}},{\"id\":\"blocks-shortcut-hero\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Hero Blocks\",\"col\":3}},{\"id\":\"blocks-shortcut-feature\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Feature Highlights\",\"col\":3}},{\"id\":\"blocks-shortcut-trust-logo\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Trust Logos\",\"col\":3}},{\"id\":\"blocks-spacer\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"blocks-card-longform\",\"type\":\"card\",\"data\":{\"card_name\":\"Longform Experience\",\"col\":6}},{\"id\":\"blocks-card-marketing\",\"type\":\"card\",\"data\":{\"card_name\":\"Marketing Blocks\",\"col\":6}}]",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "folder-normal",
+ "idx": 0,
+ "indicator_color": "orange",
+ "is_hidden": 0,
+ "label": "Content Blocks",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Longform Experience",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Longform Block",
+   "link_count": 0,
+   "link_to": "Longform Block",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Marketing Blocks",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Hero Block",
+   "link_count": 0,
+   "link_to": "Hero Block",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Feature Highlight",
+   "link_count": 0,
+   "link_to": "Feature Highlight",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Trust Logo",
+   "link_count": 0,
+   "link_to": "Trust Logo",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "module": "Ifitwala Doc",
+ "name": "Content Blocks",
+ "number_cards": [],
+ "parent_page": "Ifitwala Doc",
+ "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "sequence_id": 4.0,
+ "shortcuts": [
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Longform Blocks",
+   "link_to": "Longform Block",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Hero Blocks",
+   "link_to": "Hero Block",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Purple",
+   "doc_view": "List",
+   "label": "Feature Highlights",
+   "link_to": "Feature Highlight",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Trust Logos",
+   "link_to": "Trust Logo",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Content Blocks",
+ "type": "Workspace"
+}

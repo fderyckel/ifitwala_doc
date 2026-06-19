@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://ifitwala.com/en/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://ifitwala.com/fr/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://ifitwala.com/en/services/</loc><changefreq>weekly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://ifitwala.com/fr/services/</loc><changefreq>weekly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://ifitwala.com/en/services/erp-implementation/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://ifitwala.com/fr/services/erp-implementation/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://ifitwala.com/en/data-governance/</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ifitwala.com/fr/data-governance/</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ifitwala.com/en/education/</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ifitwala.com/fr/education/</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://ifitwala.com/en/ifitwala-ed/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ifitwala.com/fr/ifitwala-ed/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ifitwala.com/en/platform/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ifitwala.com/fr/platform/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ifitwala.com/en/implementation/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ifitwala.com/fr/implementation/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ifitwala.com/en/security/</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://ifitwala.com/fr/security/</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://ifitwala.com/en/about/</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://ifitwala.com/fr/about/</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://ifitwala.com/en/book-a-call/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ifitwala.com/fr/book-a-call/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ifitwala.com/en/book-a-demo/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ifitwala.com/fr/book-a-demo/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ifitwala.com/insights/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ifitwala.com/docs/</loc><changefreq>weekly</changefreq><priority>0.65</priority></url>
+</urlset>

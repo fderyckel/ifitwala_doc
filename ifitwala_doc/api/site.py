@@ -2,18 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict
+from collections.abc import Callable
+from typing import Any, Optional, TypedDict
+from urllib.parse import urlparse
+
 import frappe
 from frappe.model.document import Document
 from frappe.utils import format_datetime
-from urllib.parse import urlparse
 
 
 class SectionDict(TypedDict):
     type: str
-    props: Dict[str, Any]
+    props: dict[str, Any]
     order: int
-    block: Dict[str, Any]
+    block: dict[str, Any]
 
 
 class PageSummary(TypedDict):
@@ -22,8 +24,8 @@ class PageSummary(TypedDict):
     title: str
     layout: str
     is_published: int
-    modified: Optional[str]
-    created: Optional[str]
+    modified: str | None
+    created: str | None
 
 
 class PagePayload(TypedDict, total=False):
@@ -31,14 +33,46 @@ class PagePayload(TypedDict, total=False):
     slug: str
     title: str
     layout: str
-    seo: Dict[str, Any]
-    sections: List[SectionDict]
+    seo: dict[str, Any]
+    sections: list[SectionDict]
     is_published: int
-    modified: Optional[str]
-    created: Optional[str]
+    modified: str | None
+    created: str | None
 
 
-THEME_DEFAULTS: Dict[str, str] = {
+class StorySummary(TypedDict, total=False):
+    name: str
+    slug: str
+    title: str
+    hero_subtitle: str | None
+    summary: str | None
+    story_type: str | None
+    topic: str | None
+    author_name: str | None
+    author_role: str | None
+    published_on: str | None
+    estimated_read_minutes: int
+    cover_image: str | None
+    cover_image_alt: str | None
+    featured: int
+    featured_priority: int | None
+
+
+class StoryPayload(StorySummary, total=False):
+    status: str | None
+    body_md: str | None
+    seo_title: str | None
+    seo_description: str | None
+    canonical_url: str | None
+    og_image: str | None
+    noindex: int
+    key_takeaways: list[dict[str, Any]]
+    primary_cta: dict[str, str] | None
+    secondary_cta: dict[str, str] | None
+    related_stories: list[StorySummary]
+
+
+THEME_DEFAULTS: dict[str, str] = {
     "ink_color": "#0F172A",
     "slate_color": "#475569",
     "canopy_color": "#12563A",
@@ -100,8 +134,21 @@ def _normalize_demo_href(label: Any, href: Any) -> str:
 
     return href_value
 
-def _hero_props(doc: Document) -> Dict[str, Any]:
+def _null_last_int_sort_key(value: Any) -> tuple[int, int]:
+    if value in (None, ""):
+        return (1, 0)
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return (0, 0)
+    # Frappe v16 normalizes blank Int fields to 0 on readback, so treat 0 as unset.
+    if parsed == 0:
+        return (1, 0)
+    return (0, parsed)
+
+def _hero_props(doc: Document) -> dict[str, Any]:
     return {
+        "eyebrow": getattr(doc, "eyebrow", None),
         "title": doc.heading,
         "subtitle": doc.subheading,
         "bgImage": doc.bg_image,
@@ -118,7 +165,7 @@ def _hero_props(doc: Document) -> Dict[str, Any]:
     }
 
 
-def _feature_highlights_props(doc: Document) -> Dict[str, Any]:
+def _feature_highlights_props(doc: Document) -> dict[str, Any]:
     items = sorted(doc.items or [], key=lambda x: (x.item_order or 0))
     return {
         "eyebrow": doc.eyebrow,
@@ -136,7 +183,7 @@ def _feature_highlights_props(doc: Document) -> Dict[str, Any]:
     }
 
 
-def _trust_logos_props(doc: Document) -> Dict[str, Any]:
+def _trust_logos_props(doc: Document) -> dict[str, Any]:
     rows = sorted(doc.logos or [], key=lambda r: (r.item_order or 0))
     return {
         "title": doc.title,
@@ -147,7 +194,7 @@ def _trust_logos_props(doc: Document) -> Dict[str, Any]:
     }
 
 
-def _longform_props(doc: Document) -> Dict[str, Any]:
+def _longform_props(doc: Document) -> dict[str, Any]:
     sections = sorted(
         doc.sections or [],
         key=lambda r: (
@@ -156,13 +203,13 @@ def _longform_props(doc: Document) -> Dict[str, Any]:
             else getattr(r, "idx", 0)
         ),
     )
-    payload: List[Dict[str, Any]] = []
+    payload: list[dict[str, Any]] = []
     for row in sections:
         order = getattr(row, "section_order", None)
         if order is None:
             order = getattr(row, "idx", None) or 0
 
-        section_payload: Dict[str, Any] = {
+        section_payload: dict[str, Any] = {
             "order": order,
             "layout": (getattr(row, "layout", None) or "text"),
             "style": (getattr(row, "style", None) or getattr(doc, "background", None) or "default"),
@@ -206,17 +253,17 @@ def _longform_props(doc: Document) -> Dict[str, Any]:
     }
 
 
-BlockSerializer = Callable[[Document], Dict[str, Any]]
+BlockSerializer = Callable[[Document], dict[str, Any]]
 
-BLOCK_REGISTRY: Tuple[Tuple[str, Tuple[str, ...], BlockSerializer], ...] = (
+BLOCK_REGISTRY: tuple[tuple[str, tuple[str, ...], BlockSerializer], ...] = (
     ("Hero", ("Hero Block",), _hero_props),
     ("Feature Highlights", ("Feature Highlight", "Feature Highlights"), _feature_highlights_props),
     ("Trust Logos", ("Trust Logos", "Trust Logo", "Trust Logo Group"), _trust_logos_props),
     ("Longform Content", ("Longform Block",), _longform_props),
 )
 
-BLOCK_TYPES: Dict[str, Dict[str, Any]] = {}
-BLOCK_DOCTYPES: Dict[str, Dict[str, Any]] = {}
+BLOCK_TYPES: dict[str, dict[str, Any]] = {}
+BLOCK_DOCTYPES: dict[str, dict[str, Any]] = {}
 
 for block_type, doctypes, serializer in BLOCK_REGISTRY:
     key = block_type.lower()
@@ -234,7 +281,7 @@ for block_type, doctypes, serializer in BLOCK_REGISTRY:
         }
 
 
-def _serialize_block(block_dt: str, name: str) -> Optional[Tuple[str, Dict[str, Any]]]:
+def _serialize_block(block_dt: str, name: str) -> tuple[str, dict[str, Any]] | None:
     index_key = (block_dt or "").strip().lower()
     info = BLOCK_DOCTYPES.get(index_key)
     if not info:
@@ -243,7 +290,7 @@ def _serialize_block(block_dt: str, name: str) -> Optional[Tuple[str, Dict[str, 
     return info["type"], info["serializer"](doc)
 
 
-def _seo_payload(page: Document) -> Dict[str, Any]:
+def _seo_payload(page: Document) -> dict[str, Any]:
     return {
         "title": page.seo_title or page.title,
         "description": page.seo_description or page.meta_description,
@@ -266,13 +313,13 @@ def _seo_payload(page: Document) -> Dict[str, Any]:
 # Helpers
 # -----------------------
 
-def _format(value: Any) -> Optional[str]:
+def _format(value: Any) -> str | None:
     if not value:
         return None
     return format_datetime(value)
 
 
-def _normalize_slug(value: Optional[str]) -> str:
+def _normalize_slug(value: str | None) -> str:
     if not value:
         return "/"
     raw = str(value).strip()
@@ -292,17 +339,17 @@ def _normalize_slug(value: Optional[str]) -> str:
     return f"/{trimmed}"
 
 
-def _slug_candidates(slug: str) -> List[str]:
+def _slug_candidates(slug: str) -> list[str]:
     normalized = _normalize_slug(slug)
     bare = normalized.lstrip("/")
-    candidates: List[str] = [normalized]
+    candidates: list[str] = [normalized]
     if bare:
         candidates.append(bare)
         candidates.append(bare.rstrip("/"))
     else:
         candidates.extend(["", "home", "index"])
 
-    seen: List[str] = []
+    seen: list[str] = []
     for candidate in candidates:
         key = candidate.strip()
         if not key:
@@ -315,7 +362,7 @@ def _slug_candidates(slug: str) -> List[str]:
     return seen
 
 
-def _coerce_int(value: Any) -> Optional[int]:
+def _coerce_int(value: Any) -> int | None:
     try:
         if value is None:
             return None
@@ -324,12 +371,142 @@ def _coerce_int(value: Any) -> Optional[int]:
         return None
 
 
-def _serialize_sections(page_doc: Document) -> List[SectionDict]:
+def _normalize_story_slug(value: str | None) -> str:
+    if not value:
+        return ""
+    return str(value).strip().strip("/").lower()
+
+
+def _story_date(value: Any) -> str | None:
+    if not value:
+        return None
+    return str(value)
+
+
+def _story_takeaways(doc: Document) -> list[dict[str, Any]]:
+    rows = list(getattr(doc, "key_takeaways", None) or [])
+    rows.sort(
+        key=lambda row: (
+            _null_last_int_sort_key(getattr(row, "takeaway_order", None)),
+            _coerce_int(getattr(row, "idx", None)) or 0,
+        )
+    )
+
+    payload: list[dict[str, Any]] = []
+    for row in rows:
+        title = (getattr(row, "title", None) or "").strip()
+        detail = (getattr(row, "detail", None) or "").strip()
+        if not title and not detail:
+            continue
+        payload.append(
+            {
+                "title": title,
+                "detail": detail,
+                "order": _coerce_int(getattr(row, "takeaway_order", None)) or 0,
+            }
+        )
+    return payload
+
+
+def _story_cta(label: Any, href: Any) -> dict[str, str] | None:
+    label_value = (label or "").strip()
+    href_value = _normalize_demo_href(label, href)
+    if not label_value or not href_value:
+        return None
+    return {"label": label_value, "href": href_value}
+
+
+def _story_summary_payload(item: Any) -> StorySummary:
+    title = (getattr(item, "title", None) or "").strip()
+    return {
+        "name": getattr(item, "name", None),
+        "slug": _normalize_story_slug(getattr(item, "slug", None)),
+        "title": title,
+        "hero_subtitle": getattr(item, "hero_subtitle", None),
+        "summary": getattr(item, "summary", None),
+        "story_type": getattr(item, "story_type", None),
+        "topic": getattr(item, "topic", None),
+        "author_name": getattr(item, "author_name", None),
+        "author_role": getattr(item, "author_role", None),
+        "published_on": _story_date(getattr(item, "published_on", None)),
+        "estimated_read_minutes": _coerce_int(getattr(item, "estimated_read_minutes", None)) or 1,
+        "cover_image": getattr(item, "cover_image", None),
+        "cover_image_alt": getattr(item, "cover_image_alt", None) or title or None,
+        "featured": _coerce_int(getattr(item, "featured", None)) or 0,
+        "featured_priority": _coerce_int(getattr(item, "featured_priority", None)),
+    }
+
+
+def _story_payload(doc: Document) -> StoryPayload:
+    payload: StoryPayload = {
+        **_story_summary_payload(doc),
+        "status": getattr(doc, "status", None),
+        "body_md": getattr(doc, "body_md", None),
+        "seo_title": getattr(doc, "seo_title", None),
+        "seo_description": getattr(doc, "seo_description", None),
+        "canonical_url": getattr(doc, "canonical_url", None),
+        "og_image": getattr(doc, "og_image", None) or getattr(doc, "cover_image", None),
+        "noindex": _coerce_int(getattr(doc, "noindex", None)) or 0,
+        "key_takeaways": _story_takeaways(doc),
+        "primary_cta": _story_cta(
+            getattr(doc, "primary_cta_label", None),
+            getattr(doc, "primary_cta_href", None),
+        ),
+        "secondary_cta": _story_cta(
+            getattr(doc, "secondary_cta_label", None),
+            getattr(doc, "secondary_cta_href", None),
+        ),
+        "related_stories": [],
+    }
+    return payload
+
+
+def _story_order_by() -> str:
+    return "featured desc, featured_priority asc, published_on desc, modified desc"
+
+
+def _list_related_stories(doc: Document, limit: int = 3) -> list[StorySummary]:
+    filters: dict[str, Any] = {
+        "status": "Published",
+        "name": ["!=", doc.name],
+    }
+    if getattr(doc, "topic", None):
+        filters["topic"] = doc.topic
+    elif getattr(doc, "story_type", None):
+        filters["story_type"] = doc.story_type
+
+    rows = frappe.get_all(
+        "Ifitwala Story",
+        filters=filters,
+        fields=[
+            "name",
+            "slug",
+            "title",
+            "hero_subtitle",
+            "summary",
+            "story_type",
+            "topic",
+            "author_name",
+            "author_role",
+            "published_on",
+            "estimated_read_minutes",
+            "cover_image",
+            "cover_image_alt",
+            "featured",
+            "featured_priority",
+        ],
+        limit_page_length=limit,
+        order_by=_story_order_by(),
+    )
+    return [_story_summary_payload(row) for row in rows]
+
+
+def _serialize_sections(page_doc: Document) -> list[SectionDict]:
     rows = list(page_doc.sections or [])
     if not rows:
         return []
 
-    sections: List[SectionDict] = []
+    sections: list[SectionDict] = []
     for idx, row in enumerate(rows, start=1):
         block_info = (
             _serialize_block(row.block_doctype, row.block_ref)
@@ -368,7 +545,7 @@ def _serialize_sections(page_doc: Document) -> List[SectionDict]:
 # -----------------------
 
 @frappe.whitelist(allow_guest=True)
-def get_nav(location: str = "Header") -> List[Dict[str, Any]]:
+def get_nav(location: str = "Header") -> list[dict[str, Any]]:
     """Return a flat nav for a given location (Header|Footer|Secondary)."""
     if not location:
         location = "Header"
@@ -401,14 +578,14 @@ def get_nav(location: str = "Header") -> List[Dict[str, Any]]:
 
 
 @frappe.whitelist(allow_guest=True)
-def search_blocks(block_type: str, limit: int = 10) -> List[Dict[str, Any]]:
+def search_blocks(block_type: str, limit: int = 10) -> list[dict[str, Any]]:
     """Simple helper for editors (find blocks by doctype)."""
     if not block_type:
         return []
 
     key = block_type.strip().lower()
-    target_dt: Optional[str] = None
-    block_label: Optional[str] = None
+    target_dt: str | None = None
+    block_label: str | None = None
 
     type_entry = BLOCK_TYPES.get(key)
     if type_entry:
@@ -448,7 +625,7 @@ def search_blocks(block_type: str, limit: int = 10) -> List[Dict[str, Any]]:
 def get_page(slug: str = "/", include_unpublished: int = 0) -> PagePayload:
     """Return the page defined in Ifitwala Web Page with its ordered sections."""
     candidates = _slug_candidates(slug or "/")
-    page_doc: Optional[Document] = None
+    page_doc: Document | None = None
     include_drafts = bool(int(include_unpublished or 0))
 
     for candidate in candidates:
@@ -491,10 +668,10 @@ def get_page(slug: str = "/", include_unpublished: int = 0) -> PagePayload:
 
 
 @frappe.whitelist(allow_guest=True)
-def list_pages(include_unpublished: int = 0) -> List[PageSummary]:
+def list_pages(include_unpublished: int = 0) -> list[PageSummary]:
     """Return all marketing pages so Astro can determine which routes to pre-render."""
     include_drafts = bool(int(include_unpublished or 0))
-    filters: Dict[str, Any] = {}
+    filters: dict[str, Any] = {}
     if not include_drafts:
         filters["is_published"] = 1
 
@@ -505,7 +682,7 @@ def list_pages(include_unpublished: int = 0) -> List[PageSummary]:
         order_by="modified desc",
     )
 
-    payload: List[PageSummary] = []
+    payload: list[PageSummary] = []
     seen_slugs: set[str] = set()
     for row in rows:
         slug_value = _normalize_slug(row.slug)
@@ -530,13 +707,19 @@ def list_pages(include_unpublished: int = 0) -> List[PageSummary]:
 
 # Optional: expose Single settings to the front-end if you ever need it
 @frappe.whitelist(allow_guest=True)
-def get_site_settings() -> Dict[str, Any]:
+def get_site_settings() -> dict[str, Any]:
     ws = frappe.get_single("Ifitwala Website Settings")
     social_links = frappe.get_all(
         "Website Social Link",
         filters={"parent": ws.name, "parenttype": "Ifitwala Website Settings"},
         fields=["platform", "url", "icon", "display_order"],
-        order_by="IFNULL(display_order, 9999), platform asc",
+        order_by="platform asc",
+    )
+    social_links.sort(
+        key=lambda row: (
+            _null_last_int_sort_key(row.get("display_order")),
+            (row.get("platform") or "").lower(),
+        )
     )
     return {
         "site_name": ws.site_name,
@@ -553,9 +736,9 @@ def get_site_settings() -> Dict[str, Any]:
 
 
 @frappe.whitelist(allow_guest=True)
-def get_theme() -> Dict[str, str]:
+def get_theme() -> dict[str, str]:
     """Return design tokens defined in Ifitwala Theme Settings (with safe defaults)."""
-    payload: Dict[str, str] = {}
+    payload: dict[str, str] = {}
     doc = None
     try:
         doc = frappe.get_single("Ifitwala Theme Settings")
@@ -572,3 +755,93 @@ def get_theme() -> Dict[str, str]:
         payload[key] = (value or default).strip() if isinstance(value, str) else default
 
     return payload
+
+
+@frappe.whitelist(allow_guest=True)
+def list_stories(
+    include_unpublished: int = 0,
+    topic: str | None = None,
+    story_type: str | None = None,
+    limit: int | None = None,
+) -> list[StorySummary]:
+    filters: dict[str, Any] = {}
+    if not bool(int(include_unpublished or 0)):
+        filters["status"] = "Published"
+    if topic:
+        filters["topic"] = topic
+    if story_type:
+        filters["story_type"] = story_type
+
+    limit_value = _coerce_int(limit) or 100
+    rows = frappe.get_all(
+        "Ifitwala Story",
+        filters=filters,
+        fields=[
+            "name",
+            "slug",
+            "title",
+            "hero_subtitle",
+            "summary",
+            "story_type",
+            "topic",
+            "author_name",
+            "author_role",
+            "published_on",
+            "estimated_read_minutes",
+            "cover_image",
+            "cover_image_alt",
+            "featured",
+            "featured_priority",
+        ],
+        limit_page_length=limit_value,
+        order_by=_story_order_by(),
+    )
+    return [_story_summary_payload(row) for row in rows]
+
+
+@frappe.whitelist(allow_guest=True)
+def get_story(slug: str, include_unpublished: int = 0) -> StoryPayload:
+    normalized = _normalize_story_slug(slug)
+    filters: dict[str, Any] = {"slug": normalized}
+    if not bool(int(include_unpublished or 0)):
+        filters["status"] = "Published"
+
+    row = frappe.get_all("Ifitwala Story", filters=filters, fields=["name"], limit=1)
+    if not row:
+        return {
+            "slug": normalized,
+            "title": "",
+            "key_takeaways": [],
+            "related_stories": [],
+        }
+
+    doc = frappe.get_doc("Ifitwala Story", row[0].name)
+    payload = _story_payload(doc)
+    payload["related_stories"] = _list_related_stories(doc)
+    return payload
+
+
+@frappe.whitelist(allow_guest=True)
+def get_story_topics(include_unpublished: int = 0) -> list[dict[str, Any]]:
+    filters: dict[str, Any] = {}
+    if not bool(int(include_unpublished or 0)):
+        filters["status"] = "Published"
+
+    rows = frappe.get_all(
+        "Ifitwala Story",
+        filters=filters,
+        fields=["topic"],
+        limit_page_length=500,
+    )
+
+    counts: dict[str, int] = {}
+    for row in rows:
+        topic = (getattr(row, "topic", None) or "").strip()
+        if not topic:
+            continue
+        counts[topic] = counts.get(topic, 0) + 1
+
+    return [
+        {"topic": topic, "count": count}
+        for topic, count in sorted(counts.items(), key=lambda item: (-item[1], item[0].lower()))
+    ]

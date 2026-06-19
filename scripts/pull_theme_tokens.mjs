@@ -8,6 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 const targetPath = path.join(projectRoot, 'src', 'styles', 'tokens.css');
+const LOCAL_API_HOSTS = new Set(['127.0.0.1', 'localhost']);
 
 const DEFAULT_THEME = {
   ink_color: '#0F172A',
@@ -35,14 +36,79 @@ const argFlags = new Set(process.argv.slice(2));
 const silent = argFlags.has('--silent');
 
 function resolveBase() {
-  return process.env.PUBLIC_SITE_API || process.env.SITE_API_BASE || 'http://127.0.0.1:8000';
+  return (
+    process.env.PUBLIC_SITE_API ||
+    process.env.SITE_API_BASE ||
+    process.env.PUBLIC_DOCS_API ||
+    process.env.DOCS_API_BASE ||
+    'http://127.0.0.1:8000'
+  );
+}
+
+function resolveBenchSiteName() {
+  const explicitCandidates = [
+    process.env.IFITWALA_DOC_SITE_NAME,
+    process.env.FRAPPE_SITE,
+    process.env.SITE_NAME,
+  ];
+  for (const candidate of explicitCandidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  let currentDir = projectRoot;
+  for (let depth = 0; depth < 6; depth += 1) {
+    const sitesDir = path.join(currentDir, 'sites');
+    const commonConfig = path.join(sitesDir, 'common_site_config.json');
+    if (fs.existsSync(commonConfig)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(commonConfig, 'utf8'));
+        if (typeof parsed?.default_site === 'string' && parsed.default_site.trim()) {
+          return parsed.default_site.trim();
+        }
+      } catch {
+        // Ignore malformed local config and continue searching.
+      }
+    }
+
+    const currentSiteFile = path.join(sitesDir, 'currentsite.txt');
+    if (fs.existsSync(currentSiteFile)) {
+      try {
+        const siteName = fs.readFileSync(currentSiteFile, 'utf8').trim();
+        if (siteName) {
+          return siteName;
+        }
+      } catch {
+        // Ignore unreadable fallback files and continue searching.
+      }
+    }
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+    currentDir = parentDir;
+  }
+
+  return undefined;
 }
 
 async function fetchTheme() {
   const base = resolveBase();
   const url = new URL('/api/method/ifitwala_doc.api.site.get_theme', base).toString();
+  const headers = { Accept: 'application/json' };
+  const siteName = resolveBenchSiteName();
   try {
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    const hostname = new URL(url).hostname.toLowerCase();
+    if (siteName && LOCAL_API_HOSTS.has(hostname)) {
+      headers['X-Frappe-Site-Name'] = siteName;
+    }
+  } catch {
+    // Ignore invalid URLs and use the base headers.
+  }
+  try {
+    const res = await fetch(url, { headers });
     if (!res.ok) throw new Error(`${res.status}`);
     const json = await res.json();
     return json.message || json;
@@ -72,6 +138,8 @@ function buildCss(theme) {
   --sky: ${theme.sky_color};
   --sand: ${theme.sand_color};
   --border: ${theme.border_color};
+  --panel: #EEF2F6;
+  --paper: #FFFCF8;
   --ink-rgb: ${hexToRgbString(theme.ink_color)};
   --slate-rgb: ${hexToRgbString(theme.slate_color)};
   --canopy-rgb: ${hexToRgbString(theme.canopy_color)};
@@ -80,12 +148,15 @@ function buildCss(theme) {
   --sky-rgb: ${hexToRgbString(theme.sky_color)};
   --sand-rgb: ${hexToRgbString(theme.sand_color)};
   --border-rgb: ${hexToRgbString(theme.border_color)};
+  --panel-rgb: 238 242 246;
+  --paper-rgb: 255 252 248;
   
   /* Additional tokens mapped to CSS vars */
   --radius-lg: ${theme.radius_lg};
   --radius-xl: ${theme.radius_xl};
   --shadow-soft: ${theme.shadow_soft};
   --shadow-strong: ${theme.shadow_strong};
+  --focus-ring: ${theme.focus_ring};
 }
 `;
 }

@@ -13,7 +13,7 @@ def _unique(prefix: str) -> str:
 	return f"{prefix}-{frappe.generate_hash(length=8).lower()}"
 
 
-def _make_category(label=None, slug=None):
+def _make_category(label=None, slug=None, cat_order=None):
 	label = label or _unique("Category")
 	slug = slug or label.lower().replace(" ", "-")
 	return frappe.get_doc(
@@ -21,6 +21,7 @@ def _make_category(label=None, slug=None):
 			"doctype": "Doc Category",
 			"label": label,
 			"slug": slug,
+			"cat_order": cat_order,
 		}
 	).insert()
 
@@ -60,6 +61,30 @@ class TestDocumentation(FrappeTestCase):
 		self.assertEqual(doc.slug, "smoke-test-guide")
 		self.assertTrue(doc.published_on)
 		self.assertEqual(doc.last_edited_by, "Administrator")
+
+	def test_body_md_preserves_custom_authoring_blocks(self):
+		body_md = """# Inquiry
+
+<Callout type="info" title="Why Ifitwala Ed is different">
+Inquiry treats first contact as a real operational workflow, not just a form submission.
+</Callout>
+"""
+
+		with patch("frappe.enqueue"):
+			doc = frappe.get_doc(
+				{
+					"doctype": "Documentation",
+					"title": _unique("Authoring Blocks"),
+					"language": "en",
+					"status": "Published",
+					"body_md": body_md,
+					"author": "CI",
+				}
+			).insert()
+
+		saved_body = frappe.db.get_value("Documentation", doc.name, "body_md")
+		self.assertIn('<Callout type="info" title="Why Ifitwala Ed is different">', saved_body)
+		self.assertIn("</Callout>", saved_body)
 
 	def test_rejects_mismatched_subcategory(self):
 		category = _make_category(_unique("Docs Parent"))
@@ -119,3 +144,105 @@ class TestDocumentation(FrappeTestCase):
 		self.assertEqual(record["tags"], [])
 		self.assertEqual(record["screenshots"], [])
 		self.assertIsNone(record["og_image"])
+
+	def test_fetch_one_orders_screenshots_with_missing_image_order_last(self):
+		category = _make_category()
+		subcategory = _make_subcategory(category.name)
+
+		with patch("frappe.enqueue"):
+			doc = frappe.get_doc(
+				{
+					"doctype": "Documentation",
+					"title": _unique("Screenshot Guide"),
+					"slug": _unique("screenshot-guide"),
+					"language": "en",
+					"status": "Published",
+					"category": category.name,
+					"subcategory": subcategory.name,
+					"summary": "Screenshot ordering",
+					"body_md": "## Ordered screenshots",
+					"author": "QA",
+					"screenshots": [
+						{
+							"anchor_id": "third-shot",
+							"title": "Third",
+							"image": "/files/third-shot.png",
+							"alt_text": "Third screenshot",
+						},
+						{
+							"anchor_id": "second-shot",
+							"title": "Second",
+							"image": "/files/second-shot.png",
+							"image_order": 2,
+							"alt_text": "Second screenshot",
+						},
+						{
+							"anchor_id": "first-shot",
+							"title": "First",
+							"image": "/files/first-shot.png",
+							"image_order": 1,
+							"alt_text": "First screenshot",
+						},
+					],
+				}
+			).insert()
+
+		record = docs_api.fetch_one(language="en", slug=doc.slug)
+		self.assertEqual(
+			[shot["fig"] for shot in record["screenshots"]],
+			["first-shot", "second-shot", "third-shot"],
+		)
+
+	def test_category_endpoints_keep_missing_sort_orders_last(self):
+		ordered_category = _make_category(
+			label=_unique("Zulu Category"),
+			slug=_unique("zulu-category"),
+			cat_order=1,
+		)
+		unordered_category = _make_category(
+			label=_unique("Alpha Category"),
+			slug=_unique("alpha-category"),
+		)
+		subcategory = _make_subcategory(ordered_category.name, _unique("Ordering"))
+
+		with patch("frappe.enqueue"):
+			late_doc = frappe.get_doc(
+				{
+					"doctype": "Documentation",
+					"title": "Alpha Unordered",
+					"slug": _unique("alpha-unordered"),
+					"language": "en",
+					"status": "Published",
+					"category": ordered_category.name,
+					"subcategory": subcategory.name,
+					"summary": "No explicit order",
+					"body_md": "Body",
+					"author": "QA",
+				}
+			).insert()
+			first_doc = frappe.get_doc(
+				{
+					"doctype": "Documentation",
+					"title": "Zulu Ordered",
+					"slug": _unique("zulu-ordered"),
+					"language": "en",
+					"status": "Published",
+					"category": ordered_category.name,
+					"subcategory": subcategory.name,
+					"summary": "Explicit order",
+					"body_md": "Body",
+					"author": "QA",
+					"doc_order": 1,
+				}
+			).insert()
+
+		categories = docs_api.get_categories()
+		category_names = [
+			row["name"]
+			for row in categories
+			if row["name"] in {ordered_category.name, unordered_category.name}
+		]
+		self.assertEqual(category_names, [ordered_category.name, unordered_category.name])
+
+		docs = docs_api.get_docs_in_category(language="en", category_slug=ordered_category.slug)
+		self.assertEqual([row["name"] for row in docs], [first_doc.name, late_doc.name])

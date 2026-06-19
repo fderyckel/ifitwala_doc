@@ -1,0 +1,28 @@
+---
+import type { StorySummary } from '@/lib/siteClient'
+import StoryCard from './StoryCard.astro'
+
+interface Props {
+  title: string
+  intro?: string
+  items: StorySummary[]
+}
+
+const { title, intro = '', items = [] }: Props = Astro.props
+---
+
+{items.length > 0 && (
+  <section class="space-y-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div class="space-y-2">
+        <span class="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-canopy/70">Editorial rail</span>
+        <h2 class="font-serif text-[2rem] leading-tight tracking-[-0.04em] text-ink md:text-[2.35rem]">{title}</h2>
+      </div>
+      {intro && <p class="max-w-2xl text-sm leading-6 text-slate md:text-base">{intro}</p>}
+    </div>
+
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      {items.map((story) => <StoryCard story={story} compact />)}
+    </div>
+  </section>
+)}

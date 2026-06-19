@@ -1,0 +1,54 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-04-13 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_assignment",
+  "default_lead_owner",
+  "source_assignment_rules"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_assignment",
+   "fieldtype": "Section Break",
+   "label": "Lead Assignment"
+  },
+  {
+   "description": "Fallback owner for inbound leads when no source-specific rule matches.",
+   "fieldname": "default_lead_owner",
+   "fieldtype": "Link",
+   "label": "Default Lead Owner",
+   "options": "User"
+  },
+  {
+   "fieldname": "source_assignment_rules",
+   "fieldtype": "Table",
+   "label": "Source Assignment Rules",
+   "options": "Lead Source Assignment Rule"
+  }
+ ],
+ "grid_page_length": 50,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-04-13 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "CRM",
+ "name": "Ifitwala CRM Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

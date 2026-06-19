@@ -6,6 +6,7 @@ import { resolveSectionComponent } from '@/components/site/sections'
 export const prerender = true
 
 const RESERVED_STATIC_ROUTES = new Set([
+  '/about',
   '/book-a-call',
   '/book-a-demo',
   '/data-governance',
@@ -140,6 +141,9 @@ const stackClasses =
   layoutVariant === 'landing'
     ? 'space-y-16 md:space-y-20'
     : 'space-y-12'
+const shouldRenderPageHeader =
+  Boolean(page?.title) &&
+  !(layoutVariant === 'landing' && sections[0]?.type === 'Hero')
 
 function sectionAnchor(label?: string | null, fallback?: string) {
   const source = label || fallback
@@ -178,7 +182,7 @@ if (!hasContent) {
   <div class={`mx-auto w-full max-w-6xl px-6 py-16 md:py-24 ${stackClasses}`}>
     {hasContent ? (
       <>
-        {page?.title && (
+        {shouldRenderPageHeader && (
           <header class="mb-12 text-center md:mb-16">
             <h1 class="text-3xl font-semibold tracking-tight text-ink md:text-4xl">
               {page.title}

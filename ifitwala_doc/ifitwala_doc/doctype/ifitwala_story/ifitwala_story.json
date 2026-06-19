@@ -1,0 +1,281 @@
+{
+  "actions": [],
+  "allow_rename": 1,
+  "autoname": "hash",
+  "creation": "2026-04-15 09:00:00.000000",
+  "doctype": "DocType",
+  "engine": "InnoDB",
+  "field_order": [
+    "section_break_content",
+    "title",
+    "slug",
+    "hero_subtitle",
+    "summary",
+    "column_break_status",
+    "status",
+    "published_on",
+    "story_type",
+    "topic",
+    "featured",
+    "featured_priority",
+    "section_break_author",
+    "author_name",
+    "author_role",
+    "estimated_read_minutes",
+    "cover_image",
+    "cover_image_alt",
+    "section_break_takeaways",
+    "key_takeaways",
+    "section_break_body",
+    "body_md",
+    "section_break_cta",
+    "primary_cta_label",
+    "primary_cta_href",
+    "secondary_cta_label",
+    "secondary_cta_href",
+    "section_break_seo",
+    "seo_title",
+    "seo_description",
+    "canonical_url",
+    "og_image",
+    "noindex"
+  ],
+  "fields": [
+    {
+      "fieldname": "section_break_content",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Title",
+      "reqd": 1
+    },
+    {
+      "fieldname": "slug",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Slug",
+      "reqd": 1,
+      "unique": 1
+    },
+    {
+      "fieldname": "hero_subtitle",
+      "fieldtype": "Small Text",
+      "label": "Hero Subtitle"
+    },
+    {
+      "fieldname": "summary",
+      "fieldtype": "Small Text",
+      "label": "Summary"
+    },
+    {
+      "fieldname": "column_break_status",
+      "fieldtype": "Column Break"
+    },
+    {
+      "default": "Draft",
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "in_standard_filter": 1,
+      "label": "Status",
+      "options": "Draft\nPublished\nArchived"
+    },
+    {
+      "fieldname": "published_on",
+      "fieldtype": "Date",
+      "label": "Published On"
+    },
+    {
+      "default": "What's New",
+      "fieldname": "story_type",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "label": "Story Type",
+      "options": "What's New\nProduct Insight\nSchool Operations\nImplementation Story\nCompany Update"
+    },
+    {
+      "fieldname": "topic",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Topic"
+    },
+    {
+      "default": "0",
+      "fieldname": "featured",
+      "fieldtype": "Check",
+      "in_list_view": 1,
+      "label": "Featured"
+    },
+    {
+      "fieldname": "featured_priority",
+      "fieldtype": "Int",
+      "label": "Featured Priority",
+      "description": "Lower values appear first in featured surfaces."
+    },
+    {
+      "fieldname": "section_break_author",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "author_name",
+      "fieldtype": "Data",
+      "label": "Author Name"
+    },
+    {
+      "fieldname": "author_role",
+      "fieldtype": "Data",
+      "label": "Author Role"
+    },
+    {
+      "description": "Auto-calculated from the story body.",
+      "fieldname": "estimated_read_minutes",
+      "fieldtype": "Int",
+      "label": "Estimated Read Minutes",
+      "read_only": 1
+    },
+    {
+      "fieldname": "cover_image",
+      "fieldtype": "Attach Image",
+      "label": "Cover Image"
+    },
+    {
+      "fieldname": "cover_image_alt",
+      "fieldtype": "Data",
+      "label": "Cover Image Alt Text"
+    },
+    {
+      "fieldname": "section_break_takeaways",
+      "fieldtype": "Section Break",
+      "label": "Key Takeaways"
+    },
+    {
+      "fieldname": "key_takeaways",
+      "fieldtype": "Table",
+      "label": "Key Takeaways",
+      "options": "Ifitwala Story Takeaway"
+    },
+    {
+      "fieldname": "section_break_body",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "body_md",
+      "fieldtype": "Long Text",
+      "label": "Body Markdown",
+      "reqd": 1
+    },
+    {
+      "fieldname": "section_break_cta",
+      "fieldtype": "Section Break",
+      "label": "Calls to Action"
+    },
+    {
+      "fieldname": "primary_cta_label",
+      "fieldtype": "Data",
+      "label": "Primary CTA Label"
+    },
+    {
+      "fieldname": "primary_cta_href",
+      "fieldtype": "Data",
+      "label": "Primary CTA URL",
+      "description": "Accepts either an absolute URL or an internal path such as /book-a-demo/."
+    },
+    {
+      "fieldname": "secondary_cta_label",
+      "fieldtype": "Data",
+      "label": "Secondary CTA Label"
+    },
+    {
+      "fieldname": "secondary_cta_href",
+      "fieldtype": "Data",
+      "label": "Secondary CTA URL",
+      "description": "Accepts either an absolute URL or an internal path such as /platform/."
+    },
+    {
+      "fieldname": "section_break_seo",
+      "fieldtype": "Section Break",
+      "label": "SEO"
+    },
+    {
+      "fieldname": "seo_title",
+      "fieldtype": "Data",
+      "label": "SEO Title"
+    },
+    {
+      "fieldname": "seo_description",
+      "fieldtype": "Small Text",
+      "label": "SEO Description"
+    },
+    {
+      "fieldname": "canonical_url",
+      "fieldtype": "Data",
+      "label": "Canonical URL"
+    },
+    {
+      "fieldname": "og_image",
+      "fieldtype": "Attach Image",
+      "label": "OG Image"
+    },
+    {
+      "default": "0",
+      "fieldname": "noindex",
+      "fieldtype": "Check",
+      "label": "Hide from Search"
+    }
+  ],
+  "grid_page_length": 50,
+  "index_web_pages_for_search": 1,
+  "links": [],
+  "modified": "2026-04-15 09:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "Ifitwala Doc",
+  "name": "Ifitwala Story",
+  "naming_rule": "Random",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    },
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Website Manager",
+      "share": 1,
+      "write": 1
+    },
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Content Editor",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "row_format": "Dynamic",
+  "rows_threshold_for_grid_search": 20,
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": []
+}
