@@ -2,6 +2,7 @@
 import { ArrowRight, BookOpen, Database, GraduationCap, ShieldCheck } from '@lucide/astro'
 import SiteShell from '@/layouts/SiteShell.astro'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
+import { SEO_KEYWORDS, serviceSchema } from '@/lib/seo'
 
 export const prerender = true
 
@@ -11,9 +12,20 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'Education Systems | Ifitwala'
+const title = 'Education ERP, SIS and LMS Implementation | Ifitwala'
 const description =
-  'ERP, SIS, LMS, admissions, reporting, safeguarding workflows, and privacy-aware data operations for education organizations.'
+  'ERP, SIS, LMS, admissions, reporting, safeguarding workflows, and privacy-aware data operations for schools and education organizations.'
+
+const structuredData = [
+  serviceSchema({
+    name: 'Education ERP, SIS, and LMS implementation',
+    description,
+    url: '/en/education/',
+    serviceType: 'Education ERP implementation, SIS implementation, LMS integration, school data governance',
+    audience: 'Schools, school groups, and education organizations',
+    keywords: [...SEO_KEYWORDS, 'student information system', 'school ERP', 'Moodle implementation'],
+  }),
+]
 
 const areas = [
   {
@@ -47,6 +59,9 @@ const areas = [
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <section class="bg-sand/60">
     <div class="mx-auto w-full max-w-6xl px-6 py-16">

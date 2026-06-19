@@ -13,6 +13,7 @@ import {
 import SiteShell from '@/layouts/SiteShell.astro'
 import FeatureHighlightsSection from '@/components/site/FeatureHighlightsSection.astro'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
+import { SEO_KEYWORDS, softwareApplicationSchema } from '@/lib/seo'
 
 export const prerender = true
 
@@ -22,9 +23,18 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'Ifitwala Ed | Education Operations Platform'
+const title = 'Ifitwala Ed | Education ERP for School Operations'
 const description =
-  'Ifitwala Ed is a full education operations platform for admissions, student records, portals, workflows, reporting, and governed school data.'
+  'Ifitwala Ed is an education ERP for school operations, admissions, student records, portals, workflows, reporting, and governed school data.'
+
+const structuredData = [
+  softwareApplicationSchema({
+    name: 'Ifitwala Ed',
+    description,
+    url: '/en/ifitwala-ed/',
+    keywords: [...SEO_KEYWORDS, 'education ERP', 'school ERP', 'student records', 'admissions management'],
+  }),
+]
 
 const featureItems = [
   {
@@ -115,6 +125,9 @@ const audienceSignals = [
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <section class="bg-sand/60">
     <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.85fr)] lg:items-center lg:py-20">

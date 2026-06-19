@@ -12,6 +12,7 @@ import {
   listStories,
   type StorySummary,
 } from '@/lib/siteClient'
+import { SEO_KEYWORDS } from '@/lib/seo'
 
 export const prerender = true
 
@@ -78,9 +79,9 @@ const rails = railSpecs
   .filter((rail) => rail.items.length > 0)
 
 const archiveStories = allStories.filter((story) => story?.slug && !used.has(story.slug))
-const pageTitle = 'Insights | Ifitwala Ed'
+const pageTitle = 'ERP, Frappe, Odoo and Education Systems Insights | Ifitwala'
 const pageDescription =
-  'Product updates, operational thinking, and premium editorial stories from the education platform built for modern institutions.'
+  'Insights on ERP implementation, Frappe, ERPNext, Odoo, education systems, data governance, and operational workflows from Ifitwala.'
 ---
 
 <SiteShell
@@ -91,6 +92,7 @@ const pageDescription =
   settings={settings}
   headerNav={headerNav}
   footerNav={footerNav}
+  keywords={SEO_KEYWORDS.join(', ')}
 >
   <div class="mx-auto flex w-full max-w-7xl flex-col gap-14 px-6 py-14 md:gap-16 md:py-16">
     <section class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">

@@ -10,15 +10,25 @@ import {
   withMarketingDefaults,
   workflowLanes,
 } from '@/lib/marketing'
+import { SEO_KEYWORDS, softwareApplicationSchema } from '@/lib/seo'
 
 export const prerender = true
 
 const rawSettings = await getSiteSettings()
 const settings = withMarketingDefaults(rawSettings)
 
-const pageTitle = 'Platform | Ifitwala Ed'
+const pageTitle = 'Education ERP Platform for School Operations | Ifitwala Ed'
 const pageDescription =
-  'Explore how Ifitwala Ed connects academics, operations, finance, communication, and institutional reporting in one platform.'
+  'Explore how Ifitwala Ed connects academics, operations, finance, communication, admissions, student records, and institutional reporting in one platform.'
+
+const structuredData = [
+  softwareApplicationSchema({
+    name: 'Ifitwala Ed education ERP platform',
+    description: pageDescription,
+    url: '/en/platform/',
+    keywords: [...SEO_KEYWORDS, 'school operations software', 'education ERP platform'],
+  }),
+]
 ---
 
 <SiteShell
@@ -30,6 +40,9 @@ const pageDescription =
   footerNav={marketingFooterNav}
   settings={settings}
   bodyClass="overflow-x-hidden"
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <div class="relative isolate overflow-hidden">
     <div class="absolute inset-x-0 top-0 -z-20 h-[32rem] bg-[radial-gradient(circle_at_top,rgba(232,238,245,0.92),transparent_58%)]"></div>

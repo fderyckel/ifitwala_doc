@@ -11,6 +11,7 @@ import {
 } from '@lucide/astro'
 import SiteShell from '@/layouts/SiteShell.astro'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
+import { SEO_KEYWORDS, serviceSchema } from '@/lib/seo'
 
 export const prerender = true
 
@@ -20,9 +21,18 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'About Ifitwala | ERP, Data Governance, and Education Systems'
+const title = 'About Ifitwala | ERP Implementation for SMEs'
 const description =
-  'Ifitwala helps organizations implement ERP systems, improve workflows, strengthen data governance, and build reliable education operations platforms.'
+  'Ifitwala helps SMEs and schools implement Frappe, ERPNext, Odoo, and education ERP systems with workflow mapping, data governance, and adoption support.'
+
+const structuredData = [
+  serviceSchema({
+    name: 'ERP implementation and data governance consulting',
+    description,
+    url: '/en/about/',
+    serviceType: 'ERP implementation, data governance, workflow analysis, education systems consulting',
+  }),
+]
 
 const serviceAreas = [
   {
@@ -88,6 +98,9 @@ const platformGroups = [
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <section class="bg-sand/60">
     <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center lg:py-24">

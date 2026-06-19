@@ -3,6 +3,25 @@ import { Github, Linkedin, Twitter, Youtube } from '@lucide/astro';
 import '@/styles/global.css';
 import { marked } from 'marked';
 import type { NavItem, SiteSettings } from '@/lib/siteClient';
+import {
+  alternateLinks as buildAlternateLinks,
+  localeLabels,
+  localizeHref,
+  localizeNav,
+  localizeSettings,
+  localizedPath,
+  normalizePath,
+  normalizeLocale,
+  stripLocale,
+  type Locale,
+} from '@/lib/i18n';
+import {
+  breadcrumbSchema,
+  organizationSchema,
+  webPageSchema,
+  websiteSchema,
+  type JsonLd,
+} from '@/lib/seo';
 
 const {
   lang = 'en',
@@ -21,6 +40,8 @@ const {
   keywords = '',
   ogType = 'website',
   ogImageAlt,
+  structuredData = [],
+  availableLocales,
 } = Astro.props as {
   lang?: string;
   title?: string;
@@ -38,29 +59,37 @@ const {
   keywords?: string;
   ogType?: string;
   ogImageAlt?: string;
+  structuredData?: JsonLd | JsonLd[];
+  availableLocales?: string[];
 };
 
+const activeLocale = normalizeLocale(lang) as Locale;
+const localizedSettings = localizeSettings(settings, activeLocale);
+const normalizedAvailableLocales = Array.from(
+  new Set(
+    (Array.isArray(availableLocales) && availableLocales.length ? availableLocales : [activeLocale])
+      .map((locale) => normalizeLocale(locale))
+  )
+);
+if (!normalizedAvailableLocales.includes(activeLocale)) {
+  normalizedAvailableLocales.unshift(activeLocale);
+}
 
 const siteName =
-  typeof settings?.site_name === 'string' && settings.site_name.trim()
-    ? settings.site_name.trim()
+  typeof localizedSettings?.site_name === 'string' && localizedSettings.site_name.trim()
+    ? localizedSettings.site_name.trim()
     : 'Ifitwala';
 const title =
   typeof titleProp === 'string' && titleProp.trim() ? titleProp : siteName;
-const resolvedDescription = description || settings?.tagline || '';
+const resolvedDescription = description || localizedSettings?.tagline || '';
 
 const siteOrigin = Astro.site ? Astro.site.toString() : 'https://ifitwala.com/';
-const canonicalHref =
-  canonical && canonical.startsWith('http')
-    ? canonical
-    : canonical
-    ? new URL(canonical.replace(/^\//, ''), siteOrigin).toString()
-    : undefined;
-const footerHtml = settings?.footer_md ? marked.parse(settings.footer_md) : '';
-const headerItems = Array.isArray(headerNav) ? headerNav : [];
-const footerItems = Array.isArray(footerNav) ? footerNav : [];
-const renderedSocialLinks = Array.isArray(settings?.social_links)
-  ? settings.social_links
+const siteRoot = siteOrigin.endsWith('/') ? siteOrigin : `${siteOrigin}/`;
+const footerHtml = localizedSettings?.footer_md ? marked.parse(localizedSettings.footer_md) : '';
+const headerItems = localizeNav(Array.isArray(headerNav) ? headerNav : [], activeLocale);
+const footerItems = localizeNav(Array.isArray(footerNav) ? footerNav : [], activeLocale);
+const renderedSocialLinks = Array.isArray(localizedSettings?.social_links)
+  ? localizedSettings.social_links
       .map((link: any) => ({
         platform: (link?.platform || '').trim(),
         url: (link?.url || '').trim(),
@@ -69,8 +98,8 @@ const renderedSocialLinks = Array.isArray(settings?.social_links)
       .filter((link: any) => link.url)
   : [];
 
-const sameAs = Array.isArray(settings?.social_same_as)
-  ? settings.social_same_as.filter(
+const sameAs = Array.isArray(localizedSettings?.social_same_as)
+  ? localizedSettings.social_same_as.filter(
       (url: any) => typeof url === 'string' && url.trim()
     )
   : [];
@@ -113,18 +142,20 @@ const HeaderIconComponent = headerIconKey ? iconMap[headerIconKey] : null;
 const footerSocial = renderedSocialLinks.filter((link) => link !== headerLink);
 
 const rawPrimaryCtaLabel =
-  typeof settings?.primary_cta_label === 'string' && settings.primary_cta_label.trim()
-    ? settings.primary_cta_label.trim()
+  typeof localizedSettings?.primary_cta_label === 'string' && localizedSettings.primary_cta_label.trim()
+    ? localizedSettings.primary_cta_label.trim()
     : 'Book a Call';
 const rawPrimaryCtaUrl =
-  typeof settings?.primary_cta_url === 'string' && settings.primary_cta_url.trim()
-    ? settings.primary_cta_url.trim()
+  typeof localizedSettings?.primary_cta_url === 'string' && localizedSettings.primary_cta_url.trim()
+    ? localizedSettings.primary_cta_url.trim()
     : '/book-a-call/';
 const primaryCtaLooksProductOnly = rawPrimaryCtaLabel.toLowerCase().includes('demo');
-const primaryCtaLabel = primaryCtaLooksProductOnly ? 'Book a Call' : rawPrimaryCtaLabel;
+const primaryCtaLooksVague = rawPrimaryCtaLabel.toLowerCase() === 'explore for more';
+const fitCallLabel = activeLocale === 'fr' ? 'Appel de cadrage' : 'Book a fit call';
+const primaryCtaLabel = primaryCtaLooksProductOnly || primaryCtaLooksVague ? fitCallLabel : rawPrimaryCtaLabel;
 const primaryCtaUrl =
-  primaryCtaLooksProductOnly || rawPrimaryCtaUrl.replace(/\/+$/, '') === '/book-a-demo'
-    ? '/book-a-call/'
+  primaryCtaLooksProductOnly || primaryCtaLooksVague || rawPrimaryCtaUrl.replace(/\/+$/, '') === '/book-a-demo'
+    ? localizeHref('/book-a-call/', activeLocale)
     : rawPrimaryCtaUrl;
 
 function absoluteUrl(input?: string | null) {
@@ -156,44 +187,81 @@ const resolvedOgImageAlt =
 const resolvedOgType =
   typeof ogType === 'string' && ogType.trim() ? ogType.trim() : 'website';
 
-let robots: string | undefined;
+let robots = 'index, follow, max-image-preview:large';
 if (noindex || nofollow) {
   const directives: string[] = [];
   directives.push(noindex ? 'noindex' : 'index');
   directives.push(nofollow ? 'nofollow' : 'follow');
   robots = directives.join(', ');
 }
+
+const currentPath = canonical || Astro.url.pathname || '/';
+const shouldLocalizePage = normalizedAvailableLocales.length > 1;
+const canonicalPath = shouldLocalizePage
+  ? localizeHref(stripLocale(currentPath), activeLocale)
+  : normalizePath(stripLocale(currentPath));
+const localizedCanonical =
+  canonical && canonical.startsWith('http')
+    ? canonical
+    : new URL(canonicalPath.replace(/^\//, ''), siteRoot).toString();
+const localizedAlternateLinks =
+  normalizedAvailableLocales.length > 1
+    ? buildAlternateLinks(currentPath, normalizedAvailableLocales).map((link) => ({
+        ...link,
+        href: new URL(link.href.replace(/^\//, ''), siteRoot).toString(),
+      }))
+    : [];
+const localeSwitcherItems = normalizedAvailableLocales.length > 1 ? normalizedAvailableLocales : [];
+
+const providedStructuredData = (Array.isArray(structuredData) ? structuredData : [structuredData]).filter(
+  (item): item is JsonLd => Boolean(item) && typeof item === 'object'
+);
+const graph = [
+  organizationSchema(siteName, localizedSettings?.brand_logo, sameAs),
+  websiteSchema(siteName),
+  webPageSchema({
+    url: localizedCanonical,
+    name: title,
+    description: resolvedDescription,
+    inLanguage: activeLocale,
+  }),
+  breadcrumbSchema(localizedCanonical),
+  ...providedStructuredData,
+].filter(Boolean);
+const graphSchema = {
+  '@context': 'https://schema.org',
+  '@graph': graph,
+};
+const homeHref = shouldLocalizePage ? localizedPath('/', activeLocale) : '/';
 ---
 
 
-<html lang={lang}>
+<html lang={activeLocale}>
   <head>
     <meta charset="utf-8" />
     <title>{title}</title>
     {resolvedDescription && <meta name="description" content={resolvedDescription} />}
     {keywords && <meta name="keywords" content={keywords} />}
-    {canonicalHref && <link rel="canonical" href={canonicalHref} />}
+    {localizedCanonical && <link rel="canonical" href={localizedCanonical} />}
+    {localizedAlternateLinks.map((link) => (
+      <link rel="alternate" hreflang={link.hreflang} href={link.href} />
+    ))}
     {robots && <meta name="robots" content={robots} />}
+    <meta name="author" content={siteName} />
+    <meta name="application-name" content={siteName} />
+    <meta name="theme-color" content="#12563A" />
     <meta property="og:type" content={resolvedOgType} />
+    <meta property="og:site_name" content={siteName} />
+    {localizedCanonical && <meta property="og:url" content={localizedCanonical} />}
     <meta property="og:title" content={resolvedOgTitle} />
     {resolvedOgDescription && <meta property="og:description" content={resolvedOgDescription} />}
     {resolvedOgImage && <meta property="og:image" content={resolvedOgImage} />}
     {resolvedOgImageAlt && <meta property="og:image:alt" content={resolvedOgImageAlt} />}
-    {resolvedOgImage && <meta name="twitter:card" content="summary_large_image" />}
+    <meta name="twitter:card" content={resolvedOgImage ? 'summary_large_image' : 'summary'} />
     {resolvedOgImage && <meta name="twitter:image" content={resolvedOgImage} />}
     {resolvedOgTitle && <meta name="twitter:title" content={resolvedOgTitle} />}
     {resolvedOgDescription && <meta name="twitter:description" content={resolvedOgDescription} />}
-    {sameAs.length ? (
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": siteName,
-          "url": siteOrigin,
-          "sameAs": sameAs,
-        })}
-      </script>
-    ) : null}
+    <script type="application/ld+json" set:html={JSON.stringify(graphSchema)} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
 
@@ -201,11 +269,11 @@ if (noindex || nofollow) {
     <div class="flex min-h-screen flex-col">
       <header class="border-b border-border/60 bg-white/85 backdrop-blur">
         <div class="mx-auto flex w-full flex-col gap-4 px-6 py-5 md:max-w-6xl md:flex-row md:items-center md:justify-between">
-          <a href="/" class="flex items-center gap-3 text-lg font-semibold text-canopy">
-            {settings?.brand_logo ? (
+          <a href={homeHref} class="flex items-center gap-3 text-lg font-semibold text-canopy">
+            {localizedSettings?.brand_logo ? (
               <img
-                src={settings.brand_logo}
-                alt={settings.brand_logo_alt || siteName}
+                src={localizedSettings.brand_logo}
+                alt={localizedSettings.brand_logo_alt || siteName}
                 class="h-11 w-auto rounded-xl border border-border bg-white p-1.5 shadow-sm"
               />
             ) : null}
@@ -244,14 +312,31 @@ if (noindex || nofollow) {
               </a>
             </div>
           ) : null}
-          {primaryCtaLabel && primaryCtaUrl ? (
-            <a
-              href={primaryCtaUrl}
-              class="inline-flex items-center justify-center rounded-md bg-canopy px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/50"
-            >
-              {primaryCtaLabel}
-            </a>
-          ) : null}
+          <div class="flex flex-wrap items-center gap-2">
+            {localeSwitcherItems.length > 1 ? (
+            <div class="inline-flex rounded-md border border-border/70 bg-white/75 p-1 text-xs font-semibold text-slate">
+              {localeSwitcherItems.map((locale) => (
+                <a
+                  href={localizedPath(stripLocale(Astro.url.pathname), locale)}
+                  class={`rounded px-2.5 py-1 transition ${
+                    locale === activeLocale ? 'bg-canopy text-white' : 'hover:bg-moss/40 hover:text-canopy'
+                  }`}
+                  aria-current={locale === activeLocale ? 'page' : undefined}
+                >
+                  {localeLabels[locale]}
+                </a>
+              ))}
+            </div>
+            ) : null}
+            {primaryCtaLabel && primaryCtaUrl ? (
+              <a
+                href={primaryCtaUrl}
+                class="inline-flex items-center justify-center rounded-md bg-canopy px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf/50"
+              >
+                {primaryCtaLabel}
+              </a>
+            ) : null}
+          </div>
         </div>
       </header>
 
@@ -281,7 +366,7 @@ if (noindex || nofollow) {
 
           <div class="mt-6 grid gap-6 md:grid-cols-[minmax(0,2.5fr)_minmax(0,3fr)] md:items-start md:gap-10">
             <div class="space-y-4">
-              {settings?.tagline && <p class="text-sm text-slate">{settings.tagline}</p>}
+              {localizedSettings?.tagline && <p class="text-sm text-slate">{localizedSettings.tagline}</p>}
               {footerSocial.length ? (
                 <nav class="flex flex-wrap items-center gap-3 text-sm text-slate">
                   {footerSocial.map((link) => (
@@ -311,9 +396,14 @@ if (noindex || nofollow) {
                   ))}
                 </nav>
               ) : null}
-        </div>
-        <div class="border-t border-border/60 py-3 text-center text-xs text-slate">
-          © {new Date().getFullYear()} {siteName}. All rights reserved.
+              {footerHtml ? (
+                <div class="prose prose-sm max-w-none text-slate" set:html={footerHtml} />
+              ) : null}
+            </div>
+            <div class="border-t border-border/60 py-3 text-center text-xs text-slate md:border-t-0 md:text-right">
+              © {new Date().getFullYear()} {siteName}. All rights reserved.
+            </div>
+          </div>
         </div>
       </footer>
     </div>

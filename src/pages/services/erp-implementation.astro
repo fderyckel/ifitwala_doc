@@ -9,6 +9,7 @@ import {
 } from '@lucide/astro'
 import SiteShell from '@/layouts/SiteShell.astro'
 import { getNav, getSiteSettings } from '@/lib/siteClient'
+import { SEO_KEYWORDS, faqSchema, serviceSchema } from '@/lib/seo'
 
 export const prerender = true
 
@@ -18,9 +19,44 @@ const [settings, headerNav, footerNav] = await Promise.all([
   getNav('Footer'),
 ])
 
-const title = 'Open-source ERP Implementation | Ifitwala'
+const title = 'Frappe, ERPNext and Odoo Implementation for SMEs | Ifitwala'
 const description =
-  'Open-source ERP implementation for organizations using Frappe, ERPNext, Odoo, LMS platforms, and education operations systems.'
+  'Open-source ERP implementation for SMEs and schools using Frappe, ERPNext, Odoo, HRMS, CRM, LMS, and Moodle, from discovery to migration, UAT, training, and go-live.'
+
+const faqs = [
+  {
+    question: 'Does Ifitwala implement Frappe and ERPNext?',
+    answer:
+      'Yes. Ifitwala implements Frappe Framework applications, ERPNext, and related Frappe tools including HRMS, CRM, LMS, and Helpdesk.',
+  },
+  {
+    question: 'Does Ifitwala support Odoo implementation?',
+    answer:
+      'Yes. Ifitwala supports Odoo implementation projects where organizations need strong workflow mapping, migration planning, permissions design, testing, training, and go-live coordination.',
+  },
+  {
+    question: 'Who is this ERP implementation service for?',
+    answer:
+      'The service is for schools, SMEs, and operational teams that need clearer workflows, cleaner data, better access control, reporting, and adoption support during ERP implementation.',
+  },
+]
+
+const structuredData = [
+  serviceSchema({
+    name: 'Frappe, ERPNext, and Odoo implementation for SMEs and schools',
+    description,
+    url: '/en/services/erp-implementation/',
+    serviceType: 'Open-source ERP implementation',
+    keywords: [
+      ...SEO_KEYWORDS,
+      'Frappe HRMS implementation',
+      'Frappe CRM implementation',
+      'Moodle integration',
+      'ERP go-live support',
+    ],
+  }),
+  faqSchema(faqs, '/en/services/erp-implementation/'),
+]
 
 const steps = [
   {
@@ -73,24 +109,27 @@ const credibilityPoints = [
   headerNav={headerNav}
   footerNav={footerNav}
   settings={settings}
+  keywords={SEO_KEYWORDS.join(', ')}
+  structuredData={structuredData}
+  availableLocales={['en', 'fr']}
 >
   <section class="bg-sand/60">
     <div class="mx-auto w-full max-w-6xl px-6 py-16">
       <div class="max-w-3xl">
         <p class="text-sm font-semibold uppercase text-canopy">Open-source ERP Implementation</p>
         <h1 class="mt-4 text-4xl font-semibold leading-tight text-ink md:text-5xl">
-          ERP implementation for organizations that need systems people actually use.
+          ERP implementation after the workflow is clear.
         </h1>
         <p class="mt-6 text-lg leading-relaxed text-slate">
-          We help organizations implement Frappe, ERPNext, Odoo, LMS platforms, and education operations systems with a practical focus on workflows, data quality, permissions, reporting, and adoption.
+          We help schools and SMEs implement Frappe, ERPNext, Odoo, LMS platforms, and education operations systems with a practical focus on workflows, data quality, permissions, reporting, and adoption.
         </p>
         <div class="mt-8 flex flex-wrap gap-3">
           <a href="/book-a-call/" class="inline-flex items-center gap-2 rounded-md bg-canopy px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-[#0f4a31]">
-            Discuss your implementation
+            Book a 15-minute fit call
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
           <a href="/services/" class="inline-flex items-center gap-2 rounded-md border border-canopy/30 bg-white px-5 py-3 text-sm font-semibold text-canopy transition hover:border-leaf hover:text-leaf">
-            View all services
+            Start with discovery
             <ArrowRight class="h-4 w-4" aria-hidden="true" />
           </a>
         </div>
@@ -193,6 +232,25 @@ const credibilityPoints = [
             </li>
           ))}
         </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-sand/45">
+    <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.85fr_1.15fr]">
+      <div>
+        <p class="text-sm font-semibold uppercase text-canopy">ERP implementation FAQ</p>
+        <h2 class="mt-3 text-3xl font-semibold text-ink">
+          Common questions from SME ERP research.
+        </h2>
+      </div>
+      <div class="grid gap-4">
+        {faqs.map((item) => (
+          <article class="rounded-lg border border-border bg-white p-6 shadow-soft">
+            <h3 class="text-lg font-semibold text-ink">{item.question}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate">{item.answer}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>
